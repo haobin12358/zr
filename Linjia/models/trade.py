@@ -108,3 +108,20 @@ class UserCleanTrade(Base):
     UCTtruestarttime = Column(String(16), comment=u'实际上门时间')
     UCTtrueendtime = Column(String(16), comment=u'工作人员离开时间')
     UCTtrueprice = Column(Float, comment=u'实际价格')
+
+
+class HomeStayComment(Base):
+    """公寓评论和评分"""
+    __tablename__ = 'homestaycomment'
+    HSCid = Column(String(64), primary_key=True)
+    HSid = Column(String(64), nullable=False, comment=u'民宿id')
+    USid = Column(String(64), nullable=False, comment=u'评论用户')
+    USname = Column(String(16), nullable=False, comment=u'评论用户昵称')
+    HSCsleeptime = Column(String(16), comment=u'入住时间')
+    HSCcleanscore = Column(Float, default=5.0, comment=u'整洁卫生评分')
+    HSCdescripscore = Column(Float, default=5.0, comment=u'描述相符')
+    HSCimpressionscore = Column(Float, default=5.0, comment=u'房东印象评分')
+    HSCtrafficscore = Column(Float, default=5.0, comment=u'交通位置评分')
+    HSCperformancescore = Column(Float, default=5.0, comment=u'性价比评分')
+    HStext = Column(String(255), comment=u'评论内容')
+

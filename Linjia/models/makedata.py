@@ -55,6 +55,8 @@ class Dbcreater(object):
     def create_room(self):
         from Linjia.models import Room
         self.alread_sent = []
+        self.hezu = []
+        self.zhengzu = []
         for index, id in enumerate(self.roomid):
             room = Room()
             room.ROid = id
@@ -77,8 +79,13 @@ class Dbcreater(object):
             if room.ROstatus == 5:
                 self.alread_sent.append(room.ROid)
             room.ROcitynum = random.randint(1, 100)
+            if room.ROrenttype == 0:
+                self.hezu.append(id)
+            if room.ROrenttype == 1:
+                self.zhengzu.append(id)
             self.session.add(room)
             self.session.commit()
+
 
     def create_house(self):
         from  Linjia.models  import House
@@ -209,6 +216,8 @@ class Dbcreater(object):
             userroom.URendtime = '20180000'
             self.session.add(userroom)
             self.session.commit()
+
+
 
 
 

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from datetime import date
 
+from flask_cors import CORS
 from flask import Flask as _Flask, Response
 from werkzeug.exceptions import HTTPException
 
-from Linjia.apis.v1 import AUser, ARoom
+from Linjia.apis.v1 import AUser, ARoom, AIndex
 from Linjia.apis.v1.verify_wechat import register_blueprint
 from flask.json import JSONEncoder as _JSONEncoder
 from Linjia.commons.error_response import error_handler
@@ -31,7 +32,8 @@ class JSONEncoder(_JSONEncoder):
             raise o()
         if isinstance(o, HTTPException):
             raise o
-        raise Exception()
+        # raise Exception()
+        raise TypeError(repr(o) + " is not JSON serializable")
 
 
 class Flask(_Flask):
@@ -42,6 +44,7 @@ def register_route(app):
     # register_blueprint(app)
     app.add_url_rule('/user/<string:user>/', view_func=AUser.as_view('user'))
     app.add_url_rule('/room/<string:room>/', view_func=ARoom.as_view('room'))
+    app.add_url_rule('/index/<string:index>/', view_func=AIndex.as_view('index'))
 
 
 def create_app():
@@ -51,5 +54,6 @@ def create_app():
     print(app.debug)
     if not app.debug:
         error_handler(app)
+    CORS(app, supports_credentials=True)
     request_first_handler(app)
     return app

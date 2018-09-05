@@ -135,15 +135,6 @@ class RoomEquirment(Base):
     REsort = Column(Integer, comment=u'顺序标志')
 
 
-class RoomIndexShow(Base):
-    """首页展示中的房源(整租/合租)列表"""
-    __tablename__ = 'roomindexshow'
-    RISid = Column(String(64), primary_key=True)
-    ROid = Column(String(64), nullable=False, comment=u'房源id')
-    ROtype = Column(Integer, comment=u'显示位置 0: 合租, 1: 整租')
-    ROsort = Column(Integer, comment=u'位置标志')
-
-
 class RoomPayPrice(Base):
     """价格信息"""
     __tablename__ = 'roomprice'
@@ -239,20 +230,13 @@ class ApartmentAquirment(Base):
     AAsort = Column(Integer, comment=u'顺序标志')
 
 
-class APartmentIndexShow(Base):
-    """公寓首页显示"""
-    __tablename__ = 'apartmentindexshow'
-    AISid = Column(String(64), primary_key=True)
-    APid = Column(String(64), nullable=False, comment=u'公寓id')
-    AISsort = Column(Integer, comment=u'顺序标志')
-
-
 # 民宿
 class HomeStay(Base):
     """民宿"""
     __tablename__ = 'homestay'
     HSid = Column(String(64), primary_key=True)
     HSname = Column(String(16), nullable=False, comment=u'名字')
+    HSimage = Column(String(255), comment=u'主图')
     HScitynum = Column(String(16), comment=u'城市编号')
     Hsrentwayname = Column(String(16), default=u'独立房间', comment=u'出租方式')
     HSpersoncount = Column(Integer, default=2, comment=u'可住人数')
@@ -283,21 +267,6 @@ class HomeStayBed(Base):
     HSBname = Column(Integer, comment=u'床名字, 如: 双人床')
     HSBtype = Column(Integer, default=2, comment=u'床类型: 1: 单人床, 2: 双人床')
 
-
-class HomeStayComment(Base):
-    """评论和评分"""
-    __tablename__ = 'homestaycomment'
-    HSCid = Column(String(64), primary_key=True)
-    HSid = Column(String(64), nullable=False, comment=u'民宿id')
-    USid = Column(String(64), nullable=False, comment=u'评论用户')
-    USname = Column(String(16), nullable=False, comment=u'评论用户昵称')
-    HSCsleeptime = Column(String(16), comment=u'入住时间')
-    HSCcleanscore = Column(Float, default=5.0, comment=u'整洁卫生评分')
-    HSCdescripscore = Column(Float, default=5.0, comment=u'描述相符')
-    HSCimpressionscore = Column(Float, default=5.0, comment=u'房东印象评分')
-    HSCtrafficscore = Column(Float, default=5.0, comment=u'交通位置评分')
-    HSCperformancescore = Column(Float, default=5.0, comment=u'性价比评分')
-    HStext = Column(String(255), comment=u'评论内容')
 
 
 class HomeStayPic(Base):
@@ -331,6 +300,8 @@ class HomeStayReserve(Base):
     HSRstartliveingtime = Column(String(16), comment=u'入住时间')
     HSRleavingtime = Column(String(16), default=u'12点之前', comment=u'退房时间')
     HSRservice = Column(String(32), comment=u'服务, 如可做饭')
+# 驿站, 自如驿
+
 
 
 class Question(Base):
@@ -341,7 +312,6 @@ class Question(Base):
     QUanswer = Column(Text, nullable=False, comment=u'回答')
     QUisshow = Column(Boolean, default=True, comment=u'是否显示')
     QUsort = Column(Integer, comment=u'顺序标志')
-
 
 
 if __name__ == '__main__':
