@@ -3,14 +3,15 @@ from flask import request
 
 from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
-from Linjia.configs.enums import FACE_CONFIG, PAY_PERIOD, HYTING_TYPE
+from Linjia.configs.enums import FACE_CONFIG, PAY_PERIOD, HYTING_TYPE, GENDER_CONFIG, RENT_TYPE
 from Linjia.configs.messages import get_room_list_success
-from Linjia.service import SRoom
+from Linjia.service import SRoom, SUser
 
 
 class CRoom(object):
     def __init__(self):
         self.sroom = SRoom()
+        self.suser = SUser()
 
     def get_list(self):
         args = request.args.to_dict()
@@ -46,9 +47,9 @@ class CRoom(object):
             k: v for k, v in args_dict.items() if v is not None
         }
         room_detail_list = self.sroom.get_room_list_filter(args_dict)
-        map(self.fill_detail_for_list, room_detail_list)
-        map(self.fill_features, room_detail_list)
-        map(self.fill_house_info, room_detail_list)
+        map(self._fill_detail_for_list, room_detail_list)
+        map(self._fill_features, room_detail_list)
+        map(self._fill_house_info, room_detail_list)
         data = Success(get_room_list_success, data=room_detail_list)
         return data
 
@@ -56,29 +57,30 @@ class CRoom(object):
         data = parameter_required('roid')
         roid = data.get('roid')
         room = self.sroom.get_room_by_roid(roid)
-        self.fill_price_detail(room)
-        self.fill_features(room)
-        self.fill_subdiary_info(room)
-        self.fill_house_info(room)
+        room.ROface = FACE_CONFIG[int(room.ROface)]
+        room.ROrenttype = RENT_TYPE.get(int(room.ROrenttype), u'未知')
+        self._fill_price_detail(room)
+        self._fill_features(room)
+        self._fill_subdiary_info(room)
+        self._fill_house_info(room)
+        self._fill_roomate_info(room)
         return Success('获取房源信息成功', room)
 
-    def fill_detail_for_list(self, room):
+    def _fill_detail_for_list(self, room):
         """调整返回列表的格式"""
         room_respose_fields = ['ROid', 'ROname', 'ROarea', 'face',
                                'ROdistance', 'ROshowpriceunit',
                                'ROprice', 'ROimage', 'ROrenttype', 'ROpersoncount']
         room.fields = room_respose_fields
         room.face = FACE_CONFIG.get(int(room.ROface), u'未知')
+        room.ROrenttype = RENT_TYPE.get(int(room.ROrenttype), u'未知')
         if room.ROstatus == 3:
             room.ROname = u'转' + room.ROname
         # 价格
-        roompayprice = self.sroom.get_price_by_roidandperid(room.ROid, room.ROshowpricetype)
-        room.ROprice = str(room.ROshowprice) + u'元' + room.ROshowpriceunit \
-            if room.ROshowprice else str(roompayprice.RPPprice) +\
-                                        roompayprice.RPPpriceUnit
+        self._fill_show_price(room)
         return room
 
-    def fill_features(self, room):
+    def _fill_features(self, room):
         roid = room.ROid
         features = self.sroom.get_features_by_roid(roid)
         features.hide('ROid', 'RFid')
@@ -87,7 +89,15 @@ class CRoom(object):
         room.add('ROfeatures')
         return room
 
-    def fill_price_detail(self, room):
+    def _fill_show_price(self, room):
+        roompayprice = self.sroom.get_price_by_roidandperid(room.ROid, room.ROshowpricetype)
+        room.ROprice = str(room.ROshowprice) + u'元' + room.ROshowpriceunit \
+            if room.ROshowprice else str(roompayprice.RPPprice) + \
+                                     roompayprice.RPPpriceUnit
+        room.add('ROprice')
+        return room
+
+    def _fill_price_detail(self, room):
         roid = room.ROid
         price_list = self.sroom.get_price_by_roid(roid)
         map(lambda x: x.hide('ROid', 'RPPid'), price_list)
@@ -96,7 +106,7 @@ class CRoom(object):
         room.add('price_list')
         return room
 
-    def fill_house_info(self, room):
+    def _fill_house_info(self, room):
         hoid = room.HOid
         house = self.sroom.get_house_by_hoid(hoid)
         house.size = str(house.HObedroomcount) + u'室' + str(house.HOparlorcount) + u'厅'
@@ -105,11 +115,12 @@ class CRoom(object):
         room.fill(house, 'house')  # room.house = house
         return room
 
-    def fill_subdiary_info(self, room):
+    def _fill_subdiary_info(self, room):
         """填充配套信息(包括图片获取)"""
         hoid = room.HOid
         roid = room.ROid
         subdiary_list = self.sroom.get_subdiaryinfo_by_hoid(hoid)
+        map(lambda x: setattr(x, 'RSIface', FACE_CONFIG[int(x.RSIface)]), subdiary_list)
         map(lambda x: x.fill(self.sroom.get_subdiaryequirment_by_hsiid(x.HSIid), 'equirment'), subdiary_list)
         # 如果是合租
         if room.ROrenttype == 0:
@@ -129,3 +140,31 @@ class CRoom(object):
         house.floor = str(house.HOfloor) + '/' + str(house.HOtotalfloor) + u'层'
         room.add('house').house = house
         return room
+
+    def _fill_release_info(self, room):
+        """填充轉租"""
+        if room.ROstatus == 3:
+            room.ROname = u'转' + room.ROname
+
+    def _fill_roomate_info(self, room):
+        """填充室友信息(合租)"""
+        hoid = room.HOid
+        if room.ROstatus != 0:
+            return
+        # 该house下的所有room
+        rooms_in_same_house = self.sroom.get_bedroom_by_hoid(hoid)
+        for room_in_same_house in rooms_in_same_house:
+            # 如果未租出(或者正在转租), 参数有: 卧室名,价格,状态
+            # 如果已经租出, 参数有: 卧室名, 性别, 状态, 星座.
+            if room_in_same_house.ROstatus <= 3:  # 0: 待审核, 1: 配置中(可预订), 2: 可入住, 3: 转租
+                room_in_same_house.fields = ['ROid', 'ROnum', 'ROshowprice', 'ROshowpriceunit']
+                self._fill_show_price(room_in_same_house)
+            elif room_in_same_house.ROstatus == 5: # 已经租出
+                room_in_same_house.fields = ['ROnum']
+                user = self.suser.get_user_by_roid(room_in_same_house.ROid)
+                user.fields = ['USgender', 'USstar']
+                user.USgender = GENDER_CONFIG[int(user.USgender)]
+                room_in_same_house.fill(user, 'user')
+            room.fill(rooms_in_same_house, 'rooms_in_same_house')
+
+

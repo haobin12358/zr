@@ -43,10 +43,9 @@ class SRoom(SBase):
         if 'filter_type_list' in kwargs:
             filter_type_list = kwargs.get('filter_type_list')
             renttype_list = [and_(
-                *filter(lambda x: x.right.value != 0, [
                     Room.ROrenttype == int(ROrenttype),
-                    Room.ROpersoncount == int(ROpersoncount)
-                ])
+                    *filter(lambda x: x.right.value != 0, [Room.ROpersoncount == int(ROpersoncount)])
+
             ) for ROrenttype, ROpersoncount in filter_type_list]
             all_room = all_room.filter(or_(*renttype_list))
         if 'lowprice' in kwargs:
@@ -121,3 +120,9 @@ class SRoom(SBase):
     def get_house_by_roid(self, roid):
         """获取house"""
         return self.session.query(House).filter_by(ROid=roid).all()
+
+    @close_session
+    def get_bedroom_by_hoid(self, hoid):
+        """获取通过house下的room, (仅用于合租)"""
+        return self.session.query(Room).filter_by(HOid=hoid).all()
+

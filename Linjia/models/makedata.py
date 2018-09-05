@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
-<<<<<<< HEAD
-import math
-=======
->>>>>>> 0f19df1d6af248c0c0a107eec8059ab537faf05f
 import random
 import uuid
 
 from sqlalchemy.orm import scoped_session, sessionmaker
+from werkzeug.security import generate_password_hash
 
 from Linjia.commons import base_model as model
 from Linjia.commons.base_model import Base
 INFO_COUNT = 20
-<<<<<<< HEAD
 all_icos = {
     'ico1': '热水机',
     'ico2': '双开门衣柜',
@@ -20,9 +16,7 @@ all_icos = {
     'ico5': '路由器',
     'ico6': '华莱士'
 }
-=======
 
->>>>>>> 0f19df1d6af248c0c0a107eec8059ab537faf05f
 def create_table():
     Base.metadata.create_all(model.mysql_engine)
 
@@ -32,10 +26,7 @@ def drop_table():
 
 
 class Dbcreater(object):
-<<<<<<< HEAD
 
-=======
->>>>>>> 0f19df1d6af248c0c0a107eec8059ab537faf05f
     def __init__(self):
         self.session = scoped_session(sessionmaker(autocommit=False, autoflush=False,  bind=model.mysql_engine))
         self.roomid = self.generic_uuid(INFO_COUNT * 5)
@@ -44,37 +35,47 @@ class Dbcreater(object):
         self.sn = [str(x) for x in range(100)]
         self.roomfeatureid = self.generic_uuid(INFO_COUNT * 5)
         self.roompriceid = self.generic_uuid(INFO_COUNT * 15)
+        self.userid = self.generic_uuid(INFO_COUNT)
 
     def generic_uuid(self, info_count=INFO_COUNT):
         return [str(uuid.uuid4()) for _ in range(info_count)]
 
     def create_user(self):
-        from . import User
+        from Linjia.models import User
+        for id in self.userid:
+            user = User()
+            user.USid = id
+            user.USnickname = 'usernickname'
+            user.USgender = random.choice([1, 0])
+            user.USstar = random.choice(['大熊做', '小熊做', '金羊做', '白卖座'])
+            user.USpassword = generate_password_hash('pass')
+            self.session.add(user)
+            self.session.commit()
 
     def create_room(self):
         from Linjia.models import Room
-        for id in self.roomid:
+        self.alread_sent = []
+        for index, id in enumerate(self.roomid):
             room = Room()
             room.ROid = id
             room.HOid = random.choice(self.houseid)
             room.ROname = '这是房源的名字' + str(id)
             room.ROarea = random.randint(20, 150)
-<<<<<<< HEAD
             room.ROimage = 'http://www.thisisimage/fjdl' + str(random.randint(222222, 333333)) + '.png'
             room.ROface = random.randint(0, 8)
             room.ROdistance = '距离' + str(random.randint(3, 10)) + '号线' + str(random.randint(2, 10)) + '米'
-=======
             room.ROface = random.randint(0, 8)
             room.ROdistance = '这是距离描述还不错' + id[5]
->>>>>>> 0f19df1d6af248c0c0a107eec8059ab537faf05f
-            room.ROshowpricetype = random.randint(0, 3)
+            room.ROshowpricetype = 1  # 季
             room.ROrenttype = random.randint(0, 3)
             room.ROsubwayaround = random.choice([True, False])
             if room.ROrenttype == 0:
                 room.ROnum = random.randint(1, 4)
             room.ROpersoncount = random.randint(1, 5)
             room.ROintro = '这是房源的描述非常好' + id
-            room.ROstatus = random.choice([1, 3])
+            room.ROstatus = random.choice([0, 5])
+            if room.ROstatus == 5:
+                self.alread_sent.append(room.ROid)
             room.ROcitynum = random.randint(1, 100)
             self.session.add(room)
             self.session.commit()
@@ -153,7 +154,6 @@ class Dbcreater(object):
             self.session.add(roomsigninfo)
             self.session.commit()
 
-<<<<<<< HEAD
     def create_subdiry_info(self):
         from Linjia.models import HouseSubsidiaryInfo
         choice = ['起居室', '卫生间', '厨房', '户型', '恩行']
@@ -197,8 +197,18 @@ class Dbcreater(object):
             self.session.add(rq)
             self.session.commit()
 
-=======
->>>>>>> 0f19df1d6af248c0c0a107eec8059ab537faf05f
+
+    def create_user_room(self):
+        from Linjia.models import UserRoom
+        for id in self.alread_sent:
+            userroom = UserRoom()
+            userroom.URid = id
+            userroom.USid = random.choice(self.userid)
+            userroom.ROid = id
+            userroom.URstarttime = '201700000'
+            userroom.URendtime = '20180000'
+            self.session.add(userroom)
+            self.session.commit()
 
 
 
@@ -208,16 +218,15 @@ if __name__ == '__main__':
     drop_table()
     create_table()
     creater = Dbcreater()
+    creater.create_user()
     creater.create_room()
     creater.creat_villege()
     creater.create_house()
     creater.create_roomfeature()
     creater.create_roomprice()
     creater.create_signinfo()
-<<<<<<< HEAD
     creater.create_subdiry_info()
     creater.create_equirment()
-=======
->>>>>>> 0f19df1d6af248c0c0a107eec8059ab537faf05f
+    creater.create_user_room()
 
 

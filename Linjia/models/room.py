@@ -23,7 +23,7 @@ class Room(Base):
     ROnum = Column(Integer, comment=u'卧室号')  # 合租才有值
     ROpersoncount = Column(Integer, comment=u'可居几人, x居室')
     ROintro = Column(String(64), comment=u'房源介绍')
-    ROstatus = Column(Integer, default=0, comment=u'房源状态, 0: 待审核, 1: 配置中(可预订), 2: 可入住, 3: 转租, 4: 实习, 5, ?')
+    ROstatus = Column(Integer, default=0, comment=u'房源状态, 0: 待审核, 1: 配置中(可预订), 2: 可入住, 3: 转租, 4: 实习, 5, 已租出')
     ROisdelete = Column(Boolean, default=False, comment=u'是否删除')
     ROcreatetime = Column(String(16), comment=u'创建时间')
     ROcitynum = Column(String(64), comment=u'城市编号, 冗余字段')
