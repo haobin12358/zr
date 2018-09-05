@@ -19,6 +19,7 @@ class APartmentIndexShow(Base):
     AISid = Column(String(64), primary_key=True)
     APid = Column(String(64), nullable=False, comment=u'公寓id')
     AISsort = Column(Integer, comment=u'顺序标志')
+    AIsubtitle = Column(String(64), comment=u'描述,比如欢乐工厂lof之寓')
 
 
 class HomeStayIndexShow(Base):
