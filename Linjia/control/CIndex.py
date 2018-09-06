@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import uuid
 
-from Linjia.commons.error_response import AUTHORITY_ERROR
+from Linjia.commons.error_response import AUTHORITY_ERROR, NOT_FOUND
 from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_required import is_admin
@@ -31,7 +31,6 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         map(self._fill_room_simple, whole_rent_show_list)
         map(self._fill_apartment_simple, apartment_show_list)
         map(self._fill_homestay_simple, homestay_show_list)
-        map(lambda x: x.hide('SISid'), server_show_list)  # 隐藏无用id
         data = dict(
             join_rent=join_rent_show_list,  # 合租
             whole_rent=whole_rent_show_list,  # 整租
@@ -85,9 +84,25 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             'hsiid': data['HSIid']
         })
 
+    def delete_banner_show(self):
+        if not is_admin():
+            raise AUTHORITY_ERROR('请使用管理员登录')
+        data = parameter_required('ibid')
+        banner = self.sindex.delete_banner_show_by_ibid(data.get('ibid'))
+        message = u'删除成功' if banner else u'要删除的元素不存在'
+        return Success(message, {
+            'ibid': data.get('ibid')     
+        })
 
-
-
-
+    def delete_joinrent_show(self):
+        """删除首页显示的整租或合租房源"""
+        if not is_admin():
+            raise AUTHORITY_ERROR('请使用管理员登录')
+        data = parameter_required('risid')
+        room_index_show = self.sindex.delete_room_show_by_risid(data.get('risid'))
+        message = u'删除成功' if room_index_show else u'要删除的对象不存在'
+        return Success(message, {
+            'risid': data.get('risid')
+        })
 
 

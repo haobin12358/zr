@@ -23,6 +23,7 @@ class AIndex(Resource):
             'add_room_show': self.cindex.add_room_show,
             'add_apartment_show': self.cindex.add_apartment_show,
             'add_homestay_show': self.cindex.add_homestay_show,
+            'delete_banner_show': self.cindex.delete_banner_show,
         }
         res = apis[index]()
         return jsonify(res)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from Linjia.configs.enums import FACE_CONFIG, RENT_TYPE, HYTING_TYPE, GENDER_CONFIG, PAY_PERIOD
+from Linjia.commons.error_response import NOT_FOUND
 
 
 class BaseRoomControl(object):
@@ -116,6 +117,7 @@ class BaseIndexControl(object):
         # 下一句等同于: rent_show.ROid = room.ROid; rent_show.ROname = room.ROname....
         map(lambda x: setattr(rent_show, x, getattr(room, x)), show_fields)
         rent_show.fields = show_fields
+        rent_show.add('RISid')
         return room
 
     def _fill_apartment_simple(self, apartment_show):
@@ -124,7 +126,7 @@ class BaseIndexControl(object):
         apartment = self.sapartment.get_apartment_by_apid(apid)
         if not apartment:
             raise NOT_FOUND(u'没有这个公寓' + apid)
-        apartment_show.fill(apartment.APname, 'name').hide('AISid')
+        apartment_show.fill(apartment.APname, 'name')
 
     def _fill_homestay_simple(self, homestay_show):
         """填充民宿的价格, 名字, 图片, 出租方式, 城市"""
