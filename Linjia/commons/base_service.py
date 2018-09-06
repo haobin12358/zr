@@ -14,7 +14,7 @@ def get_session():
         session = db_session()
         status = True
     except Exception as e:
-        print e.message
+        print(e.message)
         session = None
         status = False
     finally:
@@ -55,6 +55,16 @@ class SBase(object):
             print("model name = {0} error ".format(model_name))
             return
         model_bean = eval(" models.{0}()".format(model_name))
+        model_bean_key = model_bean.__table__.columns.keys()
+        model_bean_key_without_line = list(map(lambda x: x.strip('_'), model_bean_key))
+        lower_table_key = list(map(lambda x: x.lower().strip('_'), model_bean_key))  # 数据库的字段转小写
+        for item_key in kwargs.keys():
+            if item_key.lower() in lower_table_key:  # 如果json中的key同时也存在与数据库的话
+                # 找到此key在model_beankey中的位置
+                index = lower_table_key.index(item_key.lower())
+                if kwargs.get(item_key) is not None:  # 如果传入的字段有值
+                    setattr(model_bean, model_bean_key_without_line[index], kwargs.get(item_key))
+
         for key in model_bean.__table__.columns.keys():
             if key in kwargs:
                 setattr(model_bean, key, kwargs.get(key))
