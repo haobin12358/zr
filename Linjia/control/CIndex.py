@@ -95,7 +95,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             'ibid': data.get('ibid')     
         })
 
-    def delete_joinrent_show(self):
+    def delete_room_show(self):
         """删除首页显示的整租或合租房源"""
         if not is_admin():
             raise AUTHORITY_ERROR('请使用管理员登录')
@@ -106,4 +106,35 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             'risid': data.get('risid')
         })
 
+    def delete_apartment_show(self):
+        """删除首页显示的公寓"""
+        if not is_admin():
+            raise AUTHORITY_ERROR("请使用管理员登录")
+        data = parameter_required('aisid')
+        apartment_index_show = self.sindex.delete_apartment_show_by_aisid(data.get('aisid'))
+        message = u'删除成功' if apartment_index_show else u'要删除的对象不存在'
+        return Success(message, {
+            'aisid': data.get('aisid')     
+        })
 
+    def delete_homestay_show(self):
+        """删除首页显示的民宿"""
+        if not is_admin():
+            raise AUTHORITY_ERROR("请使用管理员登录")
+        data = parameter_required('hsiid')
+        homestay_index_show = self.sindex.delete_homestay_show_by_hsiid(data.get('hsiid'))
+        message = u'删除成功' if homestay_index_show else u'要删除的对象不存在'
+        return Success(message, {
+            'hsiid': data.get('hsiid')
+        })
+
+    def delete_server_index_show(self):
+        """删除首页显示的服务"""
+        if not is_admin():
+            raise AUTHORITY_ERROR('请使用管理员登录')
+        data = parameter_required('sisid')
+        server_index_show = self.sindex.delete_server_index_show(data.get('sisid'))
+        message = u'删除成功' if server_index_show else u'要删除的对象不存在'
+        return Success(message, {
+            'sisid': data.get('sisid')
+        })
