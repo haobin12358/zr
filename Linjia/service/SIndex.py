@@ -39,4 +39,4 @@ class SIndex(SBase):
     @close_session
     def delete_room_show_by_risid(self, risid):
         """删首页显示的显示的房源"""
-        return = self.session.query(RoomIndexShow).filter_by(RISid=risid).delete()
+        return self.session.query(RoomIndexShow).filter_by(RISid=risid).delete()

@@ -85,6 +85,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         })
 
     def delete_banner_show(self):
+        """删除轮播"""
         if not is_admin():
             raise AUTHORITY_ERROR('请使用管理员登录')
         data = parameter_required('ibid')
