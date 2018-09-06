@@ -7,6 +7,8 @@ from werkzeug.security import generate_password_hash
 
 from Linjia.commons import base_model as model
 from Linjia.commons.base_model import Base
+from Linjia.models import Admin
+
 INFO_COUNT = 20
 all_icos = {
     'ico1': '热水机',
@@ -244,7 +246,14 @@ class Dbcreater(object):
                 self.session.add(c)
                 self.session.commit()
 
-
+    def creat_admin(self):
+        admin = Admin()
+        admin.ADid = str(uuid.uuid4())
+        admin.ADname = '宝强'
+        admin.ADusername = 'user'
+        admin.ADpassword = generate_password_hash('pass')
+        self.session.add(admin)
+        self.session.commit()
 
 if __name__ == '__main__':
     # drop_table()
@@ -260,6 +269,7 @@ if __name__ == '__main__':
     # creater.create_subdiry_info()
     # creater.create_equirment()
     # creater.create_user_room()
-    creater.create_cit()
+    # creater.create_cit()
+    creater.creat_admin()
 
  

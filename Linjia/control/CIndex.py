@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import uuid
 
-from Linjia.commons.error_response import NOT_FOUND
+from Linjia.commons.error_response import AUTHORITY_ERROR
 from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
+from Linjia.commons.token_required import is_admin
 from Linjia.control.base_control import BaseRoomControl, BaseIndexControl
 from Linjia.service import SIndex, SRoom, SApartment, SHomeStay, SCity
 
@@ -41,13 +42,49 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         return Success('获取成功', data)
 
     def add_banner(self):
-        """新建轮播图, 需要图片地址, 顺序标志, 链接"""
+        """新建轮播图, 必要的参数: 图片地址, 顺序标志, 链接"""
+        if not is_admin():
+            raise AUTHORITY_ERROR('请使用管理员登录')
         data = parameter_required('ibimage', 'iblink', 'ibsort')
         data['IBid'] = str(uuid.uuid4())
         self.sindex.add_model('IndexBanner', **data)
         return Success(u'添加成功', {
             'ibid': data['IBid']
         })
+
+    def add_room_show(self):
+        """新建首页显示的合租整租, 必要的参数 房源id, type, 和顺序: """
+        if not is_admin():
+            raise AUTHORITY_ERROR('请使用管理员登录')
+        data = parameter_required('roid', 'rotype', 'rosort')
+        data['RISid'] = str(uuid.uuid4())
+        self.sindex.add_model('RoomIndexShow', **data)
+        return Success(u'添加成功', {
+            'risid': data['RISid']
+        })
+
+    def add_apartment_show(self):
+        """新建首页显示的公寓, 必要的参数有:公寓id, 顺序标志, 非必需参数有: 描述 """
+        if not is_admin():
+            raise AUTHORITY_ERROR('请使用管理员登录')
+        data = parameter_required('apid', 'aisort')
+        data['AISid'] = str(uuid.uuid4())
+        self.sindex.add_model('APartmentIndexShow', **data)
+        return Success(u'添加成功', {
+            'aisid': data['AISid']
+        })
+
+    def add_homestay_show(self):
+        """新建首页显示民宿, 必要的参数有民宿id和顺序标志"""
+        if not is_admin():
+            raise AUTHORITY_ERROR('请使用管理员登录')
+        data = parameter_required('hsid', 'hsisort')
+        data['HSIid'] = str(uuid.uuid4())
+        self.sindex.add_model('HomeStayIndexShow', **data)
+        return Success(u'添加成功', {
+            'hsiid': data['HSIid']
+        })
+
 
 
 

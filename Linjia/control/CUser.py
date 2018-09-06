@@ -4,6 +4,8 @@ import uuid
 import requests
 from flask import request, redirect
 
+from Linjia.commons.error_response import NOT_FOUND
+from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_required import usid_to_token
 from Linjia.configs.messages import get_token_success
@@ -51,6 +53,26 @@ class CUser():
             'token': token
         }
         return Success(get_token_success, data)
+
+    def admin_login(self):
+        """管理员登录"""
+        data = parameter_required('username', 'password')
+        username = data.get('username')
+        password = data.get('password')
+        admin = self.suser.verify_admin_login(username, password)
+        if not admin:
+            raise NOT_FOUND(u'用户名或者密码错误')
+        level = admin.ADlevel  # 管理员等级
+        token = usid_to_token(admin.ADid, 'Admin')
+        return Success(u'获取token成功', {
+            'token': token,
+            'level': level
+        })
+
+
+    def add_admin(self):
+        pass
+
 
     @staticmethod
     def generic_user_info_by_wechat(userinfo):

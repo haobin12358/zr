@@ -17,3 +17,10 @@ class AUser(Resource):
         }
         res = apis[user]()
         return jsonify(res)
+
+    def post(self, user):
+        apis ={
+            'admin_login': self.cuser.admin_login
+        }
+        res = apis[user]()
+        return jsonify(res)

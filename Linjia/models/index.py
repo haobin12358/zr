@@ -9,7 +9,7 @@ class RoomIndexShow(Base):
     __tablename__ = 'roomindexshow'
     RISid = Column(String(64), primary_key=True)
     ROid = Column(String(64), nullable=False, comment=u'房源id')
-    ROtype = Column(Integer, comment=u'显示位置 0: 合租, 1: 整租')
+    ROtype = Column(Integer, comment=u'合租or整租,  0: 合租, 1: 整租')
     ROsort = Column(Integer, comment=u'位置标志')
 
 

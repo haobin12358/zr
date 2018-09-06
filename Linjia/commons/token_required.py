@@ -4,6 +4,9 @@ from collections import namedtuple
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
 from flask import current_app, request
+
+from Linjia.commons.error_response import AUTHORITY_ERROR
+
 User = namedtuple('User', ('id', 'model', 'level'))
 
 
@@ -39,11 +42,10 @@ def token_to_usid(token):
     return id
 
 
-def verify_token_decorator(func):
+def token_decorator(func):
     """
     验证token装饰器, 并将用户对象放入request.user中
     """
-
     def inner(self, *args, **kwargs):
         parameter = request.args.to_dict()
         token = parameter.get('token')
@@ -66,3 +68,13 @@ def verify_token_decorator(func):
         request.user = user
         return func(self, *args, **kwargs)
     return inner
+
+
+def is_admin():
+    """是否是管理员"""
+    return hasattr(request, 'user') and request.user.model == u'Admin'
+
+
+def is_tourist():
+    """是否是游客"""
+    return not hasattr(request, 'user')
