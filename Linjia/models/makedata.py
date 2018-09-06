@@ -16,6 +16,7 @@ all_icos = {
     'ico5': '路由器',
     'ico6': '华莱士'
 }
+citynum = ['hbs-shi2jia1zhuang1', 'hbs-huang2hua2', 'xjwwezzq-chang1ji2', 'xjwwezzq-kun1yu4']
 
 def create_table():
     Base.metadata.create_all(model.mysql_engine)
@@ -78,7 +79,7 @@ class Dbcreater(object):
             room.ROstatus = random.choice([0, 5])
             if room.ROstatus == 5:
                 self.alread_sent.append(room.ROid)
-            room.ROcitynum = random.randint(1, 100)
+            room.ROcitynum = random.choice(citynum)
             if room.ROrenttype == 0:
                 self.hezu.append(id)
             if room.ROrenttype == 1:
@@ -220,22 +221,45 @@ class Dbcreater(object):
 
 
 
+    def create_cit(self):
+        from Linjia.models import City as CityModel
+        import json
+        json_file = 'Linjia/models/cities.txt'
+        import pinyin
+        with open(json_file, 'r') as rf:
+            content = json.load(rf)
+        print(content)
+        provinces = content.get('provinces')
+        for province in provinces:
+            citys = province.get('citys')
+            for city in citys:
+                provinceName = province.get('provinceName')
+                cityName = city.get('citysName')
+                c = CityModel()
+                c.Cityid = str(uuid.uuid4())
+                c.Cityprovincenum = pinyin.get(provinceName, format="numerical")
+                c.Citynum = str(pinyin.get_initial(pinyin.get_initial(provinceName)).replace(' ', '') + '-' +  str(pinyin.get(cityName[: -1], format="numerical")))
+                c.Cityname = cityName
+                c.Cityprovincename = provinceName
+                self.session.add(c)
+                self.session.commit()
 
 
 
 if __name__ == '__main__':
-    drop_table()
-    create_table()
+    # drop_table()
+    # create_table()
     creater = Dbcreater()
-    creater.create_user()
-    creater.create_room()
-    creater.creat_villege()
-    creater.create_house()
-    creater.create_roomfeature()
-    creater.create_roomprice()
-    creater.create_signinfo()
-    creater.create_subdiry_info()
-    creater.create_equirment()
-    creater.create_user_room()
+    # creater.create_user()
+    # creater.create_room()
+    # creater.creat_villege()
+    # creater.create_house()
+    # creater.create_roomfeature()
+    # creater.create_roomprice()
+    # creater.create_signinfo()
+    # creater.create_subdiry_info()
+    # creater.create_equirment()
+    # creater.create_user_room()
+    creater.create_cit()
 
-
+ 
