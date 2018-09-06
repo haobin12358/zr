@@ -7,7 +7,7 @@ User = namedtuple('User', ('id', 'model', 'level'))
 
 
 def request_first_handler(app):
-    @app.before_first_request
+    @app.before_request
     def get_main_url():
         args = request.args.to_dict()
         if args and 'token' in args:
