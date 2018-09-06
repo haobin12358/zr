@@ -10,7 +10,7 @@ class ARoom(Resource):
         self.croom = CRoom()
 
     def get(self, room):
-        print room
+        print(room)
         apis = {
             'get_list': self.croom.get_list,
             'get_detail': self.croom.get_detail

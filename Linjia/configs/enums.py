@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+__all__ = ['FACE_CONFIG', 'PAY_PERIOD', 'HYTING_TYPE', 'ROstatus', 'GENDER_CONFIG', 'RENT_TYPE']
+
 FACE_CONFIG = {
     1: '东',
     2: '东南',

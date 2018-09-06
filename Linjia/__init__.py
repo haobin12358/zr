@@ -52,8 +52,8 @@ def create_app():
     app.config.from_object('Linjia.configs.appsettings')
     register_route(app)
     print(app.debug)
-    if not app.debug:
-        error_handler(app)
+    # if not app.debug:
+    #     error_handler(app)
     CORS(app, supports_credentials=True)
     request_first_handler(app)
     return app

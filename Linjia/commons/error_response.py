@@ -8,7 +8,6 @@ from Linjia.commons.success_response import Success
 
 
 class DB_ERROR(BaseError):
-    code = 200
     message = '系统错误'
     status = 404
 
@@ -35,6 +34,11 @@ class AUTHORITY_ERROR(BaseError):
     status_code = 405001
     message = "无权限"
 
+
+class NOT_FOUND(BaseError):
+    status = 404
+    status_code = 405001
+    message = '无此项目'
 
 class SYSTEM_ERROR(BaseError):
     status_code = 200

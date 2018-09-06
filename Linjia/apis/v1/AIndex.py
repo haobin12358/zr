@@ -12,7 +12,14 @@ class AIndex(Resource):
     def get(self, index):
         apis = {
             'banner': self.cindex.get_banner,
-            'detail': self.cindex.get_index_room_list
+            'detail': self.cindex.get_index_room_list,
+        }
+        res = apis[index]()
+        return jsonify(res)
+
+    def post(self, index):
+        apis = {
+            'add_banner': self.cindex.add_banner,
         }
         res = apis[index]()
         return jsonify(res)

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from flask import request
 
+from Linjia.commons.error_response import NOT_FOUND
 from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
-from Linjia.configs.enums import FACE_CONFIG, PAY_PERIOD, HYTING_TYPE, GENDER_CONFIG, RENT_TYPE
+from Linjia.configs.enums import FACE_CONFIG, RENT_TYPE
 from Linjia.configs.messages import get_room_list_success
 from Linjia.control.base_control import BaseRoomControl
 from Linjia.service import SRoom, SUser
@@ -58,6 +59,8 @@ class CRoom(BaseRoomControl):
         data = parameter_required('roid')
         roid = data.get('roid')
         room = self.sroom.get_room_by_roid(roid)
+        if not room:
+            raise NOT_FOUND()
         room.ROface = FACE_CONFIG[int(room.ROface)]
         room.ROrenttype = RENT_TYPE.get(int(room.ROrenttype), u'未知')
         self._fill_price_detail(room)

@@ -1,47 +1,56 @@
 # -*- coding: utf-8 -*-
-from flask import request
+import uuid
 
+from Linjia.commons.error_response import NOT_FOUND
+from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
-from Linjia.control.base_control import BaseRoomControl
-from Linjia.service import SIndex, SRoom
+from Linjia.control.base_control import BaseRoomControl, BaseIndexControl
+from Linjia.service import SIndex, SRoom, SApartment, SHomeStay, SCity
 
 
-class CIndex(BaseRoomControl):
+class CIndex(BaseRoomControl, BaseIndexControl):
     def __init__(self):
         self.sindex = SIndex()
         self.sroom = SRoom()
+        self.sapartment = SApartment()
+        self.shomestay = SHomeStay()
+        self.scity = SCity()
 
     def get_banner(self):
         banner_list = self.sindex.get_banner_list()
         return Success('获取成功', banner_list)
 
     def get_index_room_list(self):
-
         join_rent_show_list = self.sindex.get_index_room()
         whole_rent_show_list = self.sindex.get_index_room(1)
+        apartment_show_list = self.sindex.get_index_apartment()
+        homestay_show_list = self.sindex.get_index_homestay()
+        server_show_list = self.sindex.get_index_server()
         map(self._fill_room_simple, join_rent_show_list)
         map(self._fill_room_simple, whole_rent_show_list)
+        map(self._fill_apartment_simple, apartment_show_list)
+        map(self._fill_homestay_simple, homestay_show_list)
+        map(lambda x: x.hide('SISid'), server_show_list)  # 隐藏无用id
         data = dict(
             join_rent=join_rent_show_list,  # 合租
             whole_rent=whole_rent_show_list,  # 整租
-            apartment=self.sindex.get_index_apartment(),  # 公寓
-            homestay=self.sindex.get_index_homestay(),  # 民宿
-            server=self.sindex.get_index_server()
+            apartment=apartment_show_list,  # 公寓
+            homestay=homestay_show_list,  # 民宿
+            server=server_show_list # 服务
         )
         return Success('获取成功', data)
 
-    def _fill_room_simple(self, rent_show):
-        """需要房源的id, 名字, 图片, 价格, 地址"""
-        roid = rent_show.ROid
-        room = self.sroom.get_room_by_roid(roid)
-        self._fill_show_price(room)
-        show_fields = ['ROid', 'ROname', 'ROimage', 'ROdistance', 'ROprice']
-        # 下一句等同于: rent_show.ROid = room.ROid; rent_show.ROname = room.ROname....
-        map(lambda x: setattr(rent_show, x, getattr(room, x)), show_fields)
-        rent_show.fields = show_fields
-        return room
+    def add_banner(self):
+        """新建轮播图, 需要图片地址, 顺序标志, 链接"""
+        data = parameter_required('ibimage', 'iblink', 'ibsort')
+        data['IBid'] = str(uuid.uuid4())
+        self.sindex.add_model('IndexBanner', **data)
+        return Success(u'添加成功', {
+            'ibid': data['IBid']
+        })
 
-    def _fill_apartment_simple(self, apartment_show):
-        """需要公寓的id, 名字, 图片"""
+
+
+
 
 
