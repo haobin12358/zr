@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*-LJ_DB_PWi coding: utf-8 -*-
 import datetime
 from collections import namedtuple
 
@@ -28,10 +28,10 @@ def token_to_usid(token):
     try:
         data = s.loads(token)
     except BadSignature as e:
-        print '不合法的token'
+        print('不合法的token')
         return
     except SignatureExpired as e:
-        print 'token is expired'
+        print('token is expired')
         return
     except Exception as e:
         raise e
