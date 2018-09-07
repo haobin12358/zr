@@ -9,7 +9,7 @@ from Linjia.commons import base_model as model
 from Linjia.commons.base_model import Base
 from Linjia.models import Admin
 
-INFO_COUNT = 20
+INFO_COUNT = 5
 all_icos = {
     'ico1': '热水机',
     'ico2': '双开门衣柜',
@@ -19,7 +19,17 @@ all_icos = {
     'ico6': '华莱士'
 }
 citynum = ['hbs-shi2jia1zhuang1', 'hbs-huang2hua2', 'xjwwezzq-chang1ji2', 'xjwwezzq-kun1yu4']
+icoid = ['07783c2a-dfbf-4277-b9b1-72c58d356d84', '0c43dd4a-9dd8-4dcf-bada-628956a9d4d2', '1f3262ca-1446-43ff-a724-ba774f5d9568', '240b10d4-da8f-48f1-b370-56ef11696c22',
+         '348f4af3-8b10-4b43-aefb-a7f05d3953e8']
+bannerimage = ['http://image.ziroom.com/g2/M00/99/C4/ChAFD1rdvD2AAW2FAAEAvloDzC8507.png',
+          'http://image.ziroom.com/g2/M00/F8/21/ChAFfVsV_ieAYErzAAHz1Auwmlg995.png',
+          'http://image.ziroom.com/g2/M00/65/F0/ChAFfVq8ZmqAcUl1AAHoLmS5qPY437.jpg']
 
+roomimage = ['http://img.ziroom.com/pic/house_images/g2/M00/3C/0D/ChAFfVqiiBmASzn3ABNUggkL9yA448.jpg_C_800_600_Q100.jpg',
+             'http://img.ziroom.com/pic/house_images/g2m1/M00/5E/BF/ChAFBluCtGGAGb_fAAfIZWU2SUA093.JPG_C_800_600_Q100.jpg',
+             'http://img.ziroom.com/pic/house_images/g2m1/M00/0D/8F/ChAFBltlotSAaF1LAAWt9owi5Js458.JPG_C_800_600_Q100.jpg']
+
+subwayinfo = ['钱江世纪城', '证明路', '飞鸿路', '钱江路']
 def create_table():
     Base.metadata.create_all(model.mysql_engine)
 
@@ -50,7 +60,7 @@ class Dbcreater(object):
             user.USid = id
             user.USnickname = 'usernickname'
             user.USgender = random.choice([1, 0])
-            user.USstar = random.choice(['大熊做', '小熊做', '金羊做', '白卖座'])
+            user.USstar = random.choice(['白羊座', '双子座', '巨蟹座', '狮子座'])
             user.USpassword = generate_password_hash('pass')
             self.session.add(user)
             self.session.commit()
@@ -64,21 +74,19 @@ class Dbcreater(object):
             room = Room()
             room.ROid = id
             room.HOid = random.choice(self.houseid)
-            room.ROname = '这是房源的名字' + str(id)
+            room.ROname = '友家·天裕昕园·3居室-03卧'
             room.ROarea = random.randint(20, 150)
-            room.ROimage = 'http://www.thisisimage/fjdl' + str(random.randint(222222, 333333)) + '.png'
+            room.ROimage = random.choice(roomimage)
             room.ROface = random.randint(0, 8)
-            room.ROdistance = '距离' + str(random.randint(3, 10)) + '号线' + str(random.randint(2, 10)) + '米'
+            room.ROdistance = '距离' + str(random.randint(3, 10)) + '号线' + random.choice(subwayinfo) + str(random.randint(2, 10)) + '米'
             room.ROface = random.randint(0, 8)
-            room.ROdistance = '这是距离描述还不错' + id[5]
             # room.ROshowpricetype = 1  # 季
             room.ROshowprice = random.randint(1111, 22222)
-            room.ROrenttype = random.randint(0, 3)
+            room.ROrenttype = random.randint(0, 5)
             room.ROsubwayaround = random.choice([True, False])
             if room.ROrenttype == 0:
                 room.ROnum = random.randint(1, 4)
             room.ROpersoncount = random.randint(1, 5)
-            room.ROintro = '这是房源的描述非常好' + id
             room.ROstatus = random.choice([0, 5])
             if room.ROstatus == 5:
                 self.alread_sent.append(room.ROid)
@@ -278,7 +286,7 @@ if __name__ == '__main__':
     # creater.create_subdiry_info()
     # creater.create_equirment()
     creater.create_user_room()
-    # creater.create_cit()
+    creater.create_cit()
     creater.creat_admin()
     creater.create_user1()
  

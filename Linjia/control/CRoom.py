@@ -5,15 +5,15 @@ from Linjia.commons.error_response import NOT_FOUND
 from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
 from Linjia.configs.enums import FACE_CONFIG, RENT_TYPE
-from Linjia.configs.messages import get_room_list_success
 from Linjia.control.base_control import BaseRoomControl
-from Linjia.service import SRoom, SUser
+from Linjia.service import SRoom, SUser, SCity
 
 
 class CRoom(BaseRoomControl):
     def __init__(self):
         self.sroom = SRoom()
         self.suser = SUser()
+        self.scity = SCity()
 
     def get_list(self):
         # todo 位置, 地铁, 附近
@@ -42,9 +42,9 @@ class CRoom(BaseRoomControl):
         }
         room_detail_list = self.sroom.get_room_list_filter(args_dict)
         map(self._fill_detail_for_list, room_detail_list)
-        map(lambda x: x.fill(self.sroom.get_tags_by_roid(x.ROid).hide('RTid', 'ROid'), 'tags'), room_detail_list)  # 填充tag信息
-        map(lambda x: x.fill(self.sroom.get_house_by_hoid(x.HOid), 'house'), room_detail_list)  # 填充house信息
-        data = Success(get_room_list_success, data=room_detail_list)
+        map(self._fill_house_info, room_detail_list)  # 楼层和规格
+        map(lambda x: x.fill(self.sroom.get_tags_by_roid(x.ROid), 'tags', hide=('ROid', )), room_detail_list)  # 填充tag信息
+        data = Success(u'获取房源列表成功', data=room_detail_list)
         return data
 
     def get_detail(self):
@@ -53,11 +53,13 @@ class CRoom(BaseRoomControl):
         room = self.sroom.get_room_by_roid(roid)
         if not room:
             raise NOT_FOUND(u'房源不存在')
-        room.ROface = FACE_CONFIG[int(room.ROface)]
-        room.ROrenttype = RENT_TYPE.get(int(room.ROrenttype), u'未知')
-        room.fill(self.sroom.get_house_by_hoid(room.HOid), 'house')
-        room.fill(self.sroom.get_room_equirment_by_roid(room.ROid), 'equirment')
+        self._fill_house_info(room)  # 楼层和规格
+        self._fill_roomate_info(room)  # 室友信息
+        room.fill(self.sroom.get_room_equirment_by_roid(room.ROid), 'equirment', hide=('IConid', ))
         room.fill(self.sroom.get_room_media_by_roid(room.ROid), 'media')
-        self._fill_roomate_info(room)
+        room.fill(self.scity.get_city_by_citynum(room.ROcitynum), 'city')
+        room.ROface = FACE_CONFIG.get(room.ROface, u'未知')
+        room.ROrenttype = RENT_TYPE.get(room.ROrenttype, u'未知')
+        room.add('ROisdelete', 'ROcreatetime', 'ROcitynum')
         return Success('获取房源信息成功', room)
 

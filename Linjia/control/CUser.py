@@ -8,7 +8,6 @@ from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR
 from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import usid_to_token
-from Linjia.configs.messages import get_token_success
 from Linjia.configs.url_config import HTTP_HOST
 from Linjia.configs.wxconfig import APPID, WXSCOPE, APPSECRET
 from Linjia.service import SUser
@@ -52,7 +51,7 @@ class CUser():
         data = {
             'token': token
         }
-        return Success(get_token_success, data)
+        return Success(u'获取token成功', data)
 
     @staticmethod
     def generic_user_info_by_wechat(userinfo):

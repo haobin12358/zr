@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Linjia.commons.base_service import SBase, close_session
-from Linjia.models import IndexBanner, RoomIndexShow, APartmentIndexShow, HomeStayIndexShow, ServerIndexShow
+from Linjia.models import IndexBanner, RoomIndexShow, ServerIndexShow
 
 
 class SIndex(SBase):
@@ -10,21 +10,11 @@ class SIndex(SBase):
         return self.session.query(IndexBanner).filter_by(IBisdelete=False).order_by(IndexBanner.IBsort).all()
 
     @close_session
-    def get_index_room(self, type=0):
+    def get_rooms_index_show(self):
         """获取主页显示的房源
-        type: 0 合租, 1 正租
+        type: 0: 合租, 1: 整租, 2: 公寓, 4: 民
         """
-        return self.session.query(RoomIndexShow).filter_by(ROtype=type).order_by(RoomIndexShow.ROsort).all()
-
-    @close_session
-    def get_index_apartment(self):
-        """获取主页显示的公寓"""
-        return self.session.query(APartmentIndexShow).order_by(APartmentIndexShow.AISsort).all()
-
-    @close_session
-    def get_index_homestay(self):
-        """民宿"""
-        return self.session.query(HomeStayIndexShow).order_by(HomeStayIndexShow.HSIsort).all()
+        return self.session.query(RoomIndexShow).order_by(RoomIndexShow.ROsort).all()
 
     @close_session
     def get_index_server(self):

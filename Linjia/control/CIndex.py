@@ -8,7 +8,8 @@ from Linjia.commons.token_handler import is_admin
 from Linjia.control.base_control import BaseRoomControl, BaseIndexControl
 from Linjia.service import SIndex, SRoom, SCity
 
-'''class CIndex(BaseRoomControl, BaseIndexControl):
+
+class CIndex(BaseRoomControl, BaseIndexControl):
     def __init__(self):
         self.sindex = SIndex()
         self.sroom = SRoom()
@@ -19,23 +20,17 @@ from Linjia.service import SIndex, SRoom, SCity
         return Success('获取成功', banner_list)
 
     def get_index_room_list(self):
-        join_rent_show_list = self.sindex.get_index_room()
-        whole_rent_show_list = self.sindex.get_index_room(1)
-        apartment_show_list = self.sindex.get_index_apartment()
-        homestay_show_list = self.sindex.get_index_homestay()
-        server_show_list = self.sindex.get_index_server()
-        map(self._fill_room_simple, join_rent_show_list)
-        map(self._fill_room_simple, whole_rent_show_list)
-        map(self._fill_apartment_simple, apartment_show_list)
-        map(self._fill_homestay_simple, homestay_show_list)
+        index_shows = self.sindex.get_rooms_index_show()
+        map(self._fill_index_room_detail, index_shows)
+        # 分类
         data = dict(
-            join_rent=join_rent_show_list,  # 合租
-            whole_rent=whole_rent_show_list,  # 整租
-            apartment=apartment_show_list,  # 公寓
-            homestay=homestay_show_list,  # 民宿
-            server=server_show_list # 服务
+            join_rent=filter(lambda x: x.room.ROrenttype == 0, index_shows),
+            whole_rent=filter(lambda x: x.room.ROrenttype == 1, index_shows),
+            apartment=filter(lambda x: x.room.ROrenttype == 2, index_shows),
+            homestay=filter(lambda x: x.room.ROrenttype == 3, index_shows),
         )
-        return Success('获取成功', data)
+        return Success(u'获取首页信息成功', data)
+
 
     def add_banner(self):
         """新建轮播图, 必要的参数: 图片地址, 顺序标志, 链接"""
@@ -135,4 +130,3 @@ from Linjia.service import SIndex, SRoom, SCity
         return Success(message, {
             'sisid': data.get('sisid')
         })
-'''

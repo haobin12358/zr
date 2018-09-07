@@ -76,26 +76,10 @@ class RoomEquirment(Base):
     __tablename__ = 'roomrequirment'
     REid = Column(String(64), primary_key=True)
     ROid = Column(String(64), comment=u'房源id')
-    REaircondition = Column(Boolean, default=False, comment=u'空调')
-    REchestbox = Column(Boolean, default=False, comment=u'三开内衣柜')
-    RElock = Column(Boolean, default=False, comment=u'智能锁')
-    REdesk = Column(Boolean, default=False, comment=u'桌子')
-    REbed = Column(Boolean, default=False, comment=u'床')
-    REbedsoft = Column(Boolean, default=False, comment=u'床垫')
-    REchair = Column(Boolean, default=False, comment=u'椅子')
-    REwaterheater = Column(Boolean, default=False, comment=u'热水器')
-    REwasher = Column(Boolean, default=False, comment=u'洗衣机')
-    # todo 添加更多
-    REairconditiontext = Column(String(16), default=u'空调', comment=u'空调显示文字')
-    REchestboxtext = Column(String(16), default=u'散开内衣柜', comment=u'三开内衣柜显示文字')
-    RElocktext = Column(String(16), default=u'智能锁', comment=u'智能锁显示文字')
-    REdesktext = Column(String(16), default=u'桌子', comment=u'桌子')
-    REbedtext = Column(String(16), default=u'床', comment=u'桌子')
-    REbedsofttext = Column(String(16), default=u'床垫', comment=u'床垫')
-    REchairtext = Column(String(16), default=u'椅子', comment=u'椅子')
-    REwaterheatertext = Column(String(16), default=u'热水器', comment=u'热水器')
-    REwashertext = Column(String(16), default=u'洗衣机', comment=u'洗衣机')
-    # todo 添加更多
+    IConid = Column(String(64), comment=u'ico图标的id')
+    IContext = Column(String(64), comment=u'自定义的文字')  # 可以为空
+    IConsort = Column(Integer, comment=u'顺序标志')
+
 
 
 class RoomSignInfo(Base):
@@ -152,6 +136,13 @@ class HomeStayReserve(Base):
     HSRstartliveingtime = Column(String(16), comment=u'入住时间')
     HSRleavingtime = Column(String(16), default=u'12点之前', comment=u'退房时间')
     HSRservice = Column(String(32), comment=u'服务, 如可做饭')
+
+
+class Icon(Base):
+    __tablename__ = 'ico'
+    IConid = Column(String(64), primary_key=True)
+    IConurl = Column(String(255), nullable=False)
+    IConame = Column(String(16), nullable=False)
 
 
 class Question(Base):

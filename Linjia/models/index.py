@@ -9,25 +9,25 @@ class RoomIndexShow(Base):
     __tablename__ = 'roomindexshow'
     RISid = Column(String(64), primary_key=True)
     ROid = Column(String(64), nullable=False, comment=u'房源id')
-    ROtype = Column(Integer, comment=u'合租or整租,  0: 合租, 1: 整租')
-    ROsort = Column(Integer, comment=u'位置标志')
+    ROtype = Column(Integer, comment=u'0: 合租, 1: 整租, 2: 公寓, 民宿')
+    ROsort = Column(Integer, comment=u'顺序标志')
 
 
-class APartmentIndexShow(Base):
-    """公寓首页显示"""
-    __tablename__ = 'apartmentindexshow'
-    AISid = Column(String(64), primary_key=True)
-    APid = Column(String(64), nullable=False, comment=u'公寓id')
-    AISsort = Column(Integer, comment=u'顺序标志')
-    AIsubtitle = Column(String(64), comment=u'描述,比如欢乐工厂lof之寓')
-
-
-class HomeStayIndexShow(Base):
-    """显示在首页的民宿"""
-    __tablename__ = 'homestayindexshow'
-    HSIid = Column(String(64), primary_key=True)
-    HSid = Column(String(64), nullable=False, comment=u'民宿id')
-    HSIsort = Column(Integer, comment=u'顺序标志')
+# class APartmentIndexShow(Base):
+#     """公寓首页显示"""
+#     __tablename__ = 'apartmentindexshow'
+#     AISid = Column(String(64), primary_key=True)
+#     APid = Column(String(64), nullable=False, comment=u'公寓id')
+#     AISsort = Column(Integer, comment=u'顺序标志')
+#     AIsubtitle = Column(String(64), comment=u'描述,比如欢乐工厂lof之寓')
+#
+#
+# class HomeStayIndexShow(Base):
+#     """显示在首页的民宿"""
+#     __tablename__ = 'homestayindexshow'
+#     HSIid = Column(String(64), primary_key=True)
+#     HSid = Column(String(64), nullable=False, comment=u'民宿id')
+#     HSIsort = Column(Integer, comment=u'顺序标志')
 
 
 class ServerIndexShow(Base):

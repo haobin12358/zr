@@ -52,17 +52,28 @@ class Base(AbstractConcreteBase, _Base):
         self.fields = []
         return self
 
-    def fill(self, obj, name, null=True):
-        """
-        room.fill(self.sroom.get_house_by_hoid(room.HOid), 'house')
-        等同于:
-        room.house = self.sroom.get_house_by_hoid(room.HOid)
-        room.add('house')
-        使用lambda更方便
+    def fill(self, obj, name, hide=None, fields=None, null=True):
+        """简化control层代码:
+            room.fill(self.sroom.get_house_by_hoid(room.HOid), 'house')
+            等同于:
+            room.house = self.sroom.get_house_by_hoid(room.HOid)
+            room.add('house')
+        或者:
+            map(lambda x: x.fill(self.sroom.get_house_by_hoid(x.HOid), 'house', hide=('VIid',)), room_detail_list)
         """
         if not obj and not null:
             msg = u'关联的对象不存在:' + name
             raise NOT_FOUND(msg)
+        if hide:
+            if isinstance(obj, list):
+                map(lambda x: x.hide(*hide), obj)
+            else:
+                obj.hide(*hide)
+        if fields:
+            if isinstance(obj, list):
+                map(lambda x: x.clean.add(*fields), obj)
+            else:
+                obj.fields = fields
         setattr(self, name, obj)
         return self.add(name)
 

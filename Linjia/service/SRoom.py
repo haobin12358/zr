@@ -2,7 +2,7 @@
 from sqlalchemy import or_, and_
 
 from Linjia.commons.base_service import SBase, close_session
-from Linjia.models import Room, House, UserSubslease, RoomEquirment, RoomMedia, RoomTag
+from Linjia.models import Room, House, UserSubslease, RoomEquirment, RoomMedia, RoomTag, Icon
 
 
 class SRoom(SBase):
@@ -21,7 +21,7 @@ class SRoom(SBase):
         """获取所有(合租和整租"""
         # todo 离地铁近
         print(kwargs)
-        all_room = self.session.query(Room).join(House, Room.HOid == House.HOid)
+        all_room = self.session.query(Room).join(House, Room.HOid == House.HOid).filter(Room.ROstatus >= 1, Room.ROisdelete==False)
         if 'type' in kwargs:
             all_room = all_room.filter(Room.ROrenttype == int(kwargs.get('type')))
         if 'style' in kwargs:
@@ -38,7 +38,7 @@ class SRoom(SBase):
             all_room = all_room.filter(or_(Room.ROface == int(v) for v in kwargs.get('bedcount')))
         page_num = kwargs.get('page')
         page_size = kwargs.get('count')
-        return all_room.filter(Room.ROisdelete==False).offset((page_num - 1) * page_size).limit(page_size).all()
+        return all_room.offset((page_num - 1) * page_size).limit(page_size).all()
 
     @close_session
     def get_house_by_hoid(self, hoid):
@@ -62,7 +62,7 @@ class SRoom(SBase):
 
     @close_session
     def get_room_equirment_by_roid(self, roid):
-        return self.session.query(RoomEquirment).filter_by(ROid=roid).all()
+        return self.session.query(Icon).join(RoomEquirment, Icon.IConid==RoomEquirment.IConid).filter(RoomEquirment.ROid==roid).all()
 
     @close_session
     def get_house_by_roid(self, roid):
