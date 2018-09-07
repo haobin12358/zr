@@ -54,6 +54,36 @@ class CUser():
         }
         return Success(get_token_success, data)
 
+    @staticmethod
+    def generic_user_info_by_wechat(userinfo):
+        user = {
+            'USid': str(uuid.uuid4()),
+            'USnickname': userinfo.get('nickname'),
+            'USgender': userinfo.get('sex'),
+            'USheader': userinfo.get('headimgurl'),
+            'WXopenid': userinfo.get('openid'),
+            'WXprivilege': str(userinfo.get('privilege')),
+        }
+        return user
+
+    @staticmethod
+    def get_access_token(code):
+        """请求微信服务获取 access_token, oppenid"""
+        url = 'https://api.weixin.qq.com/sns/oauth2/access_token?' \
+              'appid=%s&secret=%s&code=%s&' \
+              'grant_type=authorization_code' % (APPID, APPSECRET, code)
+        json_response = requests.get(url).json()
+        access_token = json_response.get('access_token')
+        oppenid = json_response.get('openid')
+        return access_token, oppenid
+
+    @staticmethod
+    def get_info(access_token, opponid):
+        url = 'https://api.weixin.qq.com/sns/userinfo?' \
+              'access_token=%s&openid=%s&lang=zh_CN' % (access_token, opponid)
+        json_res = requests.get(url).json()
+        return json_res
+
     def admin_login(self):
         """管理员登录"""
         data = parameter_required('username', 'password')
@@ -95,34 +125,6 @@ class CUser():
         response = Success(u'返回签名成功', data)
         return response
 
-    @staticmethod
-    def generic_user_info_by_wechat(userinfo):
-        user = {
-            'USid': str(uuid.uuid4()),
-            'USnickname': userinfo.get('nickname'),
-            'USgender': userinfo.get('sex'),
-            'USheader': userinfo.get('headimgurl'),
-            'WXopenid': userinfo.get('openid'),
-            'WXprivilege': str(userinfo.get('privilege')),
-        }
-        return user
 
-    @staticmethod
-    def get_access_token(code):
-        """请求微信服务获取 access_token, oppenid"""
-        url = 'https://api.weixin.qq.com/sns/oauth2/access_token?' \
-              'appid=%s&secret=%s&code=%s&' \
-              'grant_type=authorization_code' % (APPID, APPSECRET, code)
-        json_response = requests.get(url).json()
-        access_token = json_response.get('access_token')
-        oppenid = json_response.get('openid')
-        return access_token, oppenid
-
-    @staticmethod
-    def get_info(access_token, opponid):
-        url = 'https://api.weixin.qq.com/sns/userinfo?' \
-              'access_token=%s&openid=%s&lang=zh_CN' % (access_token, opponid)
-        json_res = requests.get(url).json()
-        return json_res
 
 

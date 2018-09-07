@@ -71,7 +71,8 @@ class Dbcreater(object):
             room.ROdistance = '距离' + str(random.randint(3, 10)) + '号线' + str(random.randint(2, 10)) + '米'
             room.ROface = random.randint(0, 8)
             room.ROdistance = '这是距离描述还不错' + id[5]
-            room.ROshowpricetype = 1  # 季
+            # room.ROshowpricetype = 1  # 季
+            room.ROshowprice = random.randint(1111, 22222)
             room.ROrenttype = random.randint(0, 3)
             room.ROsubwayaround = random.choice([True, False])
             if room.ROrenttype == 0:
@@ -263,22 +264,21 @@ class Dbcreater(object):
         user.USpassword = generate_password_hash('pass')
 
 
-
 if __name__ == '__main__':
-    # drop_table()
-    # create_table()
+    drop_table()
+    create_table()
     creater = Dbcreater()
-    # creater.create_user()
-    # creater.create_room()
-    # creater.creat_villege()
-    # creater.create_house()
+    creater.create_user()
+    creater.create_room()
+    creater.creat_villege()
+    creater.create_house()
     # creater.create_roomfeature()
     # creater.create_roomprice()
-    # creater.create_signinfo()
+    creater.create_signinfo()
     # creater.create_subdiry_info()
     # creater.create_equirment()
-    # creater.create_user_room()
+    creater.create_user_room()
     # creater.create_cit()
-    # creater?.creat_admin()
+    creater.creat_admin()
     creater.create_user1()
  

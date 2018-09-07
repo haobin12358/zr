@@ -8,14 +8,14 @@ class BaseRoomControl(object):
         """调整返回列表的格式"""
         room_respose_fields = ['ROid', 'ROname', 'ROarea', 'face',
                                'ROdistance', 'ROshowpriceunit',
-                               'ROprice', 'ROimage', 'ROrenttype', 'ROpersoncount']
+                               'ROprice', 'ROimage', 'ROrenttype', 'ROpersoncount', 'ROshowprice']
         room.fields = room_respose_fields
         room.face = FACE_CONFIG.get(int(room.ROface), u'未知')
         room.ROrenttype = RENT_TYPE.get(int(room.ROrenttype), u'未知')
         if room.ROstatus == 3:
             room.ROname = u'转' + room.ROname
         # 价格
-        self._fill_show_price(room)
+        # self._fill_show_price(room)
         return room
 
     def _fill_features(self, room):

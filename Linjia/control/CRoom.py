@@ -22,33 +22,26 @@ class CRoom(BaseRoomControl):
             args = {}
         args_dict['page'] = int(args.get('page', 1))  # 页码
         args_dict['count'] = int(args.get('count', 15))  # 取出条数
-        # 类型  如: type=0-0|1-0|2-1  => [[0, 0], [1, 0], ...]
-        args_dict['filter_type_list'] = map(lambda x: x.split('-'),
-                                            args.get('type').split('|')) if 'type' in args else None
+        # 租赁方式, 合租整租
+        args_dict['type'] = args.get('type')
+        # 装修风格 0 毛坯, 1简装, 2: 精装, 3: 豪华
+        args_dict['style'] = args.get('style').split('|') if 'style' in args else None
         # 租金
         args_dict['lowprice'] = args.get('lowprice')
         args_dict['highprice'] = args.get('highprice')
         # 朝向 face=1|2|3 ==> [1, 2, 3]
         args_dict['face_args'] = args.get('face').split('|') if 'face' in args else None
-        # 签约时长 sign=1
-        sign_args = args.get('sign')
-        args_dict['sign_args'] = sign_args
-        # 绿化率高 green_rate = 1
-        args_dict['green_rate'] = args.get('green_rate')
-        # 面积 area=40,80
-        args_dict['lowarea'] = args.get('lowarea')
-        args_dict['hignarea'] = args.get('hignarea')
-        # 房源状态:
-        args_dict['status'] = args.get('status')
-        # 特色 feature = '1|3|5'  ==>  [1, 3, 5]
-        args_dict['feature'] = args.get('feature').split('|') if 'feature' in args else None
-        # 搜索词 多个关键词使用空格隔开
-        args_dict['kw'] = args.get('kw').split() if 'kw' in args else None
-        # 过滤None
+        # 展现方式
+        args_dict['show_type'] = args.get('show_type')
+        # 房型 一室,二室,三室,五室以上
+        args_dict['bed_count'] = args.get('bed_count').aplit('|') if 'bed_count' in args else None
+        # 地址 区, 附近 todo
         args_dict = {
             k: v for k, v in args_dict.items() if v is not None
         }
         room_detail_list = self.sroom.get_room_list_filter(args_dict)
+        import ipdb
+        ipdb.set_trace()
         map(self._fill_detail_for_list, room_detail_list)
         map(self._fill_features, room_detail_list)
         map(self._fill_house_info, room_detail_list)

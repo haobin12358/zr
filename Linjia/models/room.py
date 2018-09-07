@@ -15,13 +15,12 @@ class Room(Base):
     ROarea = Column(Float, nullable=False, comment=u'面积')
     ROface = Column(Integer, default=u'未知', comment=u'朝向{1-8分别代表东,东南,南,西南...')
     ROdistance = Column(String(32), comment=u'交通设施距离描述')
-    ROshowpricetype = Column(Integer, default=1, comment=u'显示价格标准 0: 月付, 1 季付, 2 半年付, 3 年付')  # 根据这个标准去价格表中查价格
-    ROshowpriceunit = Column(String(2), default=u'月', comment=u'显示价格单位')
+    # ROshowpricetype = Column(Integer, default=1, comment=u'显示价格标准 0: 月付, 1 季付, 2 半年付, 3 年付')  # 根据这个标准去价格表中查价格
     ROshowprice = Column(Float, comment=u'显示价格')
-    ROrenttype = Column(Integer, default=0, comment=u'房源类型, 0: 合租, 1: 整租, 2: 精选, 3: 豪宅')
-    ROsubwayaround = Column(Boolean, default=False, comment=u'离地铁近')   # 冗余
+    ROshowpriceunit = Column(String(64), default=u'元/月', comment=u'价格单位')
+    ROrenttype = Column(Integer, default=0, comment=u'租赁方式, 0: 合租, 1: 整租')
+    ROdecorationstyle = Column(Integer, default=2, comment=u'装修风格, 0: 毛坯, 1: 简装, 2: 精装, 3: 豪华')
     ROnum = Column(Integer, comment=u'卧室号')  # 合租才有值
-    ROpersoncount = Column(Integer, comment=u'可居几人, x居室')
     ROintro = Column(String(64), comment=u'房源介绍')
     ROstatus = Column(Integer, default=0, comment=u'房源状态, 0: 待审核, 1: 配置中(可预订), 2: 可入住, 3: 转租, 4: 实习, 5, 已租出')
     ROisdelete = Column(Boolean, default=False, comment=u'是否删除')
@@ -48,31 +47,18 @@ class House(Base):
         self.fields = '__all__'
 
 
-class RoomFeature(Base):
-    """房源特色"""
-    __tablename__ = 'roomfeature'
-    RFid = Column(String(64), primary_key=True)
+class RoomMedia(Base):
+    """房源展示多媒体(图片或视频)"""
+    __tablename__ = 'roomimage'
+    REid = Column(String(61), primary_key=True)
     ROid = Column(String(64), nullable=False, comment=u'房源id')
-    RFbalcony = Column(Boolean, default=False, comment=u'独立阳台')
-    RFhytingtype = Column(Integer, nullable=False, comment=u'供暖方式 0 不供暖 1 集体 2独立 3 中央')
-    RFfirstrent = Column(Boolean, nullable=False, comment=u'首次出租')
-    RFtwotoilet = Column(Boolean, default=False, comment=u'两个卫生间')
-    RFcanpet = Column(Boolean, default=False, comment=u'可养宠物')
-    RFlock = Column(Boolean, default=False, comment=u'智能锁')
-    RFelevator = Column(Boolean, default=False, comment=u'有电梯')
-    RFtimeservice = Column(Boolean, default=False, comment=u'及时维修')
-    RFwifi = Column(Boolean, default=False, comment=u'wifi覆盖')
-    RFmonthclean = Column(Integer, default=1, comment=u'月度清洁次数')
-    RFstyle = Column(String(8), comment=u'装修风格')  # 比如友家2.0 { }
-    RFhotfeaturelist = Column(String(32), comment=u'详情显示标红的特色')
-
-    @orm.reconstructor
-    def __init__(self):
-        self.fields = '__all__'
+    REpic = Column(String(255), nullable=False, comment=u'图片链接')
+    REtype = Column(Integer, default=0, comment=u'展示类型, 0: 图片, 1: 视频')
+    RIsort = Column(Integer, comment=u'显示顺序标志')
 
 
 class RoomEquirment(Base):
-    """房间的设备信息, 当房间为合租的时候会对应此表"""
+    """房间的设备信息"""
     __tablename__ = 'roomrequirment'
     REid = Column(String(64), primary_key=True)
     ROid = Column(String(64), comment=u'房源id')
@@ -83,16 +69,21 @@ class RoomEquirment(Base):
     REbed = Column(Boolean, default=False, comment=u'床')
     REbedsoft = Column(Boolean, default=False, comment=u'床垫')
     REchair = Column(Boolean, default=False, comment=u'椅子')
-    RE
+    REwaterheater = Column(Boolean, default=False, comment=u'热水器')
+    REwasher = Column(Boolean, default=False, comment=u'洗衣机')
+    # todo 添加更多
     REairconditiontext = Column(String(16), default=u'空调', comment=u'空调显示文字')
     REchestboxtext = Column(String(16), default=u'散开内衣柜', comment=u'三开内衣柜显示文字')
     RElocktext = Column(String(16), default=u'智能锁', comment=u'智能锁显示文字')
     REdesktext = Column(String(16), default=u'桌子', comment=u'桌子')
+    REbedtext = Column(String(16), default=u'床', comment=u'桌子')
+    REbedsofttext = Column(String(16), default=u'床垫', comment=u'床垫')
+    REchairtext = Column(String(16), default=u'椅子', comment=u'椅子')
+    REwaterheatertext = Column(String(16), default=u'热水器', comment=u'热水器')
+    REwashertext = Column(String(16), default=u'洗衣机', comment=u'洗衣机')
+    # todo 添加更多
 
 
-
-
-# 待定
 class RoomSignInfo(Base):
     """租房签约规定"""
     __tablename__ = 'roomsigninfo'
@@ -123,59 +114,6 @@ class Villege(Base):
     VIlongitude = Column(Float, comment=u'经度')
     VIcitynum = Column(String(64), comment=u'城市编号')
     VIlocationnum = Column(String(64), comment=u'区域编号')  # todo 区域编号
-
-
-# 删除, 废弃
-class HouseSubsidiaryInfo(Base):
-    """房源配套信息, 图片显示在详情页上方, 朝向等信息显示在详情页户型配套中"""
-    __tablename__ = 'roomsubsidiaryinfo'
-    HSIid = Column(String(64), primary_key=True)
-    HOid = Column(String(64), comment=u'房信息id')
-    HSIname = Column(String(64), comment=u'名字, 比如起居室')  # 比如:户型, 公共卫生间, 起居室, 厨房...
-    HSIarea = Column(Float, nullable=False, comment=u'面积')
-    RSIface = Column(String(2), nullable=False, comment=u'朝向')
-    HSIimage = Column(String(255), nullable=False, comment=u'图片')  #
-    HRIsort = Column(Integer, comment=u'显示顺序标志')
-
-# 删除, 废弃
-class HouseSubsidiaryEquirment(Base):
-    """配套中的设备信息"""
-    __tablename__ = 'housesubsidiaryquirment'
-    HSEid = Column(String(64), primary_key=True)
-    HSIid = Column(String(64), comment=u'')
-    HSEsn = Column(String(32), comment=u'设备编号')  # 有一个icon与之对应
-    HSEname = Column(String(8), comment=u'设备名称') # 为空则显示默认
-    HSEsort = Column(Integer, comment=u'顺序标志')
-
-
-# 可能删除
-class RoomPayPrice(Base):
-    """价格信息"""
-    __tablename__ = 'roomprice'
-    RPPid = Column(String(64), primary_key=True)
-    ROid = Column(String(64), nullable=False, comment=u'房间id')
-    RPPperiod = Column(Integer, default=0, comment=u'付费周期')  # (0, 月付), (1, 季付), (2, 半年), (3, 一年), (4, 自如客分期)
-    RPPdeposit = Column(Float, nullable=False, comment=u'押金')
-    RPPservice = Column(Float, nullable=False, comment=u'服务费')
-    RPPserviceUnit = Column(String(8), default=u'元/年', comment=u'服务费价格单位')
-    RPPprice = Column(Float, nullable=False, comment=u'价格')
-    RPPpriceUnit = Column(String(8), default=u'元/月', comment=u'房租价格单位')
-    RPPstageurl = Column(String(125), comment=u'分期网址')  # 分期网址, 可以为空
-
-    @orm.reconstructor
-    def __init__(self):
-        self.fields = '__all__'
-
-
-# 不需要使用tag, 使用feature特色表
-class RoomTag(Base):
-    """详情页显示的其他tag"""
-    __tablename__ = 'roomtag'
-    RTid = Column(String(64), primary_key=True)
-    ROid = Column(String(64), nullable=False, comment=u'房源id')
-    RTname = Column(String(8), nullable=False, comment=u'tag文字')
-    RTsort = Column(Integer, comment=u'顺序标志')
-
 
 # 代定
 class SubwayStationInfo(Base):
@@ -334,3 +272,86 @@ if __name__ == '__main__':
     obj = globals()
     filte_obj = list(filter(lambda x: x[0].isupper(), obj))
     print(filte_obj)
+
+
+
+'''
+
+# 删除
+class RoomFeature(Base):
+    """房源特色"""
+    __tablename__ = 'roomfeature'
+    RFid = Column(String(64), primary_key=True)
+    ROid = Column(String(64), nullable=False, comment=u'房源id')
+    RFbalcony = Column(Boolean, default=False, comment=u'独立阳台')
+    RFhytingtype = Column(Integer, nullable=False, comment=u'供暖方式 0 不供暖 1 集体 2独立 3 中央')
+    RFfirstrent = Column(Boolean, nullable=False, comment=u'首次出租')
+    RFtwotoilet = Column(Boolean, default=False, comment=u'两个卫生间')
+    RFcanpet = Column(Boolean, default=False, comment=u'可养宠物')
+    RFlock = Column(Boolean, default=False, comment=u'智能锁')
+    RFelevator = Column(Boolean, default=False, comment=u'有电梯')
+    RFtimeservice = Column(Boolean, default=False, comment=u'及时维修')
+    RFwifi = Column(Boolean, default=False, comment=u'wifi覆盖')
+    RFmonthclean = Column(Integer, default=1, comment=u'月度清洁次数')
+    RFstyle = Column(String(8), comment=u'装修风格')  # 比如友家2.0 { }
+    RFhotfeaturelist = Column(String(32), comment=u'详情显示标红的特色')
+
+    @orm.reconstructor
+    def __init__(self):
+        self.fields = '__all__'
+
+
+# 删除, 废弃
+class HouseSubsidiaryInfo(Base):
+    """房源配套信息, 图片显示在详情页上方, 朝向等信息显示在详情页户型配套中"""
+    __tablename__ = 'roomsubsidiaryinfo'
+    HSIid = Column(String(64), primary_key=True)
+    HOid = Column(String(64), comment=u'房信息id')
+    HSIname = Column(String(64), comment=u'名字, 比如起居室')  # 比如:户型, 公共卫生间, 起居室, 厨房...
+    HSIarea = Column(Float, nullable=False, comment=u'面积')
+    RSIface = Column(String(2), nullable=False, comment=u'朝向')
+    HSIimage = Column(String(255), nullable=False, comment=u'图片')  #
+    HRIsort = Column(Integer, comment=u'显示顺序标志')
+
+
+# 删除, 废弃
+class HouseSubsidiaryEquirment(Base):
+    """配套中的设备信息"""
+    __tablename__ = 'housesubsidiaryquirment'
+    HSEid = Column(String(64), primary_key=True)
+    HSIid = Column(String(64), comment=u'')
+    HSEsn = Column(String(32), comment=u'设备编号')  # 有一个icon与之对应
+    HSEname = Column(String(8), comment=u'设备名称') # 为空则显示默认
+    HSEsort = Column(Integer, comment=u'顺序标志')
+
+
+# 可能删除
+class RoomPayPrice(Base):
+    """价格信息"""
+    __tablename__ = 'roomprice'
+    RPPid = Column(String(64), primary_key=True)
+    ROid = Column(String(64), nullable=False, comment=u'房间id')
+    RPPperiod = Column(Integer, default=0, comment=u'付费周期')  # (0, 月付), (1, 季付), (2, 半年), (3, 一年), (4, 自如客分期)
+    RPPdeposit = Column(Float, nullable=False, comment=u'押金')
+    RPPservice = Column(Float, nullable=False, comment=u'服务费')
+    RPPserviceUnit = Column(String(8), default=u'元/年', comment=u'服务费价格单位')
+    RPPprice = Column(Float, nullable=False, comment=u'价格')
+    RPPpriceUnit = Column(String(8), default=u'元/月', comment=u'房租价格单位')
+    RPPstageurl = Column(String(125), comment=u'分期网址')  # 分期网址, 可以为空
+
+    @orm.reconstructor
+    def __init__(self):
+        self.fields = '__all__'
+
+
+# 删除, 不需要使用tag, 使用feature特色表
+class RoomTag(Base):
+    """详情页显示的其他tag"""
+    __tablename__ = 'roomtag'
+    RTid = Column(String(64), primary_key=True)
+    ROid = Column(String(64), nullable=False, comment=u'房源id')
+    RTname = Column(String(8), nullable=False, comment=u'tag文字')
+    RTsort = Column(Integer, comment=u'顺序标志')
+
+
+'''

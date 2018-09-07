@@ -66,7 +66,7 @@ def error_handler(app):
         if isinstance(e, BaseError):
             return e
         if not app.debug:
-            raise BaseError()
+            raise BaseError(e.msg)
         raise e
 
     def ge_log(e):
