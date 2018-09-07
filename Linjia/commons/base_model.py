@@ -2,6 +2,8 @@
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declarative_base, AbstractConcreteBase
 from sqlalchemy import create_engine
+
+from Linjia.commons.error_response import NOT_FOUND
 from Linjia.configs import dbconfig as cfg
 DB_PARAMS = "{0}://{1}:{2}@{3}/{4}?charset={5}".format(
     cfg.sqlenginename,
@@ -27,7 +29,7 @@ class Base(AbstractConcreteBase, _Base):
 
     def __setattr__(self, key, value):
         """
-        使子类支持使用self.fields = '__all__'
+        使支持使用self.fields = '__all__'
         """
         if key == 'fields' and value == '__all__':
             self.fields = self.__table__.columns.keys()
@@ -50,9 +52,18 @@ class Base(AbstractConcreteBase, _Base):
         self.fields = []
         return self
 
-    def fill(self, obj, name=None):
-        obj_name = name or obj.__class__.__name__.lower()
-        setattr(self, obj_name, obj)
-        return self.add(obj_name)
+    def fill(self, obj, name, null=True):
+        """
+        room.fill(self.sroom.get_house_by_hoid(room.HOid), 'house')
+        等同于:
+        room.house = self.sroom.get_house_by_hoid(room.HOid)
+        room.add('house')
+        使用lambda更方便
+        """
+        if not obj and not null:
+            msg = u'关联的对象不存在:' + name
+            raise NOT_FOUND(msg)
+        setattr(self, name, obj)
+        return self.add(name)
 
 

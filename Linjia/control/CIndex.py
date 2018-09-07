@@ -4,17 +4,14 @@ import uuid
 from Linjia.commons.error_response import AUTHORITY_ERROR, NOT_FOUND
 from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
-from Linjia.commons.token_required import is_admin
+from Linjia.commons.token_handler import is_admin
 from Linjia.control.base_control import BaseRoomControl, BaseIndexControl
-from Linjia.service import SIndex, SRoom, SApartment, SHomeStay, SCity
+from Linjia.service import SIndex, SRoom, SCity
 
-
-class CIndex(BaseRoomControl, BaseIndexControl):
+'''class CIndex(BaseRoomControl, BaseIndexControl):
     def __init__(self):
         self.sindex = SIndex()
         self.sroom = SRoom()
-        self.sapartment = SApartment()
-        self.shomestay = SHomeStay()
         self.scity = SCity()
 
     def get_banner(self):
@@ -138,3 +135,4 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         return Success(message, {
             'sisid': data.get('sisid')
         })
+'''

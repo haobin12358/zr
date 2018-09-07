@@ -7,7 +7,7 @@ from flask import request, redirect
 from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR
 from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
-from Linjia.commons.token_required import usid_to_token
+from Linjia.commons.token_handler import usid_to_token
 from Linjia.configs.messages import get_token_success
 from Linjia.configs.url_config import HTTP_HOST
 from Linjia.configs.wxconfig import APPID, WXSCOPE, APPSECRET

@@ -8,7 +8,8 @@ from werkzeug.exceptions import HTTPException
 from Linjia.apis.v1 import AUser, ARoom, AIndex
 from Linjia.apis.v1.verify_wechat import register_blueprint
 from flask.json import JSONEncoder as _JSONEncoder
-from Linjia.commons.error_response import error_handler
+
+from Linjia.commons.logger_handler import error_handler
 from Linjia.commons.request_handler import request_first_handler
 from test.blue import register_blue
 
@@ -55,7 +56,7 @@ def create_app():
     # register_blue(app)
     print(app.debug)
     # if not app.debug:
-    #     error_handler(app)
+    error_handler(app)
     CORS(app, supports_credentials=True)
     request_first_handler(app)
     return app

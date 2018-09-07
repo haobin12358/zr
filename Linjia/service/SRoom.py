@@ -2,7 +2,7 @@
 from sqlalchemy import or_, and_
 
 from Linjia.commons.base_service import SBase, close_session
-from Linjia.models import Room, House, UserSubslease, RoomEquirment, RoomMedia
+from Linjia.models import Room, House, UserSubslease, RoomEquirment, RoomMedia, RoomTag
 
 
 class SRoom(SBase):
@@ -23,7 +23,7 @@ class SRoom(SBase):
         print(kwargs)
         all_room = self.session.query(Room).join(House, Room.HOid == House.HOid)
         if 'type' in kwargs:
-            all_room = all_room.filter(Room.ROrenttype==int(kwargs.get('type')))
+            all_room = all_room.filter(Room.ROrenttype == int(kwargs.get('type')))
         if 'style' in kwargs:
             all_room = all_room.filter(or_(Room.ROdecorationstyle == int(v) for v in kwargs.get('style')))
         if 'lowprice' in kwargs:
@@ -33,28 +33,12 @@ class SRoom(SBase):
         if 'face_args' in kwargs:
             all_room = all_room.filter(or_(Room.ROface == int(v) for v in kwargs.get('face_args')))
         if 'show_type' in kwargs:
-            all_room = all_room.join(RoomMedia, RoomMedia.ROid == Room.ROid).filter(RoomMedia.REtype == int(kwargs.get('show_type')))
+            all_room = all_room.join(RoomMedia, RoomMedia.ROid == Room.ROid).filter(RoomMedia.REtype == kwargs.get('show_type'))
         if 'bed_count' in kwargs:
             all_room = all_room.filter(or_(Room.ROface == int(v) for v in kwargs.get('bedcount')))
         page_num = kwargs.get('page')
         page_size = kwargs.get('count')
-        return all_room.offset((page_num - 1) * page_size).limit(page_size).all()
-
-
-    # @close_session
-    # def get_features_by_roid(self, roid):
-    #     """通过roid获取特色值"""
-    #     return self.session.query(RoomFeature).filter_by(ROid=roid).first()
-    #
-    # @close_session
-    # def get_price_by_roidandperid(self, roid, showpricetype):
-    #     """价格"""
-    #     return self.session.query(RoomPayPrice).filter_by(ROid=roid, RPPperiod=showpricetype).first()
-    #
-    # @close_session
-    # def get_price_by_roid(self, roid):
-    #     """价格"""
-    #     return self.session.query(RoomPayPrice).filter_by(ROid=roid).all()
+        return all_room.filter(Room.ROisdelete==False).offset((page_num - 1) * page_size).limit(page_size).all()
 
     @close_session
     def get_house_by_hoid(self, hoid):
@@ -62,20 +46,19 @@ class SRoom(SBase):
         return self.session.query(House).filter_by(HOid=hoid).first()
 
     @close_session
+    def get_room_media_by_roid(self, roid):
+        """获取房源的显示图片或视频信息"""
+        return self.session.query(RoomMedia).filter_by(ROid=roid).all()
+
+    @close_session
     def get_reaseinfo_by_roid(self, roid):
         """通过roid获取转租信息"""
         self.session.query(UserSubslease).filter_by(ROid=roid, Subsleaseisdelete=False).first()
 
-    # @close_session
-    # def get_subdiaryinfo_by_hoid(self, hoid):
-    #     """房源配套信息(图片就在这个表中)"""
-    #     return self.session.query(HouseSubsidiaryInfo).filter_by(HOid=hoid).order_by(HouseSubsidiaryInfo.HRIsort).all()
-    #
-    # @close_session
-    # def get_subdiaryequirment_by_hsiid(self, hsiid):
-    #     """配套中的设备信息"""
-    #     return self.session.query(HouseSubsidiaryEquirment).filter_by(HSIid=hsiid).order_by(
-    #         HouseSubsidiaryEquirment.HSEsort).all()
+    @close_session
+    def get_tags_by_roid(self, roid):
+        """"""
+        return self.session.query(RoomTag).filter_by(ROid=roid).all()
 
     @close_session
     def get_room_equirment_by_roid(self, roid):

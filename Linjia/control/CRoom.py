@@ -16,6 +16,7 @@ class CRoom(BaseRoomControl):
         self.suser = SUser()
 
     def get_list(self):
+        # todo 位置, 地铁, 附近
         args = request.args.to_dict()
         args_dict = {}
         if not args:
@@ -31,7 +32,7 @@ class CRoom(BaseRoomControl):
         args_dict['highprice'] = args.get('highprice')
         # 朝向 face=1|2|3 ==> [1, 2, 3]
         args_dict['face_args'] = args.get('face').split('|') if 'face' in args else None
-        # 展现方式
+        # 展现方式 image or video
         args_dict['show_type'] = args.get('show_type')
         # 房型 一室,二室,三室,五室以上
         args_dict['bed_count'] = args.get('bed_count').aplit('|') if 'bed_count' in args else None
@@ -40,11 +41,9 @@ class CRoom(BaseRoomControl):
             k: v for k, v in args_dict.items() if v is not None
         }
         room_detail_list = self.sroom.get_room_list_filter(args_dict)
-        import ipdb
-        ipdb.set_trace()
         map(self._fill_detail_for_list, room_detail_list)
-        map(self._fill_features, room_detail_list)
-        map(self._fill_house_info, room_detail_list)
+        map(lambda x: x.fill(self.sroom.get_tags_by_roid(x.ROid).hide('RTid', 'ROid'), 'tags'), room_detail_list)  # 填充tag信息
+        map(lambda x: x.fill(self.sroom.get_house_by_hoid(x.HOid), 'house'), room_detail_list)  # 填充house信息
         data = Success(get_room_list_success, data=room_detail_list)
         return data
 
@@ -53,15 +52,12 @@ class CRoom(BaseRoomControl):
         roid = data.get('roid')
         room = self.sroom.get_room_by_roid(roid)
         if not room:
-            raise NOT_FOUND()
+            raise NOT_FOUND(u'房源不存在')
         room.ROface = FACE_CONFIG[int(room.ROface)]
         room.ROrenttype = RENT_TYPE.get(int(room.ROrenttype), u'未知')
-        self._fill_price_detail(room)
-        self._fill_features(room)
-        self._fill_subdiary_info(room)
-        self._fill_house_info(room)
+        room.fill(self.sroom.get_house_by_hoid(room.HOid), 'house')
+        room.fill(self.sroom.get_room_equirment_by_roid(room.ROid), 'equirment')
+        room.fill(self.sroom.get_room_media_by_roid(room.ROid), 'media')
         self._fill_roomate_info(room)
         return Success('获取房源信息成功', room)
-
-
 

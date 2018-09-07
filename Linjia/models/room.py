@@ -6,7 +6,7 @@ from Linjia.commons.base_model import Base
 
 
 class Room(Base):
-    """房源(合租/整租)"""
+    """房源(合租/整租/公寓/民宿)"""
     __tablename__ = 'room'
     ROid = Column(String(64), primary_key=True)
     HOid = Column(String(64), comment=u'所属房子id')
@@ -17,16 +17,20 @@ class Room(Base):
     ROdistance = Column(String(32), comment=u'交通设施距离描述')
     # ROshowpricetype = Column(Integer, default=1, comment=u'显示价格标准 0: 月付, 1 季付, 2 半年付, 3 年付')  # 根据这个标准去价格表中查价格
     ROshowprice = Column(Float, comment=u'显示价格')
-    ROshowpriceunit = Column(String(64), default=u'元/月', comment=u'价格单位')
-    ROrenttype = Column(Integer, default=0, comment=u'租赁方式, 0: 合租, 1: 整租')
+    ROshowpriceunit = Column(String(64), default=u'month', comment=u'价格单位,month,night')
+    ROrenttype = Column(Integer, default=0, comment=u'租赁方式, 0: 合租, 1: 整租, 2: 公寓, 4: 民宿')
     ROdecorationstyle = Column(Integer, default=2, comment=u'装修风格, 0: 毛坯, 1: 简装, 2: 精装, 3: 豪华')
     ROnum = Column(Integer, comment=u'卧室号')  # 合租才有值
-    ROintro = Column(String(64), comment=u'房源介绍')
     ROstatus = Column(Integer, default=0, comment=u'房源状态, 0: 待审核, 1: 配置中(可预订), 2: 可入住, 3: 转租, 4: 实习, 5, 已租出')
     ROisdelete = Column(Boolean, default=False, comment=u'是否删除')
     ROcreatetime = Column(String(16), comment=u'创建时间')
+    ROshowtime = Column(String(16), comment=u'发布时间')
     ROcitynum = Column(String(64), comment=u'城市编号, 冗余字段')
     ROsubwayaround = Column(Boolean, default=False, comment=u'地铁附近')
+    ROaroundequirment = Column(Text, comment=u'周边设施介绍')
+    # 类型为民宿的时候需要用到的字段
+    ROentertime  = Column(String(16), comment=u'入住时间')  # 入住时间
+    ROleavetime = Column(String(16), comment=u'离开时间')  # 离开时间
 
     @orm.reconstructor
     def __init__(self):
@@ -48,13 +52,22 @@ class House(Base):
         self.fields = '__all__'
 
 
+class RoomTag(Base):
+    """列表页显示的tag"""
+    __tablename__ = 'roomtag'
+    RTid = Column(String(64), primary_key=True)
+    ROid = Column(String(64), nullable=False)
+    RTname = Column(String(16), nullable=False, comment=u'tag文字')
+    RTsort = Column(Integer, comment=u'tag顺序')
+
+
 class RoomMedia(Base):
     """房源展示多媒体(图片或视频)"""
     __tablename__ = 'roomimage'
     REid = Column(String(61), primary_key=True)
     ROid = Column(String(64), nullable=False, comment=u'房源id')
     REpic = Column(String(255), nullable=False, comment=u'图片链接')
-    REtype = Column(Integer, default=0, comment=u'展示类型, 0: 图片, 1: 视频')
+    REtype = Column(String(8), default=u'image', comment=u'展示类型, image, video')
     RIsort = Column(Integer, comment=u'显示顺序标志')
 
 
@@ -123,6 +136,43 @@ class SubwayStationInfo(Base):
     SSIid = Column(String(64), primary_key=True)
     VIid = Column(String(64), comment=u'小区id')
     # todo subway
+
+
+
+
+class HomeStayReserve(Base):
+    """预约须知"""
+    __tablename__ = 'homestayreserve'
+    HSRid = Column(String(64), primary_key=True)
+    HSid = Column(String(64), nullable=False, comment=u'民宿id')
+    HSRtype = Column(Integer, default=0, comment=u'预定类型: 0: 申请预定, 1:?')
+    HSRdesposit = Column(String(16), comment=u'押金规则')
+    HSRshortestliving = Column(Float, default=1, comment=u'最少入住天数')
+    HSRcleanprice = Column(Float, default=0, comment=u'清洁费')
+    HSRstartliveingtime = Column(String(16), comment=u'入住时间')
+    HSRleavingtime = Column(String(16), default=u'12点之前', comment=u'退房时间')
+    HSRservice = Column(String(32), comment=u'服务, 如可做饭')
+
+
+class Question(Base):
+    """问题"""
+    __tablename__ = 'question'
+    QUid = Column(String(64), primary_key=True)
+    QUtitle = Column(String(255), nullable=False, comment=u'问题')
+    QUanswer = Column(Text, nullable=False, comment=u'回答')
+    QUisshow = Column(Boolean, default=True, comment=u'是否显示')
+    QUsort = Column(Integer, comment=u'顺序标志')
+
+
+if __name__ == '__main__':
+    obj = globals()
+    filte_obj = list(filter(lambda x: x[0].isupper(), obj))
+    print(filte_obj)
+
+
+
+'''
+
 
 
 # 公寓
@@ -241,42 +291,6 @@ class HomeStayAquirment(Base):
     HSAname = Column(String(16), comment=u'设备名, 为空则显示默认')
     HSAsort = Column(Integer, comment=u'顺序标志')
     HScolor = Column(String(16), comment=u'图标特殊状态')
-
-
-class HomeStayReserve(Base):
-    """预约须知"""
-    __tablename__ = 'homestayreserve'
-    HSRid = Column(String(64), primary_key=True)
-    HSid = Column(String(64), nullable=False, comment=u'民宿id')
-    HSRtype = Column(Integer, default=0, comment=u'预定类型: 0: 申请预定, 1:?')
-    HSRdesposit = Column(String(16), comment=u'押金规则')
-    HSRshortestliving = Column(Float, default=1, comment=u'最少入住天数')
-    HSRcleanprice = Column(Float, default=0, comment=u'清洁费')
-    HSRstartliveingtime = Column(String(16), comment=u'入住时间')
-    HSRleavingtime = Column(String(16), default=u'12点之前', comment=u'退房时间')
-    HSRservice = Column(String(32), comment=u'服务, 如可做饭')
-# 驿站, 自如驿
-
-
-
-class Question(Base):
-    """问题"""
-    __tablename__ = 'question'
-    QUid = Column(String(64), primary_key=True)
-    QUtitle = Column(String(255), nullable=False, comment=u'问题')
-    QUanswer = Column(Text, nullable=False, comment=u'回答')
-    QUisshow = Column(Boolean, default=True, comment=u'是否显示')
-    QUsort = Column(Integer, comment=u'顺序标志')
-
-
-if __name__ == '__main__':
-    obj = globals()
-    filte_obj = list(filter(lambda x: x[0].isupper(), obj))
-    print(filte_obj)
-
-
-
-'''
 
 # 删除
 class RoomFeature(Base):
