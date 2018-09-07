@@ -21,7 +21,7 @@ class SRoom(SBase):
         """获取所有(合租和整租"""
         # todo 离地铁近
         print(kwargs)
-        all_room = self.session.query(Room).join(House, Room.HOid == House.HOid).filter(Room.ROstatus >= 1, Room.ROisdelete==False)
+        all_room = self.session.query(Room).filter(Room.ROstatus >= 1, Room.ROisdelete==False)
         if 'type' in kwargs:
             all_room = all_room.filter(Room.ROrenttype == int(kwargs.get('type')))
         if 'style' in kwargs:

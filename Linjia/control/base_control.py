@@ -15,11 +15,13 @@ class BaseRoomControl(object):
         room.ROrenttype = RENT_TYPE.get(int(room.ROrenttype), u'未知')
         room.ROdecorationstyle = DECORATOR_STYLE.get(int(room.ROdecorationstyle), u'未知')
         room.ROstatus = ROSTATUS.get(int(room.ROstatus), u'未知')
-        return room
+        return self
 
     def _fill_house_info(self, room):
         hoid = room.HOid
         house = self.sroom.get_house_by_hoid(hoid)
+        if not house:
+            return self
         house.size = str(house.HObedroomcount) + u'室' + str(house.HOparlorcount) + u'厅'
         house.floor = str(house.HOfloor) + '/' + str(house.HOtotalfloor) + u'层'
         house.fields = ['size', 'floor']

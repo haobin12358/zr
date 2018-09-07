@@ -36,6 +36,7 @@ class CRoom(BaseRoomControl):
         args_dict['show_type'] = args.get('show_type')
         # 房型 一室,二室,三室,五室以上
         args_dict['bed_count'] = args.get('bed_count').aplit('|') if 'bed_count' in args else None
+        print(args_dict)
         # 地址 区, 附近 todo
         args_dict = {
             k: v for k, v in args_dict.items() if v is not None
