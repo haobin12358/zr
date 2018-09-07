@@ -26,6 +26,7 @@ class Room(Base):
     ROisdelete = Column(Boolean, default=False, comment=u'是否删除')
     ROcreatetime = Column(String(16), comment=u'创建时间')
     ROcitynum = Column(String(64), comment=u'城市编号, 冗余字段')
+    ROsubwayaround = Column(Boolean, default=False, comment=u'地铁附近')
 
     @orm.reconstructor
     def __init__(self):
