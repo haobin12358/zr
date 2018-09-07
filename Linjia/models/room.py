@@ -71,6 +71,28 @@ class RoomFeature(Base):
         self.fields = '__all__'
 
 
+class RoomEquirment(Base):
+    """房间的设备信息, 当房间为合租的时候会对应此表"""
+    __tablename__ = 'roomrequirment'
+    REid = Column(String(64), primary_key=True)
+    ROid = Column(String(64), comment=u'房源id')
+    REaircondition = Column(Boolean, default=False, comment=u'空调')
+    REchestbox = Column(Boolean, default=False, comment=u'三开内衣柜')
+    RElock = Column(Boolean, default=False, comment=u'智能锁')
+    REdesk = Column(Boolean, default=False, comment=u'桌子')
+    REbed = Column(Boolean, default=False, comment=u'床')
+    REbedsoft = Column(Boolean, default=False, comment=u'床垫')
+    REchair = Column(Boolean, default=False, comment=u'椅子')
+    RE
+    REairconditiontext = Column(String(16), default=u'空调', comment=u'空调显示文字')
+    REchestboxtext = Column(String(16), default=u'散开内衣柜', comment=u'三开内衣柜显示文字')
+    RElocktext = Column(String(16), default=u'智能锁', comment=u'智能锁显示文字')
+    REdesktext = Column(String(16), default=u'桌子', comment=u'桌子')
+
+
+
+
+# 待定
 class RoomSignInfo(Base):
     """租房签约规定"""
     __tablename__ = 'roomsigninfo'
@@ -103,6 +125,7 @@ class Villege(Base):
     VIlocationnum = Column(String(64), comment=u'区域编号')  # todo 区域编号
 
 
+# 删除, 废弃
 class HouseSubsidiaryInfo(Base):
     """房源配套信息, 图片显示在详情页上方, 朝向等信息显示在详情页户型配套中"""
     __tablename__ = 'roomsubsidiaryinfo'
@@ -114,7 +137,7 @@ class HouseSubsidiaryInfo(Base):
     HSIimage = Column(String(255), nullable=False, comment=u'图片')  #
     HRIsort = Column(Integer, comment=u'显示顺序标志')
 
-
+# 删除, 废弃
 class HouseSubsidiaryEquirment(Base):
     """配套中的设备信息"""
     __tablename__ = 'housesubsidiaryquirment'
@@ -125,16 +148,7 @@ class HouseSubsidiaryEquirment(Base):
     HSEsort = Column(Integer, comment=u'顺序标志')
 
 
-class RoomEquirment(Base):
-    """房间的设备信息, 当房间为合租的时候会对应此表"""
-    __tablename__ = 'roomrequirment'
-    REid = Column(String(64), primary_key=True)
-    ROid = Column(String(64), comment=u'房间id')
-    REsn = Column(String(32), comment=u'设备编号')  # 有一个icon与之对应
-    REname = Column(String(8), comment=u'设备名称') # 为空则显示默认
-    REsort = Column(Integer, comment=u'顺序标志')
-
-
+# 可能删除
 class RoomPayPrice(Base):
     """价格信息"""
     __tablename__ = 'roomprice'
@@ -153,6 +167,7 @@ class RoomPayPrice(Base):
         self.fields = '__all__'
 
 
+# 不需要使用tag, 使用feature特色表
 class RoomTag(Base):
     """详情页显示的其他tag"""
     __tablename__ = 'roomtag'
@@ -162,6 +177,7 @@ class RoomTag(Base):
     RTsort = Column(Integer, comment=u'顺序标志')
 
 
+# 代定
 class SubwayStationInfo(Base):
     """地铁距离信息"""
     __tablename__ = 'subwaystationinfo'
