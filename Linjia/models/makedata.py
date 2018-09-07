@@ -255,6 +255,15 @@ class Dbcreater(object):
         self.session.add(admin)
         self.session.commit()
 
+    def create_user1(self):
+        from Linjia.models import User
+        user = User()
+        user.USnickname = 'nickname'
+        user.USphone = '12345678901'
+        user.USpassword = generate_password_hash('pass')
+
+
+
 if __name__ == '__main__':
     # drop_table()
     # create_table()
@@ -270,6 +279,6 @@ if __name__ == '__main__':
     # creater.create_equirment()
     # creater.create_user_room()
     # creater.create_cit()
-    creater.creat_admin()
-
+    # creater?.creat_admin()
+    creater.create_user1()
  

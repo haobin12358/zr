@@ -4,7 +4,7 @@ import uuid
 import requests
 from flask import request, redirect
 
-from Linjia.commons.error_response import NOT_FOUND
+from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR
 from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_required import usid_to_token
@@ -73,6 +73,27 @@ class CUser():
     def add_admin(self):
         pass
 
+
+    def get_wx_config(self):
+        from Linjia.configs.wxconfig import APPID, APPSECRET
+        import random
+        import string
+        import time
+        import hashlib
+        noncestr = ''.join(random.sample(string.ascii_letters + string.digits, 8))
+        data = {
+            "appid": APPID,
+            'timestamp': int(time.time()),
+            "nonceStr": noncestr,
+        }
+        try:
+            response_str = "&".join([str(k)+'='+str(v) for k, v in data.items()])
+            signature = hashlib.sha1(response_str).hexdigest()
+            data['signature'] = signature
+        except Exception as e:
+            return SYSTEM_ERROR(e.message)
+        response = Success(u'返回签名成功', data)
+        return response
 
     @staticmethod
     def generic_user_info_by_wechat(userinfo):

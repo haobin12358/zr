@@ -8,7 +8,7 @@ class User(Base):
     """用户(业主或租客)"""
     __tablename__ = 'user'
     USid = Column(String(64), primary_key=True)
-    USnickname = Column(String(16), nullable=False, comment=u'用户昵称')
+    USnickname = Column(String(16), comment=u'用户昵称')
     USphone = Column(String(12), comment=u'用户手机号')
     USpassword = Column(String(255), comment=u'密码')
     USgender = Column(Integer, comment=u'性别, 0: 男, 1: 女')

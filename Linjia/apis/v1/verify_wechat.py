@@ -19,7 +19,7 @@ def prepare():
         return 'args is missed '
     my_signature = args.get('signature')  # 获取携带的signature参数
     my_timestamp = args.get('timestamp')  # 获取携带的timestamp参数
-    my_nonce = args.get('nonce')  # 获取携带的nonce参数
+    my_nonce = args.get('nonce')
     my_echostr = args.get('echostr')  # 获取携带的echostr参数
     token = WXTOKEN
     # 进行字典排序
