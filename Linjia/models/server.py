@@ -1,27 +1,26 @@
 # *- coding:utf8 *-
-from sqlalchemy import Column, String, Text, Float
+from sqlalchemy import Column, String, Text, Float, Integer, Boolean
 
 from Linjia.commons.base_model import Base
 
 
 # 搬家
-class ServerMoveMain(Base):
-    """搬家服务"""
-    __tablename__ = 'servermovemain'
-    SMiMd = Column(String(64), primary_key=True)
-    SMMtitle = Column(String(16), nullable=False, comment=u'标题, 比如搬家.')
-    SMMimage = Column(String(255), nullable=False, comment=u'顶部图')
-
-
+# class ServerMoveMain(Base):
+#     """搬家服务"""
+#     __tablename__ = 'servermovemain'
+#     SMiMd = Column(String(64), primary_key=True)
+#     SMMtitle = Column(String(16), nullable=False, comment=u'标题, 比如搬家.')
+#     SMMimage = Column(String(255), nullable=False, comment=u'顶部图')
 class ServersMoveSelector(Base):
     """搬家服务的规模选择"""
     __tablename__ = 'servermoveselector'
     SMSid = Column(String(64), primary_key=True)
-    SMMid = Column(String(64), nullable=False, comment=u'所属服务')
+    # SMMid = Column(String(64), nullable=False, comment=u'所属服务')
     SMStitlepic = Column(String(255), nullable=False, comment=u'封面图')
     SMStitle = Column(String(16), nullable=False, comment=u'标题, 比如小搬')
     SMSsubtitle = Column(String(255), nullable=False, comment=u'标题下方, 比如一句话说明适用范围')
-    SMScity = Column(String(16), comment=u'城市')  # 不同的城市有不同的服务
+    SMScity = Column(String(16), comment=u'城市编号')  # 不同的城市有不同的服务
+    SMstatus = Column(Integer, default=0, comment=u'可用状态0:可用, 2不可用')
 
 
 class ServersMoveSelectorPrice(Base):
@@ -67,19 +66,19 @@ class ServerMoveComment(Base):
 
 
 # 清洁
-class ServerCleanMain(Base):
-    """清洁服务"""
-    __tablename__ = 'servercleanmain'
-    SCMid = Column(String(64), primary_key=True)
-    SCMtitle = Column(String(16), nullable=False, comment=u'标题, 比如清洁.')
-    SCMimage = Column(String(255), nullable=False, comment=u'顶部图')
+# class ServerCleanMain(Base):
+#     """清洁服务"""
+#     __tablename__ = 'servercleanmain'
+#     SCMid = Column(String(64), primary_key=True)
+#     SCMtitle = Column(String(16), nullable=False, comment=u'标题, 比如清洁.')
+#     SCMimage = Column(String(255), nullable=False, comment=u'顶部图')
 
 
 class ServerCleanSelector(Base):
     """清洁服务的规模选择"""
     __tablename__ = 'servercleanselector'
     SCEid = Column(String(64), primary_key=True)
-    SCMid = Column(String(64), nullable=False, comment=u'所属服务')
+    # SCMid = Column(String(64), nullable=False, comment=u'所属服务')
     SCMtitlepic = Column(String(255), nullable=False, comment=u'封面图')
     SCMtitle = Column(String(16), nullable=False, comment=u'标题, 比如日常保洁')
     SCMsubtitle = Column(String(255), nullable=False, comment=u'标题下方, 比如一句话说明适用范围')
