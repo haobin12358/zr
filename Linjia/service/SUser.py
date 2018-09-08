@@ -15,6 +15,10 @@ class SUser(SBase):
         return self.session.query(User).filter_by(USid=usid).all()
 
     @close_session
+    def get_user_by_phone(self, phone):
+        return self.session.query(User).filter_by(USphone=phone).first()
+
+    @close_session
     def get_user_by_roid(self, roid):
         """获取房间的租户"""
         return self.session.query(User).join(UserRoom, User.USid==UserRoom.USid).filter_by(ROid=roid).first()

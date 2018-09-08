@@ -2,7 +2,7 @@
 import logging
 import traceback
 
-from flask import request
+from flask import request, current_app
 from werkzeug.exceptions import HTTPException
 
 from Linjia.commons.error_response import SYSTEM_ERROR
@@ -33,4 +33,4 @@ def error_handler(app):
             '\n more info:' + data.decode('unicode-escape'))
         handler.setFormatter(logging_format)
         app.logger.addHandler(handler)
-        app.logger.error(e)
+        app.logger.info(e)

@@ -14,14 +14,16 @@ class AUser(Resource):
         apis = {
             'wechat_login': self.cuser.wechat_login,
             'wexin_callback': self.cuser.wexin_callback,
-            'get_wechat_config': self.cuser.get_wx_config
+            'get_wechat_config': self.cuser.get_wx_config,
         }
         res = apis[user]()
         return jsonify(res)
 
     def post(self, user):
         apis ={
-            'admin_login': self.cuser.admin_login
+            'admin_login': self.cuser.admin_login,
+            'get_code': self.cuser.get_code,
+            'login': self.cuser.login
         }
         res = apis[user]()
         return jsonify(res)

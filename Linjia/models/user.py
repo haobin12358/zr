@@ -30,9 +30,9 @@ class UserCode(Base):
     """用户短信验证码"""
     __tablename__ = 'usercode'
     UCid = Column(String(64), primary_key=True)
-    codenum = Column(Integer, nullable=False)
-    phone = Column(String(16), nullable=False)
-    createtime = Column(String(16))
+    Codenum = Column(Integer, nullable=False)
+    Phone = Column(String(16), nullable=False)
+    Createtime = Column(String(16))
 
 
 class UserSecurity(Base):
