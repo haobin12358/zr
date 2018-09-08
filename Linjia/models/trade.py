@@ -13,6 +13,7 @@ class ProvideHouseApply(Base):
     PHAname = Column(String(8), nullable=False, comment=u'用户(业主)姓名')
     PHAphone = Column(String(16), nullable=False, comment=u'电话')
     PHAcity = Column(String(64), nullable=False, comment=u'城市编号')
+    PHAvillege = Column(String(64), nullable=False, comment=u'小区')
     PHAcreatetime = Column(String(16), nullable=False, comment=u'申请时间')
 
 

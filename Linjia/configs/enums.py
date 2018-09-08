@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['FACE_CONFIG', 'ROstatus', 'GENDER_CONFIG', 'RENT_TYPE', 'DECORATOR_STYLE']
+__all__ = ['FACE_CONFIG', 'ROSTATUS', 'GENDER_CONFIG', 'RENT_TYPE', 'DECORATOR_STYLE']
 
 FACE_CONFIG = {
     1: '东', 2: '东南', 3: '南', 4: '西南', 5: '西', 6: '西北', 7: '北', 8: '东北', 0: '未知'

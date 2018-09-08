@@ -25,6 +25,16 @@ class User(Base):
     WXprivilege = Column(String(125), comment=u'微信用户特权信息, 比如微信沃卡用户为（chinaunicom）')
 
 
+
+class UserCode(Base):
+    """用户短信验证码"""
+    __tablename__ = 'usercode'
+    UCid = Column(String(64), primary_key=True)
+    codenum = Column(Integer, nullable=False)
+    phone = Column(String(16), nullable=False)
+    createtime = Column(String(16))
+
+
 class UserSecurity(Base):
     """用户身份信息"""
     __tablename__ = 'usersecurity'

@@ -8,7 +8,7 @@ class BaseRoomControl(object):
         """调整返回列表的格式"""
         room.fields = ['ROid', 'ROname', 'ROarea', 'face',
                         'ROdistance', 'ROshowprice', 'ROshowpriceunit',
-                        'ROimage', 'ROrenttype']
+                        'ROimage', 'ROrenttype', 'ROdecorationstyle']
         if room.ROstatus == 3:
             room.ROname = u'转' + room.ROname
         room.face = FACE_CONFIG.get(int(room.ROface), u'未知')
