@@ -17,11 +17,12 @@ class CTrade(object):
         self.strade = STrade()
 
     def add_providehouse_apply(self):
-        data = parameter_required('phacity', 'phavillege', 'phaphone', 'phaname')
+        """申请房源"""
         if is_admin():
             return TOKEN_ERROR(u'普通用户才可以申请')
         if is_tourist():
             return TOKEN_ERROR(u'请登录后申请')
+        data = parameter_required('phacity', 'phavillege', 'phaphone', 'phaname')
         usid = request.user.id
         already_apply = self.strade.get_provide_appy_by_usid_village(usid, data.get('phavillege'))
         if not already_apply:
@@ -30,4 +31,13 @@ class CTrade(object):
             data['PHAid'] = str(uuid.uuid4())
             self.strade.add_model('ProvideHouseApply', **data)
         return Success(u'申请成功, 等待管家回电')
+
+    def subscribe_clean(self):
+        """预约清洁"""
+        if is_admin():
+            return TOKEN_ERROR(u'普通用户才可以申请')
+        if is_tourist():
+            return TOKEN_ERROR(u'请登录后申请')
+        usid = request.user.id
+
 

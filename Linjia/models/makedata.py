@@ -273,7 +273,7 @@ class Dbcreater(object):
 
 
 if __name__ == '__main__':
-    drop_table()
+    # drop_table()
     create_table()
     creater = Dbcreater()
     # creater.create_user()
@@ -286,7 +286,7 @@ if __name__ == '__main__':
     # creater.create_subdiry_info()
     # creater.create_equirment()
     # creater.create_user_room()
-    creater.create_cit()
+    # creater.create_cit()
     # creater.creat_admin()
     # creater.create_user1()
  
