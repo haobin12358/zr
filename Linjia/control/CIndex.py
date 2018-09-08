@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
+import os
 import uuid
 
-from Linjia.commons.error_response import AUTHORITY_ERROR, NOT_FOUND
+from flask import request
+
+from Linjia.commons.error_response import AUTHORITY_ERROR, NOT_FOUND, SYSTEM_ERROR
 from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import is_admin
+from Linjia.configs.appsettings import UPLOAD_FOLDER
 from Linjia.configs.enums import RENT_TYPE
+from Linjia.configs.url_config import HTTP_HOST
 from Linjia.control.base_control import BaseRoomControl, BaseIndexControl
 from Linjia.service import SIndex, SRoom, SCity
 
@@ -32,6 +37,10 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         )
         return Success(u'获取首页信息成功', data)
 
+    def get_index_server(self):
+        """获取首页显示的服务"""
+        server_index_show = self.sindex.get_index_server()
+        return Success(u'获取首页服务成功', server_index_show)
 
     def add_banner(self):
         """新建轮播图, 必要的参数: 图片地址, 顺序标志, 链接"""
@@ -45,7 +54,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         })
 
     def add_room_show(self):
-        """新建首页显示的合租整租, 必要的参数 房源id, type, 和顺序: """
+        """新建首页显示的合租整租公寓民宿, 必要的参数 房源id, type, 和顺序: """
         if not is_admin():
             raise AUTHORITY_ERROR('请使用管理员登录')
         data = parameter_required('roid', 'rotype', 'rosort')
@@ -55,27 +64,9 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             'risid': data['RISid']
         })
 
-    def add_apartment_show(self):
-        """新建首页显示的公寓, 必要的参数有:公寓id, 顺序标志, 非必需参数有: 描述 """
-        if not is_admin():
-            raise AUTHORITY_ERROR('请使用管理员登录')
-        data = parameter_required('apid', 'aisort')
-        data['AISid'] = str(uuid.uuid4())
-        self.sindex.add_model('APartmentIndexShow', **data)
-        return Success(u'添加成功', {
-            'aisid': data['AISid']
-        })
+    def add_index_index(self):
+        """新建首页显示的服务项目"""
 
-    def add_homestay_show(self):
-        """新建首页显示民宿, 必要的参数有民宿id和顺序标志"""
-        if not is_admin():
-            raise AUTHORITY_ERROR('请使用管理员登录')
-        data = parameter_required('hsid', 'hsisort')
-        data['HSIid'] = str(uuid.uuid4())
-        self.sindex.add_model('HomeStayIndexShow', **data)
-        return Success(u'添加成功', {
-            'hsiid': data['HSIid']
-        })
 
     def delete_banner_show(self):
         """删除轮播"""
@@ -99,28 +90,6 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             'risid': data.get('risid')
         })
 
-    def delete_apartment_show(self):
-        """删除首页显示的公寓"""
-        if not is_admin():
-            raise AUTHORITY_ERROR("请使用管理员登录")
-        data = parameter_required('aisid')
-        apartment_index_show = self.sindex.delete_apartment_show_by_aisid(data.get('aisid'))
-        message = u'删除成功' if apartment_index_show else u'要删除的对象不存在'
-        return Success(message, {
-            'aisid': data.get('aisid')     
-        })
-
-    def delete_homestay_show(self):
-        """删除首页显示的民宿"""
-        if not is_admin():
-            raise AUTHORITY_ERROR("请使用管理员登录")
-        data = parameter_required('hsiid')
-        homestay_index_show = self.sindex.delete_homestay_show_by_hsiid(data.get('hsiid'))
-        message = u'删除成功' if homestay_index_show else u'要删除的对象不存在'
-        return Success(message, {
-            'hsiid': data.get('hsiid')
-        })
-
     def delete_server_index_show(self):
         """删除首页显示的服务"""
         if not is_admin():
@@ -131,3 +100,45 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         return Success(message, {
             'sisid': data.get('sisid')
         })
+
+    def upload_img(self):
+        img_name = None
+        # print(request.files)
+        file = request.files.get('file')  # 拿到文件对象
+        if not file:
+            raise SYSTEM_ERROR(u'上传有误')
+        filename = file.filename  # 获取上传的图片名称
+        shuffix = os.path.splitext(filename)[-1]
+        # 获取到名称的后缀
+        if self.allowed_file(shuffix):
+            # 调用生成随机图片名称的函数
+            newName = self.new_name(shuffix)
+            img_name = newName
+            # 拼凑完整的图片上传路径
+            newPath = os.path.join(UPLOAD_FOLDER, 'img', 'banner', newName)
+            file.save(newPath)  # 保存图片
+            data = HTTP_HOST + '/img/banner/' + img_name
+            return Success(u'上传成功', data)
+        else:
+            return SYSTEM_ERROR(u'上传有误')
+
+    @staticmethod
+    def new_name(shuffix, length=32):
+        import string, random
+        myStr = string.ascii_letters + '0123456789'
+        newName = ''.join(random.choice(myStr) for i in range(length))
+        return newName + shuffix
+
+    @staticmethod
+    def allowed_file(shuffix):
+        return shuffix in ['.jpg','.jpeg','.png','.gif']
+
+    @staticmethod
+    def new_name(shuffix):
+        import string, random  # import random
+        myStr = string.ascii_letters + '12345678'
+        return ''.join(random.choice(myStr) for i in range(20)) + shuffix
+
+
+
+
