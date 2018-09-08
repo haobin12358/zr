@@ -24,7 +24,7 @@ class CTrade(object):
         data['PHAcreatetime'] = datetime.strftime(datetime.now(), format_for_db)
         data['PHAid'] = str(uuid.uuid4())
         self.strade.add_model('ProvideHouseApply', **data)
-        return Success(u'申请成功', {
+        return Success(u'申请成功, 等待管家回电', {
             'data': data['PHAid']
         })
 

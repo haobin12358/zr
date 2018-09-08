@@ -5,7 +5,7 @@ from flask_cors import CORS
 from flask import Flask as _Flask, Response
 from werkzeug.exceptions import HTTPException
 
-from Linjia.apis.v1 import AUser, ARoom, AIndex
+from Linjia.apis.v1 import AUser, ARoom, AIndex, ATrade
 from Linjia.apis.v1.verify_wechat import register_blueprint
 from flask.json import JSONEncoder as _JSONEncoder
 
@@ -47,15 +47,14 @@ def register_route(app):
     app.add_url_rule('/user/<string:user>/', view_func=AUser.as_view('user'))
     app.add_url_rule('/room/<string:room>/', view_func=ARoom.as_view('room'))
     app.add_url_rule('/index/<string:index>/', view_func=AIndex.as_view('index'))
+    app.add_url_rule('/trade/<string:trade>/', view_func=ATrade.as_view('trade'))
 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object('Linjia.configs.appsettings')
     register_route(app)
-    # register_blue(app)
     print(app.debug)
-    # if not app.debug:
     error_handler(app)
     CORS(app, supports_credentials=True)
     request_first_handler(app)

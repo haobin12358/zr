@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from flask import request
+from flask import request, current_app
+from raven.contrib import flask
 
 from Linjia.commons.error_response import NOT_FOUND
 from Linjia.commons.params_required import parameter_required
@@ -64,5 +65,6 @@ class CRoom(BaseRoomControl):
         room.ROface = FACE_CONFIG.get(room.ROface, u'未知')
         room.ROrenttype = RENT_TYPE.get(room.ROrenttype, u'未知')
         room.add('ROisdelete', 'ROcreatetime', 'ROcitynum')
+        flask.current_app.logger.error()
         return Success('获取房源信息成功', room)
 
