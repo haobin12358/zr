@@ -64,8 +64,18 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             'risid': data['RISid']
         })
 
-    def add_index_index(self):
+    def add_server_index(self):
         """新建首页显示的服务项目"""
+        if not is_admin():
+            raise AUTHORITY_ERROR('请使用管理员登录')
+        data = parameter_required('sisimage', 'sislink', 'sissort')
+        data['SISid'] = str(uuid.uuid4())
+        self.sindex.add_model('ServerIndexShow', **data)
+        return Success(u'添加成功', {
+            'sisid': data['SISid']
+        })
+
+
 
 
     def delete_banner_show(self):
