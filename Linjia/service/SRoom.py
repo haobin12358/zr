@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from flask import current_app
+import math
+
+from flask import current_app, request
 from sqlalchemy import or_, and_
 
 from Linjia.commons.base_service import SBase, close_session
@@ -38,6 +40,10 @@ class SRoom(SBase):
             all_room = all_room.join(House, House.HOid==Room.HOid).filter(or_(House.HObedroomcount == int(v) for v in kwargs.get('bed_count')))
         page_num = kwargs.get('page')
         page_size = kwargs.get('count')
+        all_count = all_room.count()
+        page_count = math.ceil(float(all_count) / page_size)
+        request.page_count = page_count  # wf...
+        request.all_count = all_count
         return all_room.offset((page_num - 1) * page_size).limit(page_size).all()
 
     @close_session

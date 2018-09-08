@@ -29,4 +29,3 @@ def request_first_handler(app):
             except Exception as e:
                 # 无法解析的token
                 pass
-

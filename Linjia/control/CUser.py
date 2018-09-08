@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from threading import Thread
 
-from flask import request, current_app
+from flask import request, current_app, url_for
 from raven.transport import requests
 from weixin import WeixinLogin
 
@@ -17,7 +17,7 @@ from Linjia.commons.token_handler import usid_to_token
 from Linjia.configs.phone_code import auth_key, code_url
 from Linjia.configs.timeformat import format_for_db
 from Linjia.configs.url_config import HTTP_HOST
-from Linjia.configs.wxconfig import APPID, WXSCOPE, APPSECRET
+from Linjia.configs.wxconfig import APPID, APPSECRET
 from Linjia.service import SUser, SUserCode
 
 
@@ -25,7 +25,7 @@ class CUser():
     def __init__(self):
         self.suser = SUser()
         self.susercode = SUserCode()
-
+        self.wxlogin = WeixinLogin(APPID, APPSECRET)
 
     def admin_login(self):
         """管理员登录"""
@@ -75,11 +75,10 @@ class CUser():
 
     def wechat_login(self):
         """获取微信跳转链接"""
-        self.wxlogin = WeixinLogin(APPID, APPSECRET)
-        url = self.wxlogin.authorize(HTTP_HOST + "/weixin/callback", "snsapi_base")
-        return Success('获取跳转链接成功',  {'url': url}, status=302)
+        url = self.wxlogin.authorize(HTTP_HOST + "/user/weixin_callback/", "snsapi_base")
+        return Success(u'获取跳转链接成功',  {'url': url}, status=302)
 
-    def wexin_callback(self):
+    def weixin_callback(self):
         """获取用户信息"""
         args = request.args.to_dict()
         code = args.get('code')
@@ -87,7 +86,7 @@ class CUser():
         print data.access_token
         print data.refresh_token
         print data.openid
-        data = self.wxlogin.user_info(data.access_token)
+        data = self.wxlogin.user_info(data.access_token, data.openid)
         return data
 
 

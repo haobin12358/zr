@@ -13,7 +13,7 @@ class AUser(Resource):
         print(user)
         apis = {
             'wechat_login': self.cuser.wechat_login,
-            'wexin_callback': self.cuser.wexin_callback,
+            'weixin_callback': self.cuser.weixin_callback,
             'get_wechat_config': self.cuser.get_wx_config,
         }
         res = apis[user]()
