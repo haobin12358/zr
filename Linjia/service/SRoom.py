@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from flask import current_app
 from sqlalchemy import or_, and_
 
 from Linjia.commons.base_service import SBase, close_session
@@ -20,7 +21,6 @@ class SRoom(SBase):
     def get_room_list_filter(self, kwargs):
         """获取所有(合租和整租"""
         # todo 离地铁近
-        print(kwargs)
         all_room = self.session.query(Room).filter(Room.ROstatus >= 1, Room.ROisdelete==False)
         if 'type' in kwargs:
             all_room = all_room.filter(Room.ROrenttype == int(kwargs.get('type')))
@@ -35,7 +35,7 @@ class SRoom(SBase):
         if 'show_type' in kwargs:
             all_room = all_room.join(RoomMedia, RoomMedia.ROid == Room.ROid).filter(RoomMedia.REtype == kwargs.get('show_type'))
         if 'bed_count' in kwargs:
-            all_room = all_room.filter(or_(Room.ROface == int(v) for v in kwargs.get('bedcount')))
+            all_room = all_room.join(House, House.HOid==Room.HOid).filter(or_(House.HObedroomcount == int(v) for v in kwargs.get('bed_count')))
         page_num = kwargs.get('page')
         page_size = kwargs.get('count')
         return all_room.offset((page_num - 1) * page_size).limit(page_size).all()

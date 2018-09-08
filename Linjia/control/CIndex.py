@@ -5,6 +5,7 @@ from Linjia.commons.error_response import AUTHORITY_ERROR, NOT_FOUND
 from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import is_admin
+from Linjia.configs.enums import RENT_TYPE
 from Linjia.control.base_control import BaseRoomControl, BaseIndexControl
 from Linjia.service import SIndex, SRoom, SCity
 
@@ -24,10 +25,10 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         map(self._fill_index_room_detail, index_shows)
         # 分类
         data = dict(
-            join_rent=filter(lambda x: x.room.ROrenttype == 0, index_shows),
-            whole_rent=filter(lambda x: x.room.ROrenttype == 1, index_shows),
-            apartment=filter(lambda x: x.room.ROrenttype == 2, index_shows),
-            homestay=filter(lambda x: x.room.ROrenttype == 3, index_shows),
+            join_rent=filter(lambda x: x.ROrenttype == RENT_TYPE[0], index_shows),
+            whole_rent=filter(lambda x: x.ROrenttype == RENT_TYPE[1], index_shows),
+            apartment=filter(lambda x: x.ROrenttype == RENT_TYPE[2], index_shows),
+            homestay=filter(lambda x: x.ROrenttype == RENT_TYPE[3], index_shows),
         )
         return Success(u'获取首页信息成功', data)
 

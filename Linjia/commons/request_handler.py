@@ -15,6 +15,11 @@ def request_first_handler(app):
             s = Serializer(current_app.config['SECRET_KEY'])
             try:
                 data = s.loads(token)
+                id = data['id']
+                model = data['model']
+                level = data['level']
+                user = User(id, model, level)
+                request.user = user
             except BadSignature as e:
                 # 签名出错的token
                 pass
@@ -24,8 +29,4 @@ def request_first_handler(app):
             except Exception as e:
                 # 无法解析的token
                 pass
-            id = data['id']
-            model = data['model']
-            level = data['level']
-            user = User(id, model, level)
-            request.user = user
+

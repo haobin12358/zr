@@ -23,7 +23,7 @@ class CRoom(BaseRoomControl):
             args = {}
         args_dict['page'] = int(args.get('page', 1))  # 页码
         args_dict['count'] = int(args.get('count', 15))  # 取出条数
-        # 租赁方式, 合租整租
+        # 租赁方式, 合租整租公寓民宿
         args_dict['type'] = args.get('type')
         # 装修风格 0 毛坯, 1简装, 2: 精装, 3: 豪华
         args_dict['style'] = args.get('style').split('|') if 'style' in args else None
@@ -35,7 +35,7 @@ class CRoom(BaseRoomControl):
         # 展现方式 image or video
         args_dict['show_type'] = args.get('show_type')
         # 房型 一室,二室,三室,五室以上
-        args_dict['bed_count'] = args.get('bed_count').aplit('|') if 'bed_count' in args else None
+        args_dict['bed_count'] = args.get('bed_count').split('|') if 'bed_count' in args else None
         print(args_dict)
         # 地址 区, 附近 todo
         args_dict = {

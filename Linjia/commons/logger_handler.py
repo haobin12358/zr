@@ -14,7 +14,7 @@ def error_handler(app):
     def framework_error(e):
         if isinstance(e, Success):
             return e
-        ge_log(e)
+        generic_log(e)
         if isinstance(e, HTTPException):
             return e
         else:
@@ -22,7 +22,7 @@ def error_handler(app):
                 return SYSTEM_ERROR()
             raise Exception(traceback.format_exc().decode('unicode-escape'))
 
-    def ge_log(e):
+    def generic_log(e):
         handler = logging.FileHandler('app.log', encoding='UTF-8')
         data = traceback.format_exc()
 

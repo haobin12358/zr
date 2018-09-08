@@ -21,6 +21,11 @@ class BaseRoomControl(object):
         hoid = room.HOid
         house = self.sroom.get_house_by_hoid(hoid)
         if not house:
+            house = {
+                'size': '',
+                'floor': ''
+            }
+            room.fill(house, 'house')
             return self
         house.size = str(house.HObedroomcount) + u'室' + str(house.HOparlorcount) + u'厅'
         house.floor = str(house.HOfloor) + '/' + str(house.HOtotalfloor) + u'层'
@@ -62,7 +67,10 @@ class BaseRoomControl(object):
 class BaseIndexControl(object):
     def _fill_index_room_detail(self, index_room):
         room = self.sroom.get_room_by_roid(index_room.ROid)  # 与首页显示项目关联的room
-        room.fields = ['ROid', 'ROname', 'ROimage', 'ROshowprice', 'ROshowpriceunit', 'ROrenttype']
-        index_room.fill(room, 'room')
         self._fill_house_info(room)
+        fields = ['ROid', 'ROname', 'ROimage', 'ROshowprice', 'ROshowpriceunit', 'ROrenttype', 'ROdecorationstyle', 'house']
+        map(lambda x: index_room.fill(getattr(room, x), x), fields)
+        index_room.ROrenttype = RENT_TYPE.get(int(index_room['ROrenttype']))
+        index_room.ROdecorationstyle = DECORATOR_STYLE.get(int(index_room['ROdecorationstyle']))
+        # index_room.fill(room, 'room')
         return self

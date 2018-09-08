@@ -23,7 +23,7 @@ class SUser(SBase):
     def verify_admin_login(self, username, password):
         """验证管理员登录帐号和密码"""
         admin = self.session.query(Admin).filter_by(ADusername=username).first()
-        if check_password_hash(admin.ADpassword, password):
+        if admin and check_password_hash(admin.ADpassword, password):
             return admin
 
 

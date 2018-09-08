@@ -18,7 +18,7 @@ class Room(Base):
     # ROshowpricetype = Column(Integer, default=1, comment=u'显示价格标准 0: 月付, 1 季付, 2 半年付, 3 年付')  # 根据这个标准去价格表中查价格
     ROshowprice = Column(Float, comment=u'显示价格')
     ROshowpriceunit = Column(String(64), default=u'month', comment=u'价格单位,month,night')
-    ROrenttype = Column(Integer, default=0, comment=u'租赁方式, 0: 合租, 1: 整租, 2: 公寓, 4: 民宿')
+    ROrenttype = Column(Integer, default=0, comment=u'租赁方式, 0: 合租, 1: 整租, 2: 公寓, 3: 民宿')
     ROdecorationstyle = Column(Integer, default=2, comment=u'装修风格, 0: 毛坯, 1: 简装, 2: 精装, 3: 豪华')
     ROnum = Column(Integer, comment=u'卧室号')  # 合租才有值
     ROstatus = Column(Integer, default=0, comment=u'房源状态, 0: 待审核, 1: 配置中(可预订), 2: 可入住, 3: 转租, 4: 实习, 5, 已租出')
