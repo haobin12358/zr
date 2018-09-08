@@ -78,3 +78,8 @@ def is_admin():
 def is_tourist():
     """是否是游客"""
     return not hasattr(request, 'user')
+
+
+def common_user():
+    """是否是普通用户, 不包括管理员"""
+    return hasattr(request, 'user') and request.user.model == u'user'

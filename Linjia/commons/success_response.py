@@ -10,7 +10,7 @@ class Success(BaseError):
     """
     status = 200
     message = '获取成功'
-    data = '获取成功'
+    data = None
 
     def __init__(self, message=None, data=None, page_count=None, all_count=None, *args, **kwargs):
         self.status_code = None
@@ -28,8 +28,9 @@ class Success(BaseError):
         body = dict(
             status=self.status,
             message=self.message,
-            data=self.data
         )
+        if self.data is not None:
+            body['data'] =self.data
         if hasattr(self, 'page_count'):
             body['page_count'] = self.page_count
         if hasattr(self, 'all_count'):
