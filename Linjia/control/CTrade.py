@@ -22,7 +22,7 @@ class CTrade(object):
             return TOKEN_ERROR(u'普通用户才可以申请')
         if is_tourist():
             return TOKEN_ERROR(u'请登录后申请')
-        data = parameter_required('phacity', 'phavillege', 'phaphone', 'phaname')
+        data = parameter_required(('phacity', 'phavillege', 'phaphone', 'phaname'), others='ignore')
         usid = request.user.id
         already_apply = self.strade.get_provide_appy_by_usid_village(usid, data.get('phavillege'))
         if not already_apply:
@@ -41,3 +41,6 @@ class CTrade(object):
         usid = request.user.id
 
 
+    def mover_appointment(self):
+        """搬家预约"""
+        data = parameter_required(('smsid', 'umtstarttime', 'umtmoveoutaddr', 'umtphone', 'umtspecialwish'), others='ignore')

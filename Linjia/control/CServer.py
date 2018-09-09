@@ -31,7 +31,7 @@ class CServer(object):
 
     def get_mover_list_by_city(self):
         """获取城市下搬家的服务"""
-        data = parameter_required('city_id')
+        data = parameter_required(('city_id', ), others='ignore')
         city_id = data.get('city_id')
         is_in_oppner = self.scity.is_move_oppener(city_id)
         if not is_in_oppner:
@@ -43,7 +43,7 @@ class CServer(object):
 
     def get_mover_detail(self):
         """获取该服务的详细信息"""
-        data = parameter_required('smsid')
+        data = parameter_required(('smsid', ), others='ignore')
         smsid = data.get('smsid')
         is_exists = self.sserver.get_mover_by_smsid(smsid)
         if not is_exists:

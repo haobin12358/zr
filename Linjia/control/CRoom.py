@@ -58,7 +58,7 @@ class CRoom(BaseRoomControl):
         return data
 
     def get_detail(self):
-        data = parameter_required('roid')
+        data = parameter_required(('roid', ))
         roid = data.get('roid')
         room = self.sroom.get_room_by_roid(roid)
         if not room:
@@ -83,7 +83,7 @@ class CRoom(BaseRoomControl):
         })
 
     def get_area_by_citynum(self):
-        args = parameter_required('city_id')
+        args = parameter_required(('city_id', ))
         city_id = args.get('city_id')
         area_list = self.scity.get_area_list_by_cityid(city_id)
         map(lambda x: x.hide('_id'), area_list)

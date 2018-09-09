@@ -46,7 +46,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         """新建轮播图, 必要的参数: 图片地址, 顺序标志, 链接"""
         if not is_admin():
             raise AUTHORITY_ERROR('请使用管理员登录')
-        data = parameter_required('ibimage', 'iblink', 'ibsort')
+        data = parameter_required(('ibimage', 'iblink', 'ibsort'), others='ignore')
         data['IBid'] = str(uuid.uuid4())
         self.sindex.add_model('IndexBanner', **data)
         return Success(u'添加成功', {
@@ -57,7 +57,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         """新建首页显示的合租整租公寓民宿, 必要的参数 房源id, type, 和顺序: """
         if not is_admin():
             raise AUTHORITY_ERROR('请使用管理员登录')
-        data = parameter_required('roid', 'rotype', 'rosort')
+        data = parameter_required(('roid', 'rotype', 'rosort'), others='ignore')
         data['RISid'] = str(uuid.uuid4())
         self.sindex.add_model('RoomIndexShow', **data)
         return Success(u'添加成功', {
@@ -68,7 +68,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         """新建首页显示的服务项目"""
         if not is_admin():
             raise AUTHORITY_ERROR('请使用管理员登录')
-        data = parameter_required('sisimage', 'sislink', 'sissort')
+        data = parameter_required(('sisimage', 'sislink', 'sissort'), others='ignore')
         data['SISid'] = str(uuid.uuid4())
         self.sindex.add_model('ServerIndexShow', **data)
         return Success(u'添加成功', {
@@ -82,7 +82,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         """删除轮播"""
         if not is_admin():
             raise AUTHORITY_ERROR('请使用管理员登录')
-        data = parameter_required('ibid')
+        data = parameter_required(('ibid', ))
         banner = self.sindex.delete_banner_show_by_ibid(data.get('ibid'))
         message = u'删除成功' if banner else u'要删除的元素不存在'
         return Success(message, {
@@ -103,7 +103,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
     def delete_room_show_by_roid(self):
         if not is_admin():
             raise AUTHORITY_ERROR('请使用管理员登录')
-        data = parameter_required('roid')
+        data = parameter_required(('roid', ))
         room_index_show = self.sindex.delete_room_show_by_roid(data.get('roid'))
         message = u'取消成功' if room_index_show else u'要取消的房源不在首页'
         return Success(message, {
@@ -115,7 +115,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         """删除首页显示的服务"""
         if not is_admin():
             raise AUTHORITY_ERROR('请使用管理员登录')
-        data = parameter_required('sisid')
+        data = parameter_required(('sisid', ))
         server_index_show = self.sindex.delete_server_index_show(data.get('sisid'))
         message = u'删除成功' if server_index_show else u'要删除的对象不存在'
         return Success(message, {

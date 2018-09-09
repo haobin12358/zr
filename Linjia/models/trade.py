@@ -76,7 +76,7 @@ class UserHomeStay(Base):
 
 
 class UserMoveTrade(Base):
-    """用户服务信息"""
+    """用户搬家服务信息"""
     __tablename__ = 'usermovetrade'
     UMTid = Column(String(64), primary_key=True)
     SMSid = Column(String(64), nullable=False, comment=u'服务规模id')
