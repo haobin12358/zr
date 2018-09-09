@@ -82,6 +82,7 @@ class RoomEquirment(Base):
     # IConsort = Column(Integer, comment=u'顺序标志')
     Clothesbox = Column(Boolean, default=False, comment=u'衣柜')
     Wifi = Column(Boolean, default=False)
+    Washer = Column(Boolean, default=False, comment=u'洗衣机')
     Freezebox = Column(Boolean, default=False, comment=u'冰箱')
     TV = Column(Boolean, default=False)
     Aircondition = Column(Boolean, default=False, comment=u'空调')
