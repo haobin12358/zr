@@ -14,7 +14,6 @@ class AUser(Resource):
         apis = {
             'wechat_login': self.cuser.wechat_login,
             'weixin_callback': self.cuser.weixin_callback,
-            'get_wechat_config': self.cuser.get_wx_config,
         }
         res = apis[user]()
         return jsonify(res)
@@ -23,7 +22,8 @@ class AUser(Resource):
         apis ={
             'admin_login': self.cuser.admin_login,
             'get_code': self.cuser.get_code,
-            'login': self.cuser.login
+            'login': self.cuser.login,
+            'get_wechat_config': self.cuser.get_wx_config,
         }
         res = apis[user]()
         return jsonify(res)

@@ -5,11 +5,16 @@ import traceback
 from flask import request, current_app
 from werkzeug.exceptions import HTTPException
 
-from Linjia.commons.error_response import SYSTEM_ERROR
+from Linjia.commons.error_response import SYSTEM_ERROR, APIS_WRONG
 from Linjia.commons.success_response import Success
 
 
 def error_handler(app):
+
+    @app.errorhandler(404)
+    def error404(e):
+        return APIS_WRONG()
+
     @app.errorhandler(Exception)
     def framework_error(e):
         if isinstance(e, Success):

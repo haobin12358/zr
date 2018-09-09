@@ -38,7 +38,7 @@ class CRoom(BaseRoomControl):
         args_dict['show_type'] = args.get('show_type')
         # 房型 一室,二室,三室,五室以上
         args_dict['bed_count'] = args.get('bed_count').split('|') if 'bed_count' in args else None
-        # 城市
+        # 城市编号
         args_dict['city_id'] = args.get('city_id')
         # 区
         args_dict['area_id'] = args.get('area_id')

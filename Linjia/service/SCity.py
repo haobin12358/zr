@@ -32,3 +32,8 @@ class SCity(SBase):
     def get_area_list_by_cityid(self, cityid):
         """获取城市下的所有地区"""
         return self.session.query(Area).filter_by(city_id=cityid).all()
+
+    @close_session
+    def is_move_oppener(self, city_id):
+        """是否开通搬家"""
+        return self.session.query(MoverCity).filter(MoverCity.city_id==city_id).first()

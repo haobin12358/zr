@@ -3,6 +3,7 @@ from datetime import date
 
 from flask_cors import CORS
 from flask import Flask as _Flask, Response
+from weixin import Weixin
 from werkzeug.exceptions import HTTPException
 
 from Linjia.apis.v1 import AUser, ARoom, AIndex, ATrade, AServer, AMover
@@ -11,6 +12,7 @@ from flask.json import JSONEncoder as _JSONEncoder
 
 from Linjia.commons.logger_handler import error_handler
 from Linjia.commons.request_handler import request_first_handler
+from Linjia.extensions import reigster_extensions
 
 
 class JSONEncoder(_JSONEncoder):
@@ -54,6 +56,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object('Linjia.configs.appsettings')
     register_route(app)
+    reigster_extensions(app)
     print(app.debug)
     error_handler(app)
     CORS(app, supports_credentials=True)

@@ -13,6 +13,7 @@ class AMover(Resource):
     def get(self, server):
         apis = {
             'city_list': self.cserver.get_moveercity_list,
+            'move_list': self.cserver.get_mover_list_by_city,
         }
         res = apis[server]()
         return jsonify(res)

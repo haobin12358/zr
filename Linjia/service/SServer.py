@@ -17,7 +17,7 @@ class SServer(SBase):
     @close_session
     def get_mover_serverlistby_city_id(self, cityid):
         """根据城市获取搬家服务列表信息"""
-        return self.session.query(ServersMoveSelector).filter_by(SMScity=cityid)
+        return self.session.query(ServersMoveSelector).filter_by(SMScity=cityid).all()
 
     @close_session
     def get_mover_price_by_smsid(self, smsid):

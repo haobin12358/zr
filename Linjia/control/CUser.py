@@ -89,13 +89,19 @@ class CUser():
         data = self.wxlogin.user_info(data.access_token, data.openid)
         return data
 
-
     def get_wx_config(self):
+        data = request.json
+        if not data:
+            data = {}
+        current_url = data.get('url', request.url)
         from Linjia.configs.wxconfig import APPID, APPSECRET
         from weixin.mp import WeixinMP
         mp = WeixinMP(APPID, APPSECRET)
+        print(current_url)
         data = {
-            'config': mp.jsapi_sign(url=request.url)
+            'config': mp.jsapi_sign(url=current_url),
+            'jsp_ticket': mp.jsapi_ticket,
+            'url': current_url
         }
         response = Success(u'返回签名成功', data)
         return response
