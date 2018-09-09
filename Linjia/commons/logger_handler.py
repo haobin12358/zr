@@ -13,7 +13,7 @@ def error_handler(app):
 
     @app.errorhandler(404)
     def error404(e):
-        return APIS_WRONG()
+        return APIS_WRONG(u'接口未注册' + request.path)
 
     @app.errorhandler(Exception)
     def framework_error(e):
