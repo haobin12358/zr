@@ -68,7 +68,7 @@ class CUser():
         """发送验证码"""
         data = parameter_required('phone')
         phone = data.get('phone')
-        send = Thread(target=self.async_send_code, args=(phone, ))
+        send = Thread(target=self._async_send_code, args=(phone, ))
         send.start()
         message = u'获取成功'
         return Success(message)
@@ -79,13 +79,10 @@ class CUser():
         return Success(u'获取跳转链接成功',  {'url': url}, status=302)
 
     def weixin_callback(self):
-        """获取用户信息"""
-        args = request.args.to_dict()
+        """通过code, 获取用户信息"""
+        args = parameter_required('code')
         code = args.get('code')
         data = self.wxlogin.access_token(code)
-        print data.access_token
-        print data.refresh_token
-        print data.openid
         data = self.wxlogin.user_info(data.access_token, data.openid)
         return data
 
@@ -94,19 +91,17 @@ class CUser():
         if not data:
             data = {}
         current_url = data.get('url', request.url)
-        from Linjia.configs.wxconfig import APPID, APPSECRET
         from weixin.mp import WeixinMP
         mp = WeixinMP(APPID, APPSECRET)
         print(current_url)
         data = {
             'config': mp.jsapi_sign(url=current_url),
-            'jsp_ticket': mp.jsapi_ticket,
             'url': current_url
         }
         response = Success(u'返回签名成功', data)
         return response
 
-    def async_send_code(self, phone):
+    def _async_send_code(self, phone):
         headers = {
             'Authorization': auth_key
         }

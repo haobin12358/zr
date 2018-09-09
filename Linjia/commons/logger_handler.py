@@ -2,7 +2,7 @@
 import logging
 import traceback
 
-from flask import request, current_app
+from flask import request
 from werkzeug.exceptions import HTTPException
 
 from Linjia.commons.error_response import SYSTEM_ERROR, APIS_WRONG
