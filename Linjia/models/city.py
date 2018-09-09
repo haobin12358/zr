@@ -28,3 +28,16 @@ class Area(Base):
     city_id = Column(String(8), nullable=False)
 
 
+class RoomCity(Base):
+    """开放租房服务城市"""
+    __tablename__ = 'roomcity'
+    RCid = Column(String(64), primary_key=True)
+    city_id = Column(String(8), nullable=False)
+    ishot = Column(Boolean, default=False, comment=u'是否热门')
+
+
+class MoverCity(Base):
+    """开放搬家"""
+    __tablename__ = 'movercity'
+    MCid = Column(String(64), primary_key=True)
+    city_id = Column(String(8), nullable=False)

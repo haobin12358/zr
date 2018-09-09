@@ -13,6 +13,7 @@ class ARoom(Resource):
         print(room)
         apis = {
             'get_list': self.croom.get_list,
-            'get_detail': self.croom.get_detail
+            'get_detail': self.croom.get_detail,
+            'get_city': self.croom.get_oppener_city,
         }
         return jsonify(apis[room]())

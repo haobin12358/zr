@@ -75,10 +75,19 @@ class RoomEquirment(Base):
     """房间的设备信息"""
     __tablename__ = 'roomrequirment'
     REid = Column(String(64), primary_key=True)
-    ROid = Column(String(64), comment=u'房源id')
-    IConid = Column(String(64), comment=u'ico图标的id')
-    IContext = Column(String(64), comment=u'自定义的文字')  # 可以为空
-    IConsort = Column(Integer, comment=u'顺序标志')
+    # ROid = Column(String(64), comment=u'房源id')
+    # IConid = Column(String(64), comment=u'ico图标的id')
+    # IContext = Column(String(64), comment=u'自定义的文字')  # 可以为空
+    # IConsort = Column(Integer, comment=u'顺序标志')
+    Clothesbox = Column(Boolean, default=False, comment=u'衣柜')
+    Wifi = Column(Boolean, default=False)
+    Freezebox = Column(Boolean, default=False, comment=u'冰箱')
+    TV = Column(Boolean, default=False)
+    Aircondition = Column(Boolean, default=False, comment=u'空调')
+    Heatwatter = Column(Boolean, default=False, comment=u'热水器')
+    Desk = Column(Boolean, default=False, comment=u'桌椅')
+    Shotbox = Column(Boolean, default=False, comment=u'鞋柜')
+
 
 
 

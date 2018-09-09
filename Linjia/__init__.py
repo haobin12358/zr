@@ -11,7 +11,6 @@ from flask.json import JSONEncoder as _JSONEncoder
 
 from Linjia.commons.logger_handler import error_handler
 from Linjia.commons.request_handler import request_first_handler
-from test.blue import register_blue
 
 
 class JSONEncoder(_JSONEncoder):

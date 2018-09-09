@@ -68,3 +68,10 @@ class CRoom(BaseRoomControl):
         flask.current_app.logger.error('ttest信息')
         return Success('获取房源信息成功', room)
 
+    def get_oppener_city(self):
+        """获取开放城市"""
+        opnerlist = self.scity.get_roomoppencitylist()
+        map(lambda x: x.fill(self.scity.get_city_by_city_id(x.city_id).name, 'name'), opnerlist)
+        return Success(u'获取城市列表成功', {
+            'citys': opnerlist
+        })
