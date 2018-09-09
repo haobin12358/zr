@@ -32,17 +32,12 @@ class SIndex(SBase):
         return self.session.query(RoomIndexShow).filter_by(RISid=risid).delete()
 
     @close_session
-    def delete_apartment_show_by_aisid(self, aisid):
-        """删除首页显示的公寓"""
-        return self.session.query(APartmentIndexShow).delete()
-
-    @close_session
-    def delete_homestay_show_by_hsiid(self, hsiid):
-        """删除首页显示的民宿"""
-        return self.session.query(HomeStayIndexShow).filter_by(HSIid=hsiid).delete()
-    
-    @close_session
     def delete_server_index_show(self, sisid):
         """删除首页服务显示"""
         return self.session.query(ServerIndexShow).filter_by(SISid=sisid).delete()
 
+    @close_session
+    def is_room_showinindex_by_roid(self, roid):
+        """判断是否在首页显示"""
+        show = self.session.query(RoomIndexShow).filter_by(ROid=roid).first()
+        return True if show else False

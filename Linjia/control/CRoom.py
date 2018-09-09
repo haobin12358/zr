@@ -7,7 +7,7 @@ from Linjia.commons.params_required import parameter_required
 from Linjia.commons.success_response import Success
 from Linjia.configs.enums import FACE_CONFIG, RENT_TYPE
 from Linjia.control.base_control import BaseRoomControl
-from Linjia.service import SRoom, SUser, SCity
+from Linjia.service import SRoom, SUser, SCity, SIndex
 
 
 class CRoom(BaseRoomControl):
@@ -15,6 +15,7 @@ class CRoom(BaseRoomControl):
         self.sroom = SRoom()
         self.suser = SUser()
         self.scity = SCity()
+        self.sindex = SIndex()
 
     def get_list(self):
         # todo 位置, 地铁, 附近
@@ -37,6 +38,10 @@ class CRoom(BaseRoomControl):
         args_dict['show_type'] = args.get('show_type')
         # 房型 一室,二室,三室,五室以上
         args_dict['bed_count'] = args.get('bed_count').split('|') if 'bed_count' in args else None
+        # 城市
+        args_dict['city_id'] = args.get('city_id')
+        # 区
+        args_dict['area_id'] = args.get('area_id')
         print(args_dict)
         # 地址 区, 附近 todo
         args_dict = {
@@ -46,6 +51,7 @@ class CRoom(BaseRoomControl):
         map(self._fill_detail_for_list, room_detail_list)
         map(self._fill_house_info, room_detail_list)  # 楼层和规格
         map(lambda x: x.fill(self.sroom.get_tags_by_roid(x.ROid), 'tags', hide=('ROid', )), room_detail_list)  # 填充tag信息
+        map(lambda x: x.fill(self.sindex.is_room_showinindex_by_roid(x.ROid), 'show_index'), room_detail_list)  # 是否显示在首页
         page_count = getattr(request, 'page_count')
         all_count = getattr(request, 'all_count')
         data = Success(u'获取房源列表成功', data=room_detail_list, page_count=page_count, all_count=all_count)

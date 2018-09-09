@@ -38,6 +38,10 @@ class SRoom(SBase):
             all_room = all_room.join(RoomMedia, RoomMedia.ROid == Room.ROid).filter(RoomMedia.REtype == kwargs.get('show_type'))
         if 'bed_count' in kwargs:
             all_room = all_room.join(House, House.HOid==Room.HOid).filter(or_(House.HObedroomcount == int(v) for v in kwargs.get('bed_count')))
+        if 'city_id' in kwargs:
+            all_room = all_room.filter(Room.ROcitynum==kwargs.get('city_id'))
+        if 'area_id' in kwargs:
+            all_room = all_room.filter(Room.ROareanum==kwargs.get('area_id'))
         page_num = kwargs.get('page')
         page_size = kwargs.get('count')
         all_count = all_room.count()

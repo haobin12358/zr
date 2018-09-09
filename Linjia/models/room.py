@@ -26,6 +26,7 @@ class Room(Base):
     ROcreatetime = Column(String(16), comment=u'创建时间')
     ROshowtime = Column(String(16), comment=u'发布时间')
     ROcitynum = Column(String(64), comment=u'城市编号, 冗余字段')
+    ROareanum = Column(String(64), comment=u'区编号')
     ROsubwayaround = Column(Boolean, default=False, comment=u'地铁附近')
     ROaroundequirment = Column(Text, comment=u'周边设施介绍')
     # 类型为民宿的时候需要用到的字段
