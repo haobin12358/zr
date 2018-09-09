@@ -11,7 +11,7 @@ from weixin import WeixinLogin
 
 
 from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR
-from Linjia.commons.params_required import parameter_required
+from Linjia.commons.params_validates import parameter_required, validate_phone
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import usid_to_token
 from Linjia.configs.phone_code import auth_key, code_url
@@ -29,7 +29,7 @@ class CUser():
 
     def admin_login(self):
         """管理员登录"""
-        data = parameter_required('username', 'password')
+        data = parameter_required(('username', 'password'))
         username = data.get('username')
         password = data.get('password')
         admin = self.suser.verify_admin_login(username, password)
@@ -44,7 +44,7 @@ class CUser():
 
     def login(self):
         """登录, 没有用户则自动创建"""
-        data = parameter_required('phone', 'code')
+        data = parameter_required(('phone', 'code'), others='ignore')
         phone = str(data.get('phone'))
         code = int(data.get('code'))
         usercode = self.susercode.get_active_usercode_by_phone_code(phone, code)
@@ -66,8 +66,8 @@ class CUser():
 
     def get_code(self):
         """发送验证码"""
-        data = parameter_required('phone')
-        phone = data.get('phone')
+        data = parameter_required(('phone', ))
+        phone = validate_phone(data.get('phone'))
         send = Thread(target=self._async_send_code, args=(phone, ))
         send.start()
         message = u'获取成功'
@@ -80,7 +80,7 @@ class CUser():
 
     def weixin_callback(self):
         """通过code, 获取用户信息"""
-        args = parameter_required('code')
+        args = parameter_required(('code', ))
         code = args.get('code')
         data = self.wxlogin.access_token(code)
         data = self.wxlogin.user_info(data.access_token, data.openid)

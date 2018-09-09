@@ -5,7 +5,7 @@ import uuid
 from flask import request
 
 from Linjia.commons.error_response import AUTHORITY_ERROR, NOT_FOUND, SYSTEM_ERROR
-from Linjia.commons.params_required import parameter_required
+from Linjia.commons.params_validates import parameter_required
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import is_admin
 from Linjia.configs.appsettings import UPLOAD_FOLDER

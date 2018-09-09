@@ -13,6 +13,7 @@ class ATrade(Resource):
     def post(self, trade):
         apis = {
             'add_providehouse_apply': self.ctrade.add_providehouse_apply,
+            'mover_appointment': self.ctrade.mover_appointment,
         }
         res = apis[trade]()
         return jsonify(res)

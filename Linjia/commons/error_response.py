@@ -2,12 +2,12 @@
 from Linjia.commons.base_error import BaseError
 
 
-
 class DB_ERROR(BaseError):
     message = '系统错误'
     status = 404
 
-class PARAMS_MISS(BaseError):
+
+class PARAMS_ERROR(BaseError):
     status = 405
     status_code = 405001
     message = '参数缺失'
@@ -46,6 +46,7 @@ class APIS_WRONG(BaseError):
     status = 405
     status_code = 405002
     message = "接口未注册"
+
 
 class TIME_ERROR(BaseError):
     status = 405

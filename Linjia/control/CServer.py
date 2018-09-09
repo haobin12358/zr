@@ -2,7 +2,7 @@
 from Linjia.commons.error_response import NOT_FOUND
 from Linjia.commons.success_response import Success
 from Linjia.service import SServer, SCity
-from Linjia.commons.params_required import parameter_required
+from Linjia.commons.params_validates import parameter_required
 
 
 class CServer(object):

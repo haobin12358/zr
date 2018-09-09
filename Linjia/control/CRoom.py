@@ -3,7 +3,7 @@ from flask import request, current_app
 from raven.contrib import flask
 
 from Linjia.commons.error_response import NOT_FOUND
-from Linjia.commons.params_required import parameter_required
+from Linjia.commons.params_validates import parameter_required
 from Linjia.commons.success_response import Success
 from Linjia.configs.enums import FACE_CONFIG, RENT_TYPE
 from Linjia.control.base_control import BaseRoomControl
