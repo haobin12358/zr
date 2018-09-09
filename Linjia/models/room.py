@@ -75,7 +75,7 @@ class RoomEquirment(Base):
     """房间的设备信息"""
     __tablename__ = 'roomrequirment'
     REid = Column(String(64), primary_key=True)
-    # ROid = Column(String(64), comment=u'房源id')
+    ROid = Column(String(64), comment=u'房源id')
     # IConid = Column(String(64), comment=u'ico图标的id')
     # IContext = Column(String(64), comment=u'自定义的文字')  # 可以为空
     # IConsort = Column(Integer, comment=u'顺序标志')

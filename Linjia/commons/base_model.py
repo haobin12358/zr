@@ -68,7 +68,8 @@ class Base(AbstractConcreteBase, _Base):
             if isinstance(obj, list):
                 map(lambda x: x.hide(*hide), obj)
             else:
-                obj.hide(*hide)
+                if obj:
+                    obj.hide(*hide)
         if fields:
             if isinstance(obj, list):
                 map(lambda x: x.clean.add(*fields), obj)

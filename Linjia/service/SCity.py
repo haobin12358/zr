@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Linjia.commons.base_service import SBase, close_session
-from Linjia.models import City, RoomCity
+from Linjia.models import City, RoomCity, MoverCity
 
 
 class SCity(SBase):
@@ -20,4 +20,10 @@ class SCity(SBase):
 
     @close_session
     def get_roomoppencitylist(self):
+        """获取搬家开放城市"""
         return self.session.query(RoomCity).all()
+
+    @close_session
+    def get_moveroppencitylist(self):
+        """搬家开放城市"""
+        return self.session.query(MoverCity).all()

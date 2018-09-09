@@ -68,7 +68,8 @@ class SRoom(SBase):
 
     @close_session
     def get_room_equirment_by_roid(self, roid):
-        return self.session.query(Icon).join(RoomEquirment, Icon.IConid==RoomEquirment.IConid).filter(RoomEquirment.ROid==roid).all()
+        # return self.session.query(Icon).join(RoomEquirment, Icon.IConid==RoomEquirment.IConid).filter(RoomEquirment.ROid==roid).all()
+        return self.session.query(RoomEquirment).filter(RoomEquirment.ROid==roid).first()
 
     @close_session
     def get_house_by_roid(self, roid):

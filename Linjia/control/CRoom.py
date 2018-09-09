@@ -59,9 +59,9 @@ class CRoom(BaseRoomControl):
             raise NOT_FOUND(u'房源不存在')
         self._fill_house_info(room)  # 楼层和规格
         self._fill_roomate_info(room)  # 室友信息
-        room.fill(self.sroom.get_room_equirment_by_roid(room.ROid), 'equirment', hide=('IConid', ))
+        room.fill(self.sroom.get_room_equirment_by_roid(room.ROid), 'equirment', hide=('IConid', 'REid', 'ROid'))
         room.fill(self.sroom.get_room_media_by_roid(room.ROid), 'media')
-        room.fill(self.scity.get_city_by_cityid(room.ROcitynum), 'city')
+        room.fill(self.scity.get_city_by_city_id(room.ROcitynum), 'city')
         room.ROface = FACE_CONFIG.get(room.ROface, u'未知')
         room.ROrenttype = RENT_TYPE.get(room.ROrenttype, u'未知')
         room.add('ROisdelete', 'ROcreatetime', 'ROcitynum')
