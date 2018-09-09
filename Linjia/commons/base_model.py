@@ -52,7 +52,7 @@ class Base(AbstractConcreteBase, _Base):
         self.fields = []
         return self
 
-    def fill(self, obj, name, hide=None, fields=None, null=True):
+    def fill(self, obj, name, hide=None, fields=None, allow_none=True):
         """简化control层代码:
             room.fill(self.sroom.get_house_by_hoid(room.HOid), 'house')
             等同于:
@@ -61,7 +61,7 @@ class Base(AbstractConcreteBase, _Base):
         或者:
             map(lambda x: x.fill(self.sroom.get_house_by_hoid(x.HOid), 'house', hide=('VIid',)), room_detail_list)
         """
-        if not obj and not null:
+        if not obj and not allow_none:
             msg = u'关联的对象不存在:' + name
             raise NOT_FOUND(msg)
         if hide:

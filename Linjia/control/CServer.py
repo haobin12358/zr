@@ -41,4 +41,16 @@ class CServer(object):
             'movers': move_list
         })
 
+    def get_mover_detail(self):
+        """获取该服务的详细信息"""
+        data = parameter_required('smsid')
+        smsid = data.get('smsid')
+        is_exists = self.sserver.get_mover_by_smsid(smsid)
+        if not is_exists:
+            raise NOT_FOUND(u'没有这项服务')
+        detail = self.sserver.get_mover_price_by_smsid(smsid)
+        return Success(u'获取服务详情成功', {
+            'detail': detail
+        })
+
 

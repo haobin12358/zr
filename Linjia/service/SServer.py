@@ -20,6 +20,10 @@ class SServer(SBase):
         return self.session.query(ServersMoveSelector).filter_by(SMScity=cityid).all()
 
     @close_session
+    def get_mover_by_smsid(self, smsid):
+        return self.session.query(ServersMoveSelector).filter(ServersMoveSelector.SMSid==smsid).first()
+
+    @close_session
     def get_mover_price_by_smsid(self, smsid):
         """获取搬家服务的价格详情"""
         return self.session.query(ServersMoveSelectorPrice).filter_by(SMSid=smsid).first()

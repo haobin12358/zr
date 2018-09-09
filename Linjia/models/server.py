@@ -34,10 +34,6 @@ class ServersMoveSelectorPrice(Base):
     SMSPpricesoverstartperkg = Column(Float, comment=u'超出里程的单位价格')
     SMSPfloorprice = Column(Float, comment=u'楼层费')
     SMSPpersonprice = Column(Float, comment=u'加人费')
-    SMSPtitle = Column(String(16), nullable=False, comment=u'价格标题')
-    SMSPsubtitle = Column(String(125), comment=u'价格简易描述')
-    SSPprice = Column(Float, nullable=False, comment=u'价格')
-    SMSPpriceunit = Column(String(8), comment=u'价格单位,如元/人')
 
 
 class ServerMoveTips(Base):

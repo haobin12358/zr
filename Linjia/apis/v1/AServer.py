@@ -14,6 +14,7 @@ class AMover(Resource):
         apis = {
             'city_list': self.cserver.get_moveercity_list,
             'move_list': self.cserver.get_mover_list_by_city,
+            'get_detail': self.cserver.get_mover_detail
         }
         res = apis[server]()
         return jsonify(res)
