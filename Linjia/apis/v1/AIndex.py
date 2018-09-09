@@ -25,6 +25,7 @@ class AIndex(Resource):
             'add_server_show': self.cindex.add_server_index,
             'delete_banner_show': self.cindex.delete_banner_show,
             'delete_room_show': self.cindex.delete_room_show,
+            'delete_room_show_byroid': self.cindex.delete_room_show_by_roid,
             'delete_server_show': self.cindex.delete_server_index_show,
             'upload_img': self.cindex.upload_img
         }

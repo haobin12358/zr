@@ -81,3 +81,12 @@ class CRoom(BaseRoomControl):
         return Success(u'获取城市列表成功', {
             'citys': opnerlist
         })
+
+    def get_area_by_citynum(self):
+        args = parameter_required('city_id')
+        city_id = args.get('city_id')
+        area_list = self.scity.get_area_list_by_cityid(city_id)
+        map(lambda x: x.hide('_id'), area_list)
+        return Success(u'获取城市成功', {
+            'area_list': area_list
+        })

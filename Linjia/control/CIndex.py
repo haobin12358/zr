@@ -100,6 +100,17 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             'risid': data.get('risid')
         })
 
+    def delete_room_show_by_roid(self):
+        if not is_admin():
+            raise AUTHORITY_ERROR('请使用管理员登录')
+        data = parameter_required('roid')
+        room_index_show = self.sindex.delete_room_show_by_roid(data.get('roid'))
+        message = u'取消成功' if room_index_show else u'要取消的房源不在首页'
+        return Success(message, {
+            'roid': data.get('roid')
+        })
+
+
     def delete_server_index_show(self):
         """删除首页显示的服务"""
         if not is_admin():
