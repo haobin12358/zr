@@ -49,12 +49,15 @@ class CTrade(object):
         if is_tourist():
             return TOKEN_ERROR(u'请登录后申请')
         data = parameter_required(('smsid', 'umtstarttime', 'umtmoveoutaddr', 'umtphone', 'umtspecialwish'), others='ignore')
-        validate_phone(data.get('umtphone'))
-
+        # todo是否存在这个服务
         # 暂时只简单判断预约时间
+        validate_phone(data.get('umtphone'))
         self._allow_starttime(data.get('umtstarttime'))
-        self.strade.add_model('UserMoveTrade', **data)
-        return Success()
+        data['UMTid'] = str(uuid.uuid4())
+        model_bean_dict = self.strade.add_model('UserMoveTrade', **data)
+        return Success(u'预约成功', {
+            'data': model_bean_dict
+        })
 
     @staticmethod
     def _allow_starttime(str_time):
@@ -66,6 +69,7 @@ class CTrade(object):
         if time_at_road < MOVER_APPOINT_ON_ROAD:
             raise PARAMS_ERROR(u'时间不合理')
         return str_time
+
 
 
 

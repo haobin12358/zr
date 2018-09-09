@@ -82,7 +82,7 @@ class UserMoveTrade(Base):
     SMSid = Column(String(64), nullable=False, comment=u'服务规模id')
     UMTstarttime = Column(String(16), nullable=False, comment=u'预约搬家时间')
     UMTmoveoutaddr = Column(String(64), nullable=False, comment=u'搬出地址')
-    UMTmoveinaddr = Column(String(64), nullable=False, comment=u'搬入地址')
+    UMTmoveinaddr = Column(String(64), comment=u'搬入地址')
     UMTdistance = Column(String(64), comment=u'里程')
     UMTphone = Column(String(64), nullable=False, comment=u'电话')
     UMTspecialwish = Column(String(64), comment=u'特殊请求')
