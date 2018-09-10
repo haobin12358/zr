@@ -54,6 +54,7 @@ class CTrade(object):
         self._allow_starttime(data.get('umtstarttime'))
         data['UMTid'] = str(uuid.uuid4())
         data['usid'] = request.user.id
+        data['UMTcreatetime'] = datetime.strftime(datetime.now(), format_for_db)
         model_bean_dict = self.strade.add_model('UserMoveTrade', data, ['UMTstarttime', 'UMTid'])
         model_bean_dict['name'] = mover_exsits.SMStitle
         return Success(u'预约成功', model_bean_dict)
@@ -73,6 +74,7 @@ class CTrade(object):
         self._allow_starttime(data.get('uctpreviewstarttime'))
         data['uctid'] = str(uuid.uuid4())
         data['usid'] = request.user.id
+        data['UCTcreatetime'] = datetime.strftime(datetime.now(), format_for_db)
         modelbean_dict = self.sserver.add_model('UserCleanTrade', data, ['UCTpreviewstarttime', 'UCTid'])
         modelbean_dict['name'] = cleaner_exists.SCMtitle
         return Success(u'预约成功', modelbean_dict)
@@ -83,13 +85,14 @@ class CTrade(object):
             return TOKEN_ERROR(u'只有普通用户才可以预约')
         if is_tourist():
             return TOKEN_ERROR(u'请登录后预约')
-        required = ('uftaddr', 'uftprice', 'uftstarttime', 'uftphone', 'uftlocation')
+        required = ('uftaddr' , 'uftstarttime', 'uftphone', 'uftlocation')
         forbidden = ('usid', 'uftstatus')
         data = parameter_required(required, forbidden=forbidden)
         validate_phone(data.get('uftphone'))
         self._allow_starttime(data.get('uftstarttime'))
         data['UFTid'] = str(uuid.uuid4())
         data['usid'] = request.user.id
+        data['UFTcreatetime'] = datetime.strftime(datetime.now(), format_for_db)
         model_bean_dict = self.sserver.add_model('UserFixerTrade', data, ['UFTid', 'UFTstarttime'])
         model_bean_dict['name'] = u'维修预约'
         return Success(u'预约成功', model_bean_dict)
@@ -110,12 +113,14 @@ class CTrade(object):
             order_list = self.strade.get_mover_serverlist_by_usid(usid, data)
             map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr',
                                       'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish',
-                                      'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid'), order_list)
+                                      'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid', 'UMTcreatetime'), order_list)
             map(lambda x: x.fill(SERVER_STATUS.get(x.UMTstatus), 'umtstatus'), order_list)
             map(lambda x: x.fill(self.sserver.get_mover_by_smsid(x.SMSid).SMStitle, 'name'), order_list)
             map(lambda x: x.fill('mover', 'type'), order_list)
         elif server_type == 'fixer':
-            fixer_list = ''
+            order_list = self.strade.get_fixer_serverlist_by_usid(usid, data)
+            map(lambda x: setattr(x, 'UFTstatus', SERVER_STATUS.get(x.UFTstatus)), order_list)
+            map(lambda x: x.fill(u'fixer', 'type'), order_list)
         elif server_type == 'cleaner':
             order_list = self.strade.get_clean_serverlist_by_usid(usid, data)
             map(lambda x: setattr(x, 'UCTstatus', SERVER_STATUS.get(x.UCTstatus)), order_list)
@@ -135,10 +140,4 @@ class CTrade(object):
         if MOVER_APPOINT_MIN_TIME_ON_ROAD < time_on_road_seconds < MOVER_APPOINT_MAX_TIME_ON_ROAD:
             return str_time
         raise PARAMS_ERROR(u'时间不合理, 2小时至7天')
-
-
-
-
-
-
 

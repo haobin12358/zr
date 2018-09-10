@@ -42,7 +42,7 @@ class JSONEncoder(_JSONEncoder):
 class Request(_Request):
     def on_json_loading_failed(self, e):
         if current_app is not None and current_app.debug:
-            raise BadRequest('Failed to decode JSON object: {0}'.format(e))
+            raise PARAMS_ERROR('Failed to decode JSON object: {0}'.format(e))
         raise PARAMS_ERROR(u'参数异常')
 
     def get_json(self, force=False, silent=False, cache=True):

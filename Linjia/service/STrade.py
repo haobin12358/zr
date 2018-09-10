@@ -3,7 +3,7 @@ from datetime import datetime
 
 from Linjia.commons.base_service import SBase, close_session
 from Linjia.configs.timeformat import format_for_db
-from Linjia.models import ProvideHouseApply, UserMoveTrade, UserCleanTrade
+from Linjia.models import ProvideHouseApply, UserMoveTrade, UserCleanTrade, UserFixerTrade
 
 
 class STrade(SBase):
@@ -30,3 +30,10 @@ class STrade(SBase):
         page_size = args.get('page_size')
         return self.session.query(UserCleanTrade).filter(UserCleanTrade.USid == usid).offset(
             (page_num - 1) * page_size).limit(page_size).all()
+
+    @close_session
+    def get_fixer_serverlist_by_usid(self, usid, args):
+        page_num = args.get('page_num')
+        page_size = args.get('page_size')
+        return self.session.query(UserFixerTrade).filter(UserFixerTrade.USid==usid).offset((page_num - 1) * page_size).limit(page_size).all()
+
