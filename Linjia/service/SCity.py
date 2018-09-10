@@ -42,3 +42,8 @@ class SCity(SBase):
     def get_cleaneroppencitylist(self):
         """获取开通清洁服务的城市"""
         return self.session.query(CleanerCity).all()
+
+    @close_session
+    def is_clean_oppener(self, city_id):
+        """城市是否开通清洁"""
+        return self.session.query(CleanerCity).filter(CleanerCity.city_id==city_id).first()

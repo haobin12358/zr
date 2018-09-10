@@ -60,9 +60,18 @@ class CServer(object):
         city_list = self.scity.get_cleaneroppencitylist()
         map(lambda x: x.fill(getattr(self.scity.get_city_by_city_id(x.city_id), 'name', u'未知'),  # 仅额外填充城市的名字
                              'name'), city_list)
-        return Success(u'获取列表成功', {
+        return Success(u'获取城市列表成功', {
             'citys': city_list
         })
 
-    def get_mover_list_by_cityid(self):
+    def get_clean_list_by_cityid(self):
         """获取城市下的所有清洁服务"""
+        data = parameter_required(('city_id',), others='ignore')
+        city_id = data.get('city_id')
+        is_in_oppner = self.scity.is_clean_oppener(city_id)
+        if not is_in_oppner:
+            raise NOT_FOUND(u'该城市暂未开通清洁服务')
+        move_list = self.sserver.get_clearerserver_list()
+        return Success(u'获取清洁列表成功', {
+            'movers': move_list
+        })

@@ -79,7 +79,8 @@ class ServerCleanSelector(Base):
     SCMtitlepic = Column(String(255), nullable=False, comment=u'封面图')
     SCMtitle = Column(String(16), nullable=False, comment=u'标题, 比如日常保洁')
     SCMsubtitle = Column(String(255), nullable=False, comment=u'标题下方, 比如一句话说明适用范围')
-    SCMcity = Column(String(16), comment=u'城市')  # 不同的城市有不同的服务
+    SCprice = Column(Float, nullable=False, comment=u'价格')
+    # SCMcity = Column(String(16), comment=u'城市')  # 不同的城市有不同的服务
 
 
 class ServersCleanSelectorPrice(Base):

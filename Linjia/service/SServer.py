@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Linjia.commons.base_service import SBase, close_session
-from Linjia.models import ServersMoveSelector, ServersMoveSelectorPrice, UserMoveTrade
+from Linjia.models import ServersMoveSelector, ServersMoveSelectorPrice, UserMoveTrade, ServerCleanSelector
 
 
 class SServer(SBase):
@@ -28,3 +28,7 @@ class SServer(SBase):
     def get_mover_price_by_smsid(self, smsid):
         """获取搬家服务的价格详情"""
         return self.session.query(ServersMoveSelectorPrice).filter_by(SMSid=smsid).first()
+
+    @close_session
+    def get_clearerserver_list(self):
+        return self.session.query(ServerCleanSelector).all()

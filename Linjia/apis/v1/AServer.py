@@ -26,7 +26,8 @@ class Acleaner(Aserver):
     """清洁相关"""
     def get(self, cleaner):
         apis = {
-            'city_list': self.cserver.get_cleanercity_list
+            'city_list': self.cserver.get_cleanercity_list,
+            'clean_list': self.cserver.get_clean_list_by_cityid
         }
         res = apis[cleaner]()
         return jsonify(res)
