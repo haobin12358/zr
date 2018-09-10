@@ -9,7 +9,7 @@ from Linjia.commons.error_response import TOKEN_ERROR, PARAMS_ERROR, NOT_FOUND
 from Linjia.commons.params_validates import parameter_required, validate_phone
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import is_admin, is_tourist
-from Linjia.configs.enums import UMT_STATUS
+from Linjia.configs.enums import SERVER_STATUS
 from Linjia.configs.server_config import MOVER_APPOINT_MAX_TIME_ON_ROAD, MOVER_APPOINT_MIN_TIME_ON_ROAD
 from Linjia.configs.timeformat import format_for_db
 from Linjia.service import STrade, SServer
@@ -62,7 +62,7 @@ class CTrade(object):
         self._allow_starttime(data.get('umtstarttime'))
         data['UMTid'] = str(uuid.uuid4())
         data['usid'] = request.user.id
-        model_bean_dict = self.strade.add_model('UserMoveTrade', data, ['UMTstarttime'])
+        model_bean_dict = self.strade.add_model('UserMoveTrade', data, ['UMTstarttime', 'UMTid'])
         model_bean_dict['name'] = mover_exsits.SMStitle
         return Success(u'预约成功', model_bean_dict)
 
@@ -72,14 +72,22 @@ class CTrade(object):
             return TOKEN_ERROR(u'普通用户才可以预约')
         if is_tourist():
             return TOKEN_ERROR(u'请登录后预约')
-        required = ('sceid', 'uctpreviewstarttime', 'uctaddr', 'uctpreviewlastingtime', 'uctphone', 'uctprice')
+        required = ('sceid', 'uctpreviewstarttime', 'uctaddr', 'uctpreviewlastingtime', 'uctphone', 'uctprice', 'uctspecialwish', 'uctlocation')
         data = parameter_required(required, others='ignore')
         cleaner_exists = self.sserver.get_cleanerserver_by_sceid(data.get('sceid'))
-
+        if not cleaner_exists:
+            raise NOT_FOUND(u'不存在的清洁服务')
+        validate_phone(data.get('uctphone'))
+        self._allow_starttime(data.get('uctpreviewstarttime'))
+        data['uctid'] = str(uuid.uuid4())
+        data['usid'] = request.user.id
+        modelbean_dict = self.sserver.add_model('UserCleanTrade', data, ['UCTpreviewstarttime', 'UCTid'])
+        modelbean_dict['name'] = cleaner_exists.SCMtitle
+        return Success(u'预约成功', modelbean_dict)
 
 
     def get_my_oppintment(self):
-        """获得我的预约 type=mover, fixer, cleaner"""
+        """获得我的预约搬家, 维修, 清洁 type=mover, fixer, cleaner"""
         if is_admin():
             return TOKEN_ERROR(u'普通用户查看')
         if is_tourist():
@@ -90,16 +98,21 @@ class CTrade(object):
         usid = request.user.id
         server_type = data.get('type')
         if server_type == 'mover':
-            mover_list = self.sserver.get_mover_serverlist_by_usid(usid, data)
-            map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr', 'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish', 'UMTpreviewprice'), mover_list)
-            map(lambda x: x.fill(UMT_STATUS.get(x.UMTstatus), 'umtstatus'), mover_list)
-            map(lambda x: x.fill(self.sserver.get_mover_by_smsid(x.SMSid).SMStitle, 'name'), mover_list)
-            map(lambda x: x.fill('mover', 'type'), mover_list)
+            order_list = self.strade.get_mover_serverlist_by_usid(usid, data)
+            map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr',
+                                      'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish',
+                                      'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid'), order_list)
+            map(lambda x: x.fill(SERVER_STATUS.get(x.UMTstatus), 'umtstatus'), order_list)
+            map(lambda x: x.fill(self.sserver.get_mover_by_smsid(x.SMSid).SMStitle, 'name'), order_list)
+            map(lambda x: x.fill('mover', 'type'), order_list)
         elif server_type == 'fixer':
-            mover_list = ''
+            fixer_list = ''
         elif server_type == 'cleaner':
-            mover_list = ''
-        return Success(u'获取列表成功', mover_list)
+            order_list = self.strade.get_clean_serverlist_by_usid(usid, data)
+            map(lambda x: setattr(x, 'UCTstatus', SERVER_STATUS.get(x.UCTstatus)), order_list)
+            map(lambda x: x.fill(self.sserver.get_cleanerserver_by_sceid(x.SCEid).SCMtitle, 'name'), order_list)
+            map(lambda x: x.fill('cleaner', 'type'), order_list)
+        return Success(u'获取列表成功', order_list)
 
     @staticmethod
     def _allow_starttime(str_time):

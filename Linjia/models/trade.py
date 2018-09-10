@@ -102,11 +102,13 @@ class UserCleanTrade(Base):
     """用户保洁服务"""
     __tablename__ = 'usercleantrace'
     UCTid = Column(String(64), primary_key=True)
+    USid = Column(String(64), nullable=False)
     SCEid = Column(String(64), nullable=False, comment=u'保洁规模id')
     UCTaddr = Column(String(125), nullable=False, comment=u'地址')
     UCTpreviewstarttime = Column(String(16), nullable=False, comment=u'预约上门时间')
     UCTspecialwish = Column(String(255), comment=u'特殊需求')
-    UCTpreviewlastingtime = Column(Float, comment=u'预约服务时长')
+    UCTpreviewlastingtime = Column(Float, comment=u'预约服务时长, 小时')
+    UCTlocation = Column(String(64), comment=u'地址坐标')
     UCTphone = Column(String(12), nullable=False, comment=u'手机号码')
     UCTprice = Column(Float, comment=u'价格')
     # UCTcoupo = Column(String(64), comment=u'优惠券id')

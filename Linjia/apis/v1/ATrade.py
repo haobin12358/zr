@@ -14,6 +14,7 @@ class ATrade(Resource):
         apis = {
             'add_providehouse_apply': self.ctrade.add_providehouse_apply,
             'mover_appointment': self.ctrade.mover_appointment,
+            'cleaner_apponintment': self.ctrade.cleaner_appiontment
         }
         res = apis[trade]()
         return jsonify(res)

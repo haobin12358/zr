@@ -3,7 +3,7 @@ from datetime import datetime
 
 from Linjia.commons.base_service import SBase, close_session
 from Linjia.configs.timeformat import format_for_db
-from Linjia.models import ProvideHouseApply
+from Linjia.models import ProvideHouseApply, UserMoveTrade, UserCleanTrade
 
 
 class STrade(SBase):
@@ -17,3 +17,16 @@ class STrade(SBase):
             seconds = (datetime.now() - last_applytime).total_seconds()
             if seconds < 600:
                 return apply
+
+    @close_session
+    def get_mover_serverlist_by_usid(self, usid, args):
+        page_num = args.get('page_num')
+        page_size = args.get('page_size')
+        return self.session.query(UserMoveTrade).filter(UserMoveTrade.USid==usid).offset((page_num - 1) * page_size).limit(page_size).all()
+
+    @close_session
+    def get_clean_serverlist_by_usid(self, usid, args):
+        page_num = args.get('page_num')
+        page_size = args.get('page_size')
+        return self.session.query(UserCleanTrade).filter(UserCleanTrade.USid == usid).offset(
+            (page_num - 1) * page_size).limit(page_size).all()
