@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 import logging
+import os
 import traceback
+from datetime import datetime
 
 from flask import request
 from werkzeug.exceptions import HTTPException
 
 from Linjia.commons.error_response import SYSTEM_ERROR, APIS_WRONG
 from Linjia.commons.success_response import Success
+from Linjia.configs.appsettings import BASEDIR
 
 
 def error_handler(app):
@@ -28,9 +31,10 @@ def error_handler(app):
             raise Exception(traceback.format_exc().decode('unicode-escape'))
 
     def generic_log(e):
-        handler = logging.FileHandler('app.log', encoding='UTF-8')
+        logger_file_name = datetime.now().strftime("%Y-%m-%d") + u'.log'
+        logger_dir = os.path.join(BASEDIR, 'logs', logger_file_name)
+        handler = logging.FileHandler(logger_dir, encoding='UTF-8')
         data = traceback.format_exc()
-
         logging_format = logging.Formatter(
             ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
             "%(asctime)s] {%(pathname)s: \n"

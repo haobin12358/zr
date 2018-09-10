@@ -48,9 +48,9 @@ class CTrade(object):
     def mover_appointment(self):
         """搬家预约"""
         if is_admin():
-            return TOKEN_ERROR(u'普通用户才可以申请')
+            return TOKEN_ERROR(u'普通用户才可以预约')
         if is_tourist():
-            return TOKEN_ERROR(u'请登录后申请')
+            return TOKEN_ERROR(u'请登录后预约')
         required = ('smsid', 'umtstarttime', 'umtmoveoutaddr', 'umtmoveinaddr',
                     'umtmoveoutlocation', 'umtmoveinlocation', 'umtphone', 'umtspecialwish', 'umtpreviewprice')
         data = parameter_required(required, others='ignore')
@@ -62,11 +62,21 @@ class CTrade(object):
         self._allow_starttime(data.get('umtstarttime'))
         data['UMTid'] = str(uuid.uuid4())
         data['usid'] = request.user.id
-        import ipdb
-        ipdb.set_trace()
         model_bean_dict = self.strade.add_model('UserMoveTrade', data, ['UMTstarttime'])
         model_bean_dict['name'] = mover_exsits.SMStitle
         return Success(u'预约成功', model_bean_dict)
+
+    def cleaner_appiontment(self):
+        """清洁服务预约"""
+        if is_admin():
+            return TOKEN_ERROR(u'普通用户才可以预约')
+        if is_tourist():
+            return TOKEN_ERROR(u'请登录后预约')
+        required = ('sceid', 'uctpreviewstarttime', 'uctaddr', 'uctpreviewlastingtime', 'uctphone', 'uctprice')
+        data = parameter_required(required, others='ignore')
+        cleaner_exists = self.sserver.get_cleanerserver_by_sceid(data.get('sceid'))
+
+
 
     def get_my_oppintment(self):
         """获得我的预约 type=mover, fixer, cleaner"""

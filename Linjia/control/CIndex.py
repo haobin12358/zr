@@ -8,7 +8,7 @@ from Linjia.commons.error_response import AUTHORITY_ERROR, NOT_FOUND, SYSTEM_ERR
 from Linjia.commons.params_validates import parameter_required
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import is_admin
-from Linjia.configs.appsettings import UPLOAD_FOLDER
+from Linjia.configs.appsettings import BASEDIR
 from Linjia.configs.enums import RENT_TYPE
 from Linjia.configs.url_config import HTTP_HOST
 from Linjia.control.base_control import BaseRoomControl, BaseIndexControl
@@ -133,7 +133,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             newName = self.new_name(shuffix)
             img_name = newName
             # 拼凑完整的图片上传路径
-            newPath = os.path.join(UPLOAD_FOLDER, 'img', 'banner', newName)
+            newPath = os.path.join(BASEDIR, 'img', 'banner', newName)
             file.save(newPath)  # 保存图片
             data = HTTP_HOST + '/img/banner/' + img_name
             return Success(u'上传成功', data)

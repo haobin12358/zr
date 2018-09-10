@@ -107,11 +107,13 @@ class UserCleanTrade(Base):
     UCTpreviewstarttime = Column(String(16), nullable=False, comment=u'预约上门时间')
     UCTspecialwish = Column(String(255), comment=u'特殊需求')
     UCTpreviewlastingtime = Column(Float, comment=u'预约服务时长')
+    UCTphone = Column(String(12), nullable=False, comment=u'手机号码')
+    UCTprice = Column(Float, comment=u'价格')
     # UCTcoupo = Column(String(64), comment=u'优惠券id')
     UCTstatus = Column(Integer, default=0, comment=u'订单状态, 0: 已预约, 1: 正在进行, 2: 完成')
-    UCTtruestarttime = Column(String(16), comment=u'实际上门时间')
-    UCTtrueendtime = Column(String(16), comment=u'工作人员离开时间')
-    UCTtrueprice = Column(Float, comment=u'实际价格')
+    # UCTtruestarttime = Column(String(16), comment=u'实际上门时间')
+    # UCTtrueendtime = Column(String(16), comment=u'工作人员离开时间')
+    # UCTtrueprice = Column(Float, comment=u'实际价格')
 
 
 class HomeStayComment(Base):

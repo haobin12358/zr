@@ -32,3 +32,7 @@ class SServer(SBase):
     @close_session
     def get_clearerserver_list(self):
         return self.session.query(ServerCleanSelector).all()
+
+    @close_session
+    def get_cleanerserver_by_sceid(self, sceid):
+        return self.session.query(ServerCleanSelector).filter(ServerCleanSelector.SCEid==sceid)
