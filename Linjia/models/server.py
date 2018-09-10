@@ -20,7 +20,7 @@ class ServersMoveSelector(Base):
     SMStitle = Column(String(16), nullable=False, comment=u'标题, 比如小搬')
     SMSsubtitle = Column(String(255), nullable=False, comment=u'标题下方, 比如一句话说明适用范围')
     SMSshowprice = Column(Float, nullable=False, comment=u'显示价格')
-    SMScity = Column(String(16), comment=u'城市编号')  # 不同的城市有不同的服务
+    # SMScity = Column(String(16), comment=u'城市编号')  # 不同的城市有不同的服务
     SMStatus = Column(Integer, default=0, comment=u'可用状态0:可用, 2不可用')
 
 

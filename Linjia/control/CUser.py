@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from threading import Thread
 
-from flask import request, current_app, url_for
+from flask import request
 from raven.transport import requests
 from weixin import WeixinLogin
 

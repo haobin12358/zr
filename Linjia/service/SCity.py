@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Linjia.commons.base_service import SBase, close_session
-from Linjia.models import City, RoomCity, MoverCity, Area
+from Linjia.models import City, RoomCity, MoverCity, Area, CleanerCity
 
 
 class SCity(SBase):
@@ -35,5 +35,10 @@ class SCity(SBase):
 
     @close_session
     def is_move_oppener(self, city_id):
-        """是否开通搬家"""
+        """城市是否开通搬家"""
         return self.session.query(MoverCity).filter(MoverCity.city_id==city_id).first()
+
+    @close_session
+    def get_cleaneroppencitylist(self):
+        """获取开通清洁服务的城市"""
+        return self.session.query(CleanerCity).all()

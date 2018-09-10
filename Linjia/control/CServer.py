@@ -18,10 +18,11 @@ class CServer(object):
             'servers': move_list
         })
 
+    # 搬家
     def get_moveercity_list(self):
         """获取开通搬家服务的城市"""
         city_list = self.scity.get_moveroppencitylist()
-        # # 将名字赋值到列表中的每一个, 等同于for循环 + city.fill(name, 'name')
+        # 将名字赋值到列表中的每一个, 等同于for循环 + city.fill(name, 'name')
         map(lambda x: x.fill(getattr(self.scity.get_city_by_city_id(x.city_id), 'name', u'未知'),  # 仅提取城市的名字
             'name'), city_list)
 
@@ -30,13 +31,13 @@ class CServer(object):
         })
 
     def get_mover_list_by_city(self):
-        """获取城市下搬家的服务"""
+        """获取搬家的服务列表"""
         data = parameter_required(('city_id', ), others='ignore')
         city_id = data.get('city_id')
         is_in_oppner = self.scity.is_move_oppener(city_id)
         if not is_in_oppner:
             raise NOT_FOUND(u'该城市暂未开通搬家服务')
-        move_list = self.sserver.get_mover_serverlistby_city_id(city_id)
+        move_list = self.sserver.get_mover_serverlist()
         return Success(u'获取列表成功', {
             'movers': move_list
         })
@@ -53,4 +54,15 @@ class CServer(object):
             'detail': detail
         })
 
+    # 保洁
+    def get_cleanercity_list(self):
+        """获取开通清洁的城市"""
+        city_list = self.scity.get_cleaneroppencitylist()
+        map(lambda x: x.fill(getattr(self.scity.get_city_by_city_id(x.city_id), 'name', u'未知'),  # 仅额外填充城市的名字
+                             'name'), city_list)
+        return Success(u'获取列表成功', {
+            'citys': city_list
+        })
 
+    def get_mover_list_by_cityid(self):
+        """获取城市下的所有清洁服务"""

@@ -37,7 +37,14 @@ class RoomCity(Base):
 
 
 class MoverCity(Base):
-    """开放搬家"""
+    """开放搬家的城市"""
     __tablename__ = 'movercity'
     MCid = Column(String(64), primary_key=True)
+    city_id = Column(String(8), nullable=False)
+
+
+class CleanerCity(Base):
+    """开通清洁的城市"""
+    __tablename__ = 'cleanercity'
+    CCid = Column(String(64), primary_key=True)
     city_id = Column(String(8), nullable=False)

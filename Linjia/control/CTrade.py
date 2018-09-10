@@ -4,6 +4,7 @@ from datetime import datetime
 
 from flask import request
 
+from Linjia.commons.baidu_map import BdMap
 from Linjia.commons.error_response import TOKEN_ERROR, PARAMS_ERROR, NOT_FOUND
 from Linjia.commons.params_validates import parameter_required, validate_phone
 from Linjia.commons.success_response import Success
@@ -51,7 +52,7 @@ class CTrade(object):
         if is_tourist():
             return TOKEN_ERROR(u'请登录后申请')
         required = ('smsid', 'umtstarttime', 'umtmoveoutaddr', 'umtmoveinaddr',
-                    'umtmoveoutlocation', 'umtmoveinlocation', 'umtphone', 'umtspecialwish')
+                    'umtmoveoutlocation', 'umtmoveinlocation', 'umtphone', 'umtspecialwish', 'umtpreviewprice')
         data = parameter_required(required, others='ignore')
         # 是否存在这个服务
         mover_exsits = self.sserver.get_mover_by_smsid(data.get('smsid'))
@@ -61,6 +62,8 @@ class CTrade(object):
         self._allow_starttime(data.get('umtstarttime'))
         data['UMTid'] = str(uuid.uuid4())
         data['usid'] = request.user.id
+        import ipdb
+        ipdb.set_trace()
         model_bean_dict = self.strade.add_model('UserMoveTrade', data, ['UMTstarttime'])
         model_bean_dict['name'] = mover_exsits.SMStitle
         return Success(u'预约成功', model_bean_dict)

@@ -5,16 +5,28 @@ from Linjia.commons.base_resource import Resource
 from Linjia.control import CServer
 
 
-class AMover(Resource):
-    """搬家相关"""
+class Aserver(Resource):
     def __init__(self):
         self.cserver = CServer()
 
-    def get(self, server):
+
+class AMover(Aserver):
+    """搬家相关"""
+    def get(self, mover):
         apis = {
             'city_list': self.cserver.get_moveercity_list,
             'move_list': self.cserver.get_mover_list_by_city,
             'get_detail': self.cserver.get_mover_detail
         }
-        res = apis[server]()
+        res = apis[mover]()
+        return jsonify(res)
+
+
+class Acleaner(Aserver):
+    """清洁相关"""
+    def get(self, cleaner):
+        apis = {
+            'city_list': self.cserver.get_cleanercity_list
+        }
+        res = apis[cleaner]()
         return jsonify(res)

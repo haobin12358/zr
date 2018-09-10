@@ -6,7 +6,7 @@ from flask import request
 from Linjia.commons.error_response import PARAMS_ERROR
 
 
-def parameter_required(required, others='allow', filter_none=True):
+def parameter_required(required=None, others='allow', filter_none=True):
     """验证请求中必需的参数
     others: 如果是allow, 则代表不会清除其他参数
     filter_none: True表示会过滤到空值(空列表, 空字符串, None等除了0之外的False值)
