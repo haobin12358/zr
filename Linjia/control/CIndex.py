@@ -48,7 +48,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             raise AUTHORITY_ERROR('请使用管理员登录')
         data = parameter_required(('ibimage', 'iblink', 'ibsort'), others='ignore')
         data['IBid'] = str(uuid.uuid4())
-        self.sindex.add_model('IndexBanner', **data)
+        self.sindex.add_model('IndexBanner', data)
         return Success(u'添加成功', {
             'ibid': data['IBid']
         })
@@ -59,7 +59,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             raise AUTHORITY_ERROR('请使用管理员登录')
         data = parameter_required(('roid', 'rotype', 'rosort'), others='ignore')
         data['RISid'] = str(uuid.uuid4())
-        self.sindex.add_model('RoomIndexShow', **data)
+        self.sindex.add_model('RoomIndexShow', data)
         return Success(u'添加成功', {
             'risid': data['RISid']
         })
@@ -70,7 +70,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             raise AUTHORITY_ERROR('请使用管理员登录')
         data = parameter_required(('sisimage', 'sislink', 'sissort'), others='ignore')
         data['SISid'] = str(uuid.uuid4())
-        self.sindex.add_model('ServerIndexShow', **data)
+        self.sindex.add_model('ServerIndexShow', data)
         return Success(u'添加成功', {
             'sisid': data['SISid']
         })

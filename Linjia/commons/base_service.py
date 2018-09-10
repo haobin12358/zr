@@ -49,7 +49,7 @@ class SBase(object):
             print(e.message)
 
     @close_session
-    def add_model(self, model_name, **kwargs):
+    def add_model(self, model_name, data_dict, return_fields=None):
         print(model_name)
         if not getattr(models, model_name):
             print("model name = {0} error ".format(model_name))
@@ -58,16 +58,16 @@ class SBase(object):
         model_bean_key = model_bean.__table__.columns.keys()
         model_bean_key_without_line = list(map(lambda x: x.strip('_'), model_bean_key))
         lower_table_key = list(map(lambda x: x.lower().strip('_'), model_bean_key))  # 数据库的字段转小写
-        for item_key in kwargs.keys():
+        for item_key in data_dict.keys():
             if item_key.lower() in lower_table_key:  # 如果json中的key同时也存在与数据库的话
                 # 找到此key在model_beankey中的位置
                 index = lower_table_key.index(item_key.lower())
-                if kwargs.get(item_key) is not None:  # 如果传入的字段有值
-                    setattr(model_bean, model_bean_key_without_line[index], kwargs.get(item_key))
+                if data_dict.get(item_key) is not None:  # 如果传入的字段有值
+                    setattr(model_bean, model_bean_key_without_line[index], data_dict.get(item_key))
 
         for key in model_bean.__table__.columns.keys():
-            if key in kwargs:
-                setattr(model_bean, key, kwargs.get(key))
-                model_bean_dict = dict(model_bean)
+            if key in data_dict:
+                setattr(model_bean, key, data_dict.get(key))
+        model_bean_dict = dict(model_bean.clean.add(*return_fields)) if return_fields else None
         self.session.add(model_bean)
         return model_bean_dict

@@ -56,7 +56,7 @@ class CUser():
                 'usid': str(uuid.uuid4()),
                 'USphone': str(phone),
             }
-            self.suser.add_model('User', **user_dict)
+            self.suser.add_model('User', user_dict)
             token = usid_to_token(user_dict['usid'])
         else:
             token = usid_to_token(user.USid)
@@ -116,7 +116,7 @@ class CUser():
                 'Phone': phone,
                 'Createtime': datetime.strftime(datetime.now(), format_for_db)
             }
-            self.suser.add_model('UserCode', **data)
+            self.suser.add_model('UserCode', data)
         else:
             raise SYSTEM_ERROR(traceback.format_exc().decode('unicode-escape'))
 
