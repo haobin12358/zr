@@ -6,7 +6,7 @@ from flask_cors import CORS
 from flask import Flask as _Flask, Response, current_app, json
 from werkzeug.exceptions import HTTPException, BadRequest
 
-from Linjia.apis.v1 import AUser, ARoom, AIndex, ATrade, AServer, AMover, Acleaner
+from Linjia.apis.v1 import AUser, ARoom, AIndex, ATrade, AServer, AMover, Acleaner, AFixer
 from Linjia.apis.v1.verify_wechat import register_blueprint
 from flask.json import JSONEncoder as _JSONEncoder
 
@@ -81,6 +81,7 @@ def register_route(app):
     app.add_url_rule('/trade/<string:trade>/', view_func=ATrade.as_view('trade'))
     app.add_url_rule('/mover/<string:mover>/', view_func=AMover.as_view('mover'))  # 搬家
     app.add_url_rule('/cleaner/<string:cleaner>/', view_func=Acleaner.as_view('cleaner'))  # 清洁
+    app.add_url_rule('/fixer/<string:fixer>/', view_func=AFixer.as_view('fixer'))  # 维修
 
 
 def create_app():

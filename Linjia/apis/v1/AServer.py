@@ -31,3 +31,12 @@ class Acleaner(Aserver):
         }
         res = apis[cleaner]()
         return jsonify(res)
+
+class AFixer(Aserver):
+    def get(self, fixer):
+        apis = {
+            'city_list': self.cserver.get_fixercity_list, 
+            'fixer_list': self.cserver.get_fixer_list_by_cityid,
+        }
+        res = apis[fixer]()
+        return jsonify(res)

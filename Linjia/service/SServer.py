@@ -26,6 +26,7 @@ class SServer(SBase):
 
     @close_session
     def get_clearerserver_list(self):
+        """获取清洁服务列表"""
         return self.session.query(ServerCleanSelector).all()
 
     @close_session

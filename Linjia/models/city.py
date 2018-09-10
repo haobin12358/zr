@@ -48,3 +48,9 @@ class CleanerCity(Base):
     __tablename__ = 'cleanercity'
     CCid = Column(String(64), primary_key=True)
     city_id = Column(String(8), nullable=False)
+
+class FixerCity(Base):
+    """开通维修的服务"""
+    __tablename__ = 'fixercity'
+    FCid = Column(String(64), primary_key=True)
+    city_id = Column(String(8), nullable=False)

@@ -91,7 +91,7 @@ class UserMoveTrade(Base):
     UMTspecialwish = Column(String(64), comment=u'特殊请求')
     # UMTcoupo = Column(String(64), comment=u'优惠券id') todo
     UMTpreviewprice = Column(Float, comment=u'估算价格')
-    UMTstatus = Column(Integer, default=0, comment=u'状态, 0: 已预约, 1: 正在配送, 2: 完成, 3 取消')
+    UMTstatus = Column(Integer, default=0, comment=u'订单状态,0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消')
     UMTtruestarttime = Column(String(16), comment=u'实际搬出时间')
     UMTtrueendtime = Column(String(16), comment=u'订单完成时间')
     STFid = Column(String(64), comment=u'搬家师傅')
@@ -112,10 +112,25 @@ class UserCleanTrade(Base):
     UCTphone = Column(String(12), nullable=False, comment=u'手机号码')
     UCTprice = Column(Float, comment=u'价格')
     # UCTcoupo = Column(String(64), comment=u'优惠券id')
-    UCTstatus = Column(Integer, default=0, comment=u'订单状态, 0: 已预约, 1: 正在进行, 2: 完成')
+    UCTstatus = Column(Integer, default=0, comment=u'订单状态,0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消')  #
+
     # UCTtruestarttime = Column(String(16), comment=u'实际上门时间')
     # UCTtrueendtime = Column(String(16), comment=u'工作人员离开时间')
     # UCTtrueprice = Column(Float, comment=u'实际价格')
+
+class UserFixerTrade(Base):
+    """用户维修服务"""
+    __tablename__ = 'userixertrade'
+    UFTid = Column(String(64), primary_key=True)
+    USid = Column(String(64), nullable=False, comment=u'用户')
+    UFTstarttime = Column(String(16), nullable=False, comment=u'上门时间')
+    UFTaddr = Column(String(125), nullable=False, comment=u'详细地址')
+    UFTlocation = Column(String(64), comment=u'地址坐标')
+    UFTbrokeninfo = Column(String(125), comment=u'维修情况描述')
+    UFTphone = Column(String(12), nullable=False, comment=u'手机号码')
+    UFTspecialwith = Column(String(125), comment=u'备注')
+    UFTprice = Column(Float, comment=u'价格')
+    UFTstatus = Column(Integer, default=0, comment=u'订单状态,0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消')  #
 
 
 class HomeStayComment(Base):

@@ -37,14 +37,6 @@ class CTrade(object):
             self.strade.add_model('ProvideHouseApply', data)
         return Success(u'申请成功, 等待管家回电')
 
-    def subscribe_clean(self):
-        """预约清洁"""
-        if is_admin():
-            return TOKEN_ERROR(u'普通用户才可以申请')
-        if is_tourist():
-            return TOKEN_ERROR(u'请登录后申请')
-        usid = request.user.id
-
     def mover_appointment(self):
         """搬家预约"""
         if is_admin():
@@ -85,6 +77,23 @@ class CTrade(object):
         modelbean_dict['name'] = cleaner_exists.SCMtitle
         return Success(u'预约成功', modelbean_dict)
 
+    def fixer_appiontment(self):
+        """维修预约"""
+        if is_admin():
+            return TOKEN_ERROR(u'只有普通用户才可以预约')
+        if is_tourist():
+            return TOKEN_ERROR(u'请登录后预约')
+        required = ('uftaddr', 'uftprice', 'uftstarttime', 'uftphone', 'uftlocation')
+        forbidden = ('usid', 'uftstatus')
+        data = parameter_required(required, forbidden=forbidden)
+        validate_phone(data.get('uftphone'))
+        self._allow_starttime(data.get('uftstarttime'))
+        data['UFTid'] = str(uuid.uuid4())
+        data['usid'] = request.user.id
+        model_bean_dict = self.sserver.add_model('UserFixerTrade', data, ['UFTid', 'UFTstarttime'])
+        model_bean_dict['name'] = u'维修预约'
+        return Success(u'预约成功', model_bean_dict)
+
 
     def get_my_oppintment(self):
         """获得我的预约搬家, 维修, 清洁 type=mover, fixer, cleaner"""
@@ -121,9 +130,11 @@ class CTrade(object):
         except Exception as e:
             raise PARAMS_ERROR(str(str_time) + u'时间格式不正确')
         time_on_road_seconds = (startime - datetime.now()).total_seconds()
+        import ipdb
+        ipdb.set_trace
         if MOVER_APPOINT_MIN_TIME_ON_ROAD < time_on_road_seconds < MOVER_APPOINT_MAX_TIME_ON_ROAD:
-            raise PARAMS_ERROR(u'时间不合理, 2小时至7天')
-        return str_time
+            return str_time
+        raise PARAMS_ERROR(u'时间不合理, 2小时至7天')
 
 
 
