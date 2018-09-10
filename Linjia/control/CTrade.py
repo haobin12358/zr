@@ -81,7 +81,7 @@ class CTrade(object):
         server_type = data.get('type')
         if server_type == 'mover':
             mover_list = self.sserver.get_mover_serverlist_by_usid(usid, data)
-            map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr', 'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish'), mover_list)
+            map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr', 'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish', 'UMTpreviewprice'), mover_list)
             map(lambda x: x.fill(UMT_STATUS.get(x.UMTstatus), 'umtstatus'), mover_list)
             map(lambda x: x.fill(self.sserver.get_mover_by_smsid(x.SMSid).SMStitle, 'name'), mover_list)
             map(lambda x: x.fill('mover', 'type'), mover_list)
