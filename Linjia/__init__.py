@@ -47,6 +47,8 @@ class Request(_Request):
 
     def get_json(self, force=False, silent=False, cache=True):
         data = self.data
+        if not data:
+            return
         try:
             rv = json.loads(data)
         except ValueError as e:
@@ -63,7 +65,6 @@ class Request(_Request):
         else:
             if cache:
                 self._cached_json = (rv, rv)
-
         return rv
 
 

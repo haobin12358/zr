@@ -17,3 +17,10 @@ class ATrade(Resource):
         }
         res = apis[trade]()
         return jsonify(res)
+
+    def get(self, trade):
+        apis = {
+            'get_my_appiontlist': self.ctrade.get_my_oppintment
+        }
+        res = apis[trade]()
+        return jsonify(res)

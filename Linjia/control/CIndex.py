@@ -110,7 +110,6 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             'roid': data.get('roid')
         })
 
-
     def delete_server_index_show(self):
         """删除首页显示的服务"""
         if not is_admin():
@@ -123,12 +122,10 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         })
 
     def upload_img(self):
-        img_name = None
-        # print(request.files)
-        file = request.files.get('file')  # 拿到文件对象
+        file = request.files.get('file')
         if not file:
             raise SYSTEM_ERROR(u'上传有误')
-        filename = file.filename  # 获取上传的图片名称
+        filename = file.filename
         shuffix = os.path.splitext(filename)[-1]
         # 获取到名称的后缀
         if self.allowed_file(shuffix):

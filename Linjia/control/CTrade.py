@@ -8,6 +8,7 @@ from Linjia.commons.error_response import TOKEN_ERROR, PARAMS_ERROR, NOT_FOUND
 from Linjia.commons.params_validates import parameter_required, validate_phone
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import is_admin, is_tourist
+from Linjia.configs.enums import UMT_STATUS
 from Linjia.configs.server_config import MOVER_APPOINT_MAX_TIME_ON_ROAD, MOVER_APPOINT_MIN_TIME_ON_ROAD
 from Linjia.configs.timeformat import format_for_db
 from Linjia.service import STrade, SServer
@@ -49,7 +50,8 @@ class CTrade(object):
             return TOKEN_ERROR(u'普通用户才可以申请')
         if is_tourist():
             return TOKEN_ERROR(u'请登录后申请')
-        required = ('smsid', 'umtstarttime', 'umtmoveoutaddr', 'umtphone', 'umtspecialwish')
+        required = ('smsid', 'umtstarttime', 'umtmoveoutaddr', 'umtmoveinaddr',
+                    'umtmoveoutlocation', 'umtmoveinlocation', 'umtphone', 'umtspecialwish')
         data = parameter_required(required, others='ignore')
         # 是否存在这个服务
         mover_exsits = self.sserver.get_mover_by_smsid(data.get('smsid'))
@@ -58,10 +60,33 @@ class CTrade(object):
         validate_phone(data.get('umtphone'))
         self._allow_starttime(data.get('umtstarttime'))
         data['UMTid'] = str(uuid.uuid4())
-        model_bean_dict = self.strade.add_model('UserMoveTrade', data)
-        return Success(u'预约成功', {
-            'data': model_bean_dict
-        })
+        data['usid'] = request.user.id
+        model_bean_dict = self.strade.add_model('UserMoveTrade', data, ['UMTstarttime'])
+        model_bean_dict['name'] = mover_exsits.SMStitle
+        return Success(u'预约成功', model_bean_dict)
+
+    def get_my_oppintment(self):
+        """获得我的预约 type=mover, fixer, cleaner"""
+        if is_admin():
+            return TOKEN_ERROR(u'普通用户查看')
+        if is_tourist():
+            return TOKEN_ERROR(u'请登录后查看')
+        data = parameter_required(['type'])
+        data['page_num'] = data.get('page_num', 1)
+        data['page_size'] = data.get('page_size', 15)
+        usid = request.user.id
+        server_type = data.get('type')
+        if server_type == 'mover':
+            mover_list = self.sserver.get_mover_serverlist_by_usid(usid, data)
+            map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr', 'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish'), mover_list)
+            map(lambda x: x.fill(UMT_STATUS.get(x.UMTstatus), 'umtstatus'), mover_list)
+            map(lambda x: x.fill(self.sserver.get_mover_by_smsid(x.SMSid).SMStitle, 'name'), mover_list)
+            map(lambda x: x.fill('mover', 'type'), mover_list)
+        elif server_type == 'fixer':
+            mover_list = ''
+        elif server_type == 'cleaner':
+            mover_list = ''
+        return Success(u'获取列表成功', mover_list)
 
     @staticmethod
     def _allow_starttime(str_time):
