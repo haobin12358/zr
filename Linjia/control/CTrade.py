@@ -140,15 +140,26 @@ class CTrade(object):
             if start > end:
                 start = end
             order_list = order_list[start: end]
-            map(lambda x: x.fill(getattr(self.sserver.get_mover_by_smsid(x.SMSid), 'SMStitle', u'未知'), 'name'), mover_order_list)
+            # 搬家
+
             map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr',
                                       'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish',
                                       'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid', 'UMTcreatetime'), mover_order_list)
-            map(lambda x: x.fill(u'邻家维修', 'name'), fixer_order_list)
+            map(lambda x: x.fill(getattr(self.sserver.get_mover_by_smsid(x.SMSid), 'SMStitle', u'未知'), 'name'),
+                mover_order_list)
+            map(lambda x: x.fill('mover', 'type'), mover_order_list)
+            map(lambda x: x.fill(SERVER_STATUS.get(x.UMTstatus), 'umtstatus'), mover_order_list)
+            map(lambda x: setattr(x, 'createtime', x.UMTcreatetime), mover_order_list)
+            # 清洁
             map(lambda x: x.fill(getattr(self.sserver.get_cleanerserver_by_sceid(x.SCEid), 'SCMtitle', u'未知'), 'name'), cleaner_list)
-            map(lambda x: x.fill(x.UMTcreatetime, 'createtime'), mover_order_list)
-            map(lambda x: x.fill(x.UFTcreatetime, 'createtime'), fixer_order_list)
+            map(lambda x: setattr(x, 'UCTstatus', SERVER_STATUS.get(x.UCTstatus)), cleaner_list)
             map(lambda x: setattr(x, 'createtime', x.UCTcreatetime), cleaner_list)
+            map(lambda x: x.fill('cleaner', 'type'), cleaner_list)
+            # 维修
+            map(lambda x: setattr(x, 'createtime', x.UFTcreatetime), fixer_order_list)
+            map(lambda x: x.fill(u'邻家维修', 'name'), fixer_order_list)
+            map(lambda x: setattr(x, 'UFTstatus', SERVER_STATUS.get(x.UFTstatus)), fixer_order_list)
+            map(lambda x: x.fill(u'fixer', 'type'), fixer_order_list)
             order_list = sorted(order_list, key=lambda x: x.createtime)
             request.page_count = math.ceil(float(len_order_list) / page_size)
             request.all_count = len_order_list
