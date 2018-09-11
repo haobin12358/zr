@@ -97,7 +97,6 @@ class CTrade(object):
         model_bean_dict['name'] = u'维修预约'
         return Success(u'预约成功', model_bean_dict)
 
-
     def get_my_oppintment(self):
         """获得我的预约搬家, 维修, 清洁 type=mover, fixer, cleaner"""
         if is_admin():
@@ -164,6 +163,22 @@ class CTrade(object):
             request.page_count = math.ceil(float(len_order_list) / page_size)
             request.all_count = len_order_list
         return Success(u'获取列表成功', order_list)
+
+    def add_complaint(self):
+        if is_admin():
+            raise TOKEN_ERROR(u'只有普通用户才可是投诉')
+        if is_tourist():
+            raise TOKEN_ERROR(u'请登录后投诉')
+        data = parameter_required(('usercomplainttext', 'usercomplaintaddress', 'usercomplaintphone'), others='ignore')
+        validate_phone(data.get('usercomplaintphone'))
+        data['usid'] = request.user.id
+        data['UserComplaintid'] = str(uuid.uuid4())
+        data['UserComplaintcreatetime'] = datetime.strftime(datetime.now(), format_for_db)
+        self.strade.add_model('UserComplaint', data)
+        return Success(u'投诉成功')
+
+    def get_complaint_list(self):
+        pass
 
     @staticmethod
     def _allow_starttime(str_time):

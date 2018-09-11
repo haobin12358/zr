@@ -15,14 +15,15 @@ class ATrade(Resource):
             'add_providehouse_apply': self.ctrade.add_providehouse_apply,
             'mover_appointment': self.ctrade.mover_appointment,
             'cleaner_apponintment': self.ctrade.cleaner_appiontment,
-            'fixer_appointment': self.ctrade.fixer_appiontment
+            'fixer_appointment': self.ctrade.fixer_appiontment,
+            'add_complaint': self.ctrade.add_complaint
         }
         res = apis[trade]()
         return jsonify(res)
 
     def get(self, trade):
         apis = {
-            'get_my_appiontlist': self.ctrade.get_my_oppintment
+            'get_my_appiontlist': self.ctrade.get_my_oppintment,
         }
         res = apis[trade]()
         return jsonify(res)

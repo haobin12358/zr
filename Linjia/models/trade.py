@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column, Integer, String, Float, Boolean
+from sqlalchemy import Column, Integer, String, Float, Boolean, Text
 
 from Linjia.commons.base_model import Base
 
@@ -151,3 +151,14 @@ class HomeStayComment(Base):
     HSCperformancescore = Column(Float, default=5.0, comment=u'性价比评分')
     HStext = Column(String(255), comment=u'评论内容')
 
+
+class UserComplaint(Base):
+    """用户投诉"""
+    __tablename__ = 'usecomplaint'
+    UserComplaintid = Column(String(64), primary_key=True)
+    USid = Column(String(64), nullable=False)
+    UserComplainttext= Column(Text, nullable=False, comment=u'投诉文字')
+    UserComplaintAddress = Column(String(255), comment=u'物业地址')
+    UserComplaintphone = Column(String(12), nullable=False, comment=u'用户电话')
+    UserComplaintcreatetime = Column(String(16), comment=u'创建时间')
+    UserComplaintstatus = Column(Integer, default=0, comment=u'处理状态, 0: 未读, 1: 已读')
