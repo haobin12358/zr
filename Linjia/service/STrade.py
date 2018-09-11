@@ -65,6 +65,8 @@ class STrade(SBase):
     def get_complaint_list(self, page, count, status=None):
         """查看投诉列表"""
         all_complaint = self.session.query(UserComplaint)
+        if status:
+            all_complaint = all_complaint.filter(UserComplaint.UserComplaintstatus==status)
         all_count = all_complaint.count()
         request.page_count = math.ceil(float(all_count) / count)
         request.all_count = all_count
@@ -77,6 +79,19 @@ class STrade(SBase):
 
     @close_session
     def update_somplaint_by_complaintid(self, compid, status):
-        """更新"""
+        """更新投诉处理状态"""
         return self.session.query(UserComplaint).filter(UserComplaint.UserComplaintid==compid).update(status)
+
+    @close_session
+    def get_provideapply_list(self, page, count, status=None, **kwargs):
+        """管理员获取业主申请房源列表"""
+        provide_list = self.session.query(ProvideHouseApply)
+        if status:
+            provide_list = provide_list.filter(ProvideHouseApply.PAHstatus==status)
+        all_count = provide_list.count()
+        request.page_count = math.ceil(float(all_count) / count)
+        request.all_count = all_count
+        return provide_list.order_by(ProvideHouseApply.PHAcreatetime).offset((page - 1) * count).limit(count).all()
+
+
 

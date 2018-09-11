@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['FACE_CONFIG', 'ROSTATUS', 'GENDER_CONFIG', 'RENT_TYPE', 'DECORATOR_STYLE', 'SERVER_STATUS']
+__all__ = ['FACE_CONFIG', 'ROSTATUS', 'GENDER_CONFIG', 'RENT_TYPE', 'DECORATOR_STYLE',
+           'SERVER_STATUS', 'COMPLAIN_STATUS', 'PROVIDE_HOUSE_STATUS']
 
 FACE_CONFIG = {
     1: '东', 2: '东南', 3: '南', 4: '西南', 5: '西', 6: '西北', 7: '北', 8: '东北', 0: '未知'
@@ -26,6 +27,10 @@ SERVER_STATUS = {  # 搬家订单状态
     0: '待支付', 1: '等待服务', 2: '服务完成', 3: '取消'
 }
 
-COMPLAIN_STATUS = {
+COMPLAIN_STATUS = {  # 用户投诉状态
     0: '未处理', 1: '已处理'
+}
+
+PROVIDE_HOUSE_STATUS = {
+    0: '未查看', 1: '已查看', 2: '待处理', 3: '已处理'
 }

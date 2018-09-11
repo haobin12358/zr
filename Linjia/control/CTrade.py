@@ -9,7 +9,7 @@ from Linjia.commons.error_response import TOKEN_ERROR, PARAMS_ERROR, NOT_FOUND
 from Linjia.commons.params_validates import parameter_required, validate_phone
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import is_admin, is_tourist
-from Linjia.configs.enums import SERVER_STATUS, COMPLAIN_STATUS
+from Linjia.configs.enums import SERVER_STATUS, COMPLAIN_STATUS, PROVIDE_HOUSE_STATUS
 from Linjia.configs.server_config import MOVER_APPOINT_MAX_TIME_ON_ROAD, MOVER_APPOINT_MIN_TIME_ON_ROAD
 from Linjia.configs.timeformat import format_for_db
 from Linjia.service import STrade, SServer, math
@@ -183,7 +183,8 @@ class CTrade(object):
         args = request.args.to_dict()
         page = int(args.get('page', 1))
         count = int(args.get('count', 15))
-        complain_list = self.strade.get_complaint_list(page, count)
+        status = args.get('status')
+        complain_list = self.strade.get_complaint_list(page, count, status)
         map(lambda x: setattr(x, 'UserComplaintstatus', COMPLAIN_STATUS[x.UserComplaintstatus]), complain_list)
         return Success(u'获取投诉列表成功', complain_list)
 
@@ -201,6 +202,20 @@ class CTrade(object):
             raise NOT_FOUND(u'修改失败')
         return Success(u'修改成功', {
             'status': COMPLAIN_STATUS[status]
+        })
+
+    def get_provide_house_list(self):
+        """获取业主提交的申请列表"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        args = request.args.to_dict()
+        page = int(args.get('page', 1))
+        count = int(args.get('count', 15))
+        status = args.get('status')
+        provice_house_list = self.strade.get_provideapply_list(page, count, status)
+        map(lambda x: setattr(x, 'PAHstatus', PROVIDE_HOUSE_STATUS.get(x.PAHstatus, u'未知')), provice_house_list)
+        return Success(u'获取申请列表成功', {
+            'provide': provice_house_list
         })
 
     @staticmethod

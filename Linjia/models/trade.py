@@ -15,6 +15,7 @@ class ProvideHouseApply(Base):
     PHAcity = Column(String(64), nullable=False, comment=u'城市编号')
     PHAvillege = Column(String(64), nullable=False, comment=u'小区')
     PHAcreatetime = Column(String(16), nullable=False, comment=u'申请时间')
+    PAHstatus = Column(Integer, default=0, comment=u'房源申请状态, 0 未查看 1 已查看 2 待处理 3 已处理')
 
 
 class ProprietorHouse(Base):
