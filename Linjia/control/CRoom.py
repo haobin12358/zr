@@ -75,7 +75,7 @@ class CRoom(BaseRoomControl):
         room.ROrenttype = RENT_TYPE.get(room.ROrenttype, u'未知')
         room.add('ROisdelete', 'ROcreatetime', 'ROcitynum')
         # flask.current_app.logger.error('ttest信息')
-        return Success('获取房源信息成功', room)
+        return Success(u'获取房源信息成功', room)
 
     def get_oppener_city(self):
         """获取开放城市"""
@@ -133,4 +133,46 @@ class CRoom(BaseRoomControl):
         """获取友家轮播图"""
         join_room_banner_list = self.sroom.get_joinroom_banner_list()
         return Success(u'获取轮播图成功', join_room_banner_list)
+
+    def delete_joinroom_banner(self):
+        """删除友家轮播图"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('jrbid', ))
+        jrbid = data.get('jrbid')
+        joinroom = self.sroom.delete_joinroom_banner(jrbid)
+        msg = u'删除成功' if joinroom else u'要删除的对象不存在'
+        return Success(msg, {
+            'jrbid': jrbid
+        })
+
+    def get_homestay_banner(self):
+        """获取民宿页的轮播图"""
+        homestay_banner_list = self.sroom.get_homestay_banner_list()
+        return Success(u'获取轮播图成功', homestay_banner_list)
+
+    def add_homestay_banner(self):
+        """添加民宿页的轮播图"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('hsbimage', 'hsbsort'), others='ignore')
+        data['hsbid'] = str(uuid.uuid4())
+        model_bean = self.sroom.add_model('HomeStayBanner', data)
+        return Success(u'添加成功', {
+            'hsbid': data['hsbid']
+        })
+
+    def delete_homestay_banner(self):
+        """删除民宿页的轮播图"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('hsbid',))
+        hsbid = data.get('hsbid')
+        homestaybanner = self.sroom.delete_homestay_banner(hsbid)
+        msg = u'删除成功' if homestaybanner else u'要删除的对象不存在'
+        return Success(msg, {
+            'hsbid': hsbid
+        })
+
+
 

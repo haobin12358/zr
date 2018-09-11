@@ -16,9 +16,15 @@ class ARoom(Resource):
             'get_subway': self.croom.get_subwayline_by_citynum,
             'get_position': self.croom.get_subway_potion_by_lineid,
             'get_joinroom_banner': self.croom.get_joinroom_banner,
+            'get_homestay_banner': self.croom.get_homestay_banner,
         }
         return apis
 
     def post(self, room):
-        apis = {'add_joinroom_banner': self.croom.add_joinroom_banner}
+        apis = {
+            'add_joinroom_banner': self.croom.add_joinroom_banner,
+            'add_homestay_banner': self.croom.add_homestay_banner,
+            'delete_join_room_banner': self.croom.delete_joinroom_banner,
+            'delete_homestay_banner': self.croom.delete_homestay_banner,
+        }
         return apis

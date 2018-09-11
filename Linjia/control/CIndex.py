@@ -93,7 +93,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         """删除首页显示的整租或合租房源"""
         if not is_admin():
             raise AUTHORITY_ERROR('请使用管理员登录')
-        data = parameter_required('risid')
+        data = parameter_required(('risid', ))
         room_index_show = self.sindex.delete_room_show_by_risid(data.get('risid'))
         message = u'删除成功' if room_index_show else u'要删除的对象不存在'
         return Success(message, {

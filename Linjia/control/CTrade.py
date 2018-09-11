@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import uuid
+import math
 from datetime import datetime
 
 from flask import request
@@ -12,13 +13,14 @@ from Linjia.commons.token_handler import is_admin, is_tourist
 from Linjia.configs.enums import SERVER_STATUS, COMPLAIN_STATUS, PROVIDE_HOUSE_STATUS
 from Linjia.configs.server_config import MOVER_APPOINT_MAX_TIME_ON_ROAD, MOVER_APPOINT_MIN_TIME_ON_ROAD
 from Linjia.configs.timeformat import format_for_db
-from Linjia.service import STrade, SServer, math
+from Linjia.service import STrade, SServer, SCity
 
 
 class CTrade(object):
     def __init__(self):
         self.strade = STrade()
         self.sserver = SServer()
+        self.scity = SCity()
 
     def add_providehouse_apply(self):
         """申请房源"""
@@ -30,11 +32,16 @@ class CTrade(object):
         validate_phone(data.get('phaphone'))
         usid = request.user.id
         already_apply = self.strade.get_provide_appy_by_usid_village(usid, data.get('phavillege'))
-        if not already_apply:
-            data['usid'] = usid
-            data['PHAcreatetime'] = datetime.strftime(datetime.now(), format_for_db)
-            data['PHAid'] = str(uuid.uuid4())
-            self.strade.add_model('ProvideHouseApply', data)
+        if already_apply:
+            last_applytime = datetime.strptime(already_apply.PHAcreatetime, format_for_db)
+            seconds = (datetime.now() - last_applytime).total_seconds()
+            if seconds < 600:
+                # 短时间内重复提交不记录
+                return Success(u'申请成功, 等待管家回电')
+        data['usid'] = usid
+        data['PHAcreatetime'] = datetime.strftime(datetime.now(), format_for_db)
+        data['PHAid'] = str(uuid.uuid4())
+        self.strade.add_model('ProvideHouseApply', data)
         return Success(u'申请成功, 等待管家回电')
 
     def mover_appointment(self):
@@ -214,6 +221,7 @@ class CTrade(object):
         status = args.get('status')
         provice_house_list = self.strade.get_provideapply_list(page, count, status)
         map(lambda x: setattr(x, 'PAHstatus', PROVIDE_HOUSE_STATUS.get(x.PAHstatus, u'未知')), provice_house_list)
+        map(lambda x: setattr(x, 'PHAcity', getattr(self.scity.get_city_by_city_id(x.PHAcity), 'name', u'未知')), provice_house_list)
         return Success(u'获取申请列表成功', {
             'provide': provice_house_list
         })

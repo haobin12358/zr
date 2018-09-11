@@ -34,7 +34,7 @@ class Room(Base):
     ROleavetime = Column(String(16), comment=u'离开时间')  # 离开时间
 
 
-# 调整: 此时room和house是同一个东西,
+# 调整: 此时room和house是同一个事物, 因为以前的业务代码此时不合并, 但是需要再建立一个卧室表
 class House(Base):
     """房子信息"""
     __tablename__ = 'house'
@@ -160,6 +160,22 @@ class JoinRoomBanner(Base):
     JRBid = Column(String(64), primary_key=True)
     JRBimage = Column(String(255), nullable=False)
     JRBsort = Column(Integer, comment=u'顺序标志')
+
+
+class HomeStayBanner(Base):
+    """民宿页的轮播图"""
+    __tablename__ = 'homestaybanner'
+    HSBid = Column(String(64), primary_key=True)
+    HSBimage = Column(String(255), nullable=False)
+    HSBsort = Column(Integer, comment=u'顺序标志')
+
+
+class HomeStayCopywriting(Base):
+    """民宿页的文案编辑"""
+    __tablename__ = 'homestaycopywriting'
+    HSCid = Column(String(64), primary_key=True)
+    HSCtext = Column(String(255))
+    HSCindex = Column(Integer, comment=u'文案编号')
 
 
 if __name__ == '__main__':

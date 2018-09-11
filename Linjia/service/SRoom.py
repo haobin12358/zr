@@ -5,7 +5,8 @@ from flask import current_app, request
 from sqlalchemy import or_, and_
 
 from Linjia.commons.base_service import SBase, close_session
-from Linjia.models import Room, House, UserSubslease, RoomEquirment, RoomMedia, RoomTag, Icon, JoinRoomBanner
+from Linjia.models import Room, House, UserSubslease, RoomEquirment, RoomMedia, RoomTag, Icon, JoinRoomBanner, \
+    HomeStayBanner
 
 
 class SRoom(SBase):
@@ -89,6 +90,21 @@ class SRoom(SBase):
     def get_joinroom_banner_list(self):
         """获取友家页的轮播图"""
         return self.session.query(JoinRoomBanner).order_by(JoinRoomBanner.JRBsort).all()
+
+    @close_session
+    def delete_joinroom_banner(self, jrbid):
+        """删除友家页的轮播图"""
+        return self.session.query(JoinRoomBanner).filter(JoinRoomBanner.JRBid==jrbid).delete()
+
+    @close_session
+    def get_homestay_banner_list(self):
+        """获取民宿页的轮播图"""
+        return self.session.query(HomeStayBanner).order_by(HomeStayBanner.HSBsort).all()
+
+    @close_session
+    def delete_homestay_banner(self, hsbid):
+        """删除民宿页的轮播图"""
+        return self.session.query(HomeStayBanner).filter(HomeStayBanner.HSBid==hsbid).delete()
 
 
 
