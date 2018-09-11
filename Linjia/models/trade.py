@@ -90,7 +90,7 @@ class UserMoveTrade(Base):
     UMTphone = Column(String(64), nullable=False, comment=u'电话')
     UMTspecialwish = Column(String(64), comment=u'特殊请求')
     # UMTcoupo = Column(String(64), comment=u'优惠券id') todo
-    UMTpreviewprice = Column(Float, comment=u'估算价格')
+    UMTpreviewprice = Column(Float, comment=u'估算价格')  # 真正用到的价格
     UMTstatus = Column(Integer, default=0, comment=u'订单状态,0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消')
     UMTtruestarttime = Column(String(16), comment=u'实际搬出时间')
     UMTtrueendtime = Column(String(16), comment=u'订单完成时间')

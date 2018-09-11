@@ -17,7 +17,7 @@ from Linjia.commons.token_handler import usid_to_token
 from Linjia.configs.phone_code import auth_key, code_url
 from Linjia.configs.timeformat import format_for_db
 from Linjia.configs.url_config import HTTP_HOST
-from Linjia.configs.wxconfig import APPID, APPSECRET
+from Linjia.configs.wxconfig import APPID, APPSECRET, WXSCOPE
 from Linjia.service import SUser, SUserCode
 
 
@@ -75,7 +75,7 @@ class CUser():
 
     def wechat_login(self):
         """获取微信跳转链接"""
-        url = self.wxlogin.authorize(HTTP_HOST + "/user/weixin_callback/", "snsapi_base")
+        url = self.wxlogin.authorize(HTTP_HOST + "/user/weixin_callback/", WXSCOPE)
         return Success(u'获取跳转链接成功',  {'url': url}, status=302)
 
     def weixin_callback(self):

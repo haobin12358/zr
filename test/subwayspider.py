@@ -65,6 +65,5 @@ if result.get('error') != 0:
     print('an error occured')
 subways = resp_json.get('subways').get('l')
 for subway in subways:
-
-
+    pass
 """

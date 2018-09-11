@@ -104,7 +104,7 @@ class CTrade(object):
             return TOKEN_ERROR(u'普通用户查看')
         if is_tourist():
             return TOKEN_ERROR(u'请登录后查看')
-        data = parameter_required(['type'])
+        data = parameter_required()
         data['page_num'] = data.get('page_num', 1)
         data['page_size'] = data.get('page_size', 15)
         usid = request.user.id
@@ -126,6 +126,31 @@ class CTrade(object):
             map(lambda x: setattr(x, 'UCTstatus', SERVER_STATUS.get(x.UCTstatus)), order_list)
             map(lambda x: x.fill(self.sserver.get_cleanerserver_by_sceid(x.SCEid).SCMtitle, 'name'), order_list)
             map(lambda x: x.fill('cleaner', 'type'), order_list)
+        else:
+            mover_order_list = self.strade.get_mover_serverlist_by_usid(usid)
+            # 填充名字
+            map(lambda x: x.fill(getattr(self.sserver.get_mover_by_smsid(x.SMSid), 'SMStitle', u'未知'), 'name'), mover_order_list)
+            # 创建时间
+            map(lambda x: x.fill(x.UMTcreatetime, 'createtime'), mover_order_list)
+            # 状态
+            map(lambda x: setattr(x, 'status', SERVER_STATUS.get(x.UMTstatus)), mover_order_list)
+            # 价格
+            map(lambda x: setattr(x, 'price', x.UMTpreviewprice), mover_order_list)
+            map(lambda x: setattr(x, 'type', 'mover'), mover_order_list)
+            fixer_order_list = self.strade.get_fixer_serverlist_by_usid(usid)
+            map(lambda x: x.fill(u'邻家维修', 'name'), fixer_order_list)
+            map(lambda x: x.fill(x.UFTcreatetime, 'createtime'), fixer_order_list)
+            map(lambda x: setattr(x, 'status', SERVER_STATUS.get(x.UFTstatus)), fixer_order_list)
+            map(lambda x: setattr(x, 'price', x.UFTprice), fixer_order_list)
+            map(lambda x: setattr(x, 'type', 'fixer'), fixer_order_list)
+            cleaner_list = self.strade.get_clean_serverlist_by_usid(usid)
+            map(lambda x: x.fill(getattr(self.sserver.get_cleanerserver_by_sceid(x.SCEid), 'SCMtitle', u'未知'), 'name'), cleaner_list)
+            map(lambda x: setattr(x, 'createtime', x.UCTcreatetime), cleaner_list)
+            map(lambda x: setattr(x, 'status', SERVER_STATUS.get(x.UCTstatus)), cleaner_list)
+            map(lambda x: setattr(x, 'price', x.UCTprice), cleaner_list)
+            map(lambda x: setattr(x, 'type', 'fixer'), cleaner_list)
+            order_list = mover_order_list + fixer_order_list + cleaner_list
+            map(lambda x: x.clean.add('status', 'createtime', 'name', 'price', 'type'), order_list)
         return Success(u'获取列表成功', order_list)
 
     @staticmethod
