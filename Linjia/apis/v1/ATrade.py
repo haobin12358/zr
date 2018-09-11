@@ -13,7 +13,8 @@ class ATrade(Resource):
             'mover_appointment': self.ctrade.mover_appointment,
             'cleaner_apponintment': self.ctrade.cleaner_appiontment,
             'fixer_appointment': self.ctrade.fixer_appiontment,
-            'add_complaint': self.ctrade.add_complaint
+            'add_complaint': self.ctrade.add_complaint,
+            'update_complaint': self.ctrade.update_complaint
         }
         return apis
 

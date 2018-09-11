@@ -70,4 +70,13 @@ class STrade(SBase):
         request.all_count = all_count
         return all_complaint.order_by(UserComplaint.UserComplaintcreatetime.desc()).offset((page - 1) * count).limit(count).all()
 
+    @close_session
+    def get_complaint_by_complaintid(self, compid):
+        """根据投诉id获取投诉"""
+        return self.session.query(UserComplaint).filter(UserComplaint.UserComplaintid==compid).first()
+
+    @close_session
+    def update_somplaint_by_complaintid(self, compid, status):
+        """更新"""
+        return self.session.query(UserComplaint).filter(UserComplaint.UserComplaintid==compid).update(status)
 

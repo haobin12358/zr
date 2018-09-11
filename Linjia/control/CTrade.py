@@ -187,6 +187,22 @@ class CTrade(object):
         map(lambda x: setattr(x, 'UserComplaintstatus', COMPLAIN_STATUS[x.UserComplaintstatus]), complain_list)
         return Success(u'获取投诉列表成功', complain_list)
 
+    def update_complaint(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('usercomplaintid', 'status'))
+        status = data.get('status')
+        if str(status) not in ['1', '0']:
+            raise PARAMS_ERROR(u'status参数不合法')
+        comlain = self.strade.update_somplaint_by_complaintid(data.get('usercomplaintid'), {
+            'UserComplaintstatus': status
+        })
+        if not comlain:
+            raise NOT_FOUND(u'修改失败')
+        return Success(u'修改成功', {
+            'status': COMPLAIN_STATUS[status]
+        })
+
     @staticmethod
     def _allow_starttime(str_time):
         try:

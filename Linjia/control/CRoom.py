@@ -122,6 +122,11 @@ class CRoom(BaseRoomControl):
         data = parameter_required(('jrbimage', 'jrbsort', ), others='ignore')
         data['jrbid'] = str(uuid.uuid4())
         model_bean = self.sroom.add_model('JoinRoomBanner', data, return_fields=('JRBid', 'JRBimage', 'JRBsort'))
+        for k in model_bean.keys():
+            if k[0].isupper():
+                # 字段转小写
+                model_bean[k.lower()] = model_bean[k]
+                model_bean.pop(k)
         return Success(u'添加成功', model_bean)
 
     def get_joinroom_banner(self):
