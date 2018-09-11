@@ -64,6 +64,12 @@ class SCity(SBase):
         return self.session.query(SubwayLine).filter(SubwayLine.city_id==city_id).all()
 
     @close_session
+    def get_subwayline_by_lineid(self, lineid):
+        """获取线路 根据id"""
+        return self.session.query(SubwayLine).filter(SubwayLine.subwaylineid==lineid).first()
+
+    @close_session
     def get_subwayposition_by_line_id(self, lineid):
         """获取该地铁线路的所有站点"""
-        return self.session.query(SubwayPosition).all()
+        return self.session.query(SubwayPosition).filter(SubwayPosition.subwaylineid==lineid).all()
+

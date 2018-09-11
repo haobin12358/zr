@@ -105,8 +105,8 @@ class CTrade(object):
         if is_tourist():
             return TOKEN_ERROR(u'请登录后查看')
         data = parameter_required()
-        data['page_num'] = int(data.get('page_num', 1))
-        data['page_size'] = int(data.get('page_size', 15))
+        data['page_num'] = int(data.get('page', 1))
+        data['page_size'] = int(data.get('count', 15))
         usid = request.user.id
         server_type = data.get('type')
         if server_type == 'mover':
@@ -143,7 +143,7 @@ class CTrade(object):
             map(lambda x: x.fill(getattr(self.sserver.get_mover_by_smsid(x.SMSid), 'SMStitle', u'未知'), 'name'), mover_order_list)
             map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr',
                                       'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish',
-                                      'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid', 'UMTcreatetime'), order_list)
+                                      'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid', 'UMTcreatetime'), mover_order_list)
             map(lambda x: x.fill(u'邻家维修', 'name'), fixer_order_list)
             map(lambda x: x.fill(getattr(self.sserver.get_cleanerserver_by_sceid(x.SCEid), 'SCMtitle', u'未知'), 'name'), cleaner_list)
             map(lambda x: x.fill(x.UMTcreatetime, 'createtime'), mover_order_list)
@@ -161,8 +161,6 @@ class CTrade(object):
         except Exception as e:
             raise PARAMS_ERROR(str(str_time) + u'时间格式不正确')
         time_on_road_seconds = (startime - datetime.now()).total_seconds()
-        import ipdb
-        ipdb.set_trace
         if MOVER_APPOINT_MIN_TIME_ON_ROAD < time_on_road_seconds < MOVER_APPOINT_MAX_TIME_ON_ROAD:
             return str_time
         raise PARAMS_ERROR(u'时间不合理, 2小时至7天')

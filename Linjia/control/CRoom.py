@@ -92,12 +92,23 @@ class CRoom(BaseRoomControl):
         })
 
     def get_subwayline_by_citynum(self):
-        """获取城市内的地铁线路"""
+        """获取城市内的地铁线路, 只获得线路, 暂不获得站点"""
         data = parameter_required(('city_id', ))
         city_id = data.get('city_id')
         subway_line = self.scity.get_subwayline_by_city_id(city_id)
-        map(lambda x: x.fill(
-            self.scity.get_subwayposition_by_line_id(x.subwaylineid),
-            'positions'
-        ), subway_line)
+        # map(lambda x: x.fill(
+        #     self.scity.get_subwayposition_by_line_id(x.subwaylineid),
+        #     'positions'
+        # ), subway_line)
         return Success(u'获取地铁信息成功', subway_line)
+
+    def get_subway_potion_by_lineid(self):
+        """获取地铁线路的站点"""
+        data = parameter_required(('line_id', ))
+        line_id = data.get('line_id')
+        line = self.scity.get_subwayline_by_lineid(line_id)
+        if not line:
+            raise NOT_FOUND(u'不存在的线路')
+        positions = self.scity.get_subwayposition_by_line_id(line.subwaylineid)
+        return Success(u'获取站点信息成功', positions)
+
