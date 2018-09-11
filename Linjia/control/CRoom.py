@@ -74,7 +74,7 @@ class CRoom(BaseRoomControl):
         room.ROface = FACE_CONFIG.get(room.ROface, u'未知')
         room.ROrenttype = RENT_TYPE.get(room.ROrenttype, u'未知')
         room.add('ROisdelete', 'ROcreatetime', 'ROcitynum')
-        flask.current_app.logger.error('ttest信息')
+        # flask.current_app.logger.error('ttest信息')
         return Success('获取房源信息成功', room)
 
     def get_oppener_city(self):

@@ -227,5 +227,5 @@ class CTrade(object):
         time_on_road_seconds = (startime - datetime.now()).total_seconds()
         if MOVER_APPOINT_MIN_TIME_ON_ROAD < time_on_road_seconds < MOVER_APPOINT_MAX_TIME_ON_ROAD:
             return str_time
-        raise PARAMS_ERROR(u'时间不合理, 2小时至7天')
+        raise PARAMS_ERROR(u'时间不合理')
 

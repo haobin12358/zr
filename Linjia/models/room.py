@@ -34,6 +34,7 @@ class Room(Base):
     ROleavetime = Column(String(16), comment=u'离开时间')  # 离开时间
 
 
+# 调整: 此时room和house是同一个东西,
 class House(Base):
     """房子信息"""
     __tablename__ = 'house'
