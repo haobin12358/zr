@@ -25,3 +25,7 @@ DECORATOR_STYLE = {
 SERVER_STATUS = {  # 搬家订单状态
     0: '待支付', 1: '等待服务', 2: '服务完成', 3: '取消'
 }
+
+COMPLAIN_STATUS = {
+    0: '未处理', 1: '已处理'
+}

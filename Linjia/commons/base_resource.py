@@ -2,7 +2,7 @@
 from flask import request, jsonify
 from flask.views import MethodView
 
-from Linjia.commons.error_response import APIS_WRONG
+from Linjia.commons.error_response import APIS_WRONG, MethodNotAllowed
 
 
 class Resource(MethodView):
@@ -20,18 +20,18 @@ class Resource(MethodView):
         return meth(*args, **kwargs)
 
     def get(self, *args, **kwargs):
-        raise APIS_WRONG()
+        raise MethodNotAllowed()
 
     def post(self, *args, **kwargs):
-        raise APIS_WRONG()
+        raise MethodNotAllowed()
 
     def option(self, *args, **kwargs):
-        raise APIS_WRONG()
+        raise MethodNotAllowed()
 
     def put(self, *args, **kwargs):
-        raise APIS_WRONG()
+        raise MethodNotAllowed()
 
     def delete(self, *args, **kwargs):
-        raise APIS_WRONG()
+        raise APIS_WRONG(u'请求方法不支持')
 
 

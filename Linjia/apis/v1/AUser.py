@@ -1,6 +1,4 @@
 # *- coding:utf8 *-
-from flask import jsonify
-
 from Linjia.commons.base_resource import Resource
 from Linjia.control import CUser
 

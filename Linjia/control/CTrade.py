@@ -9,7 +9,7 @@ from Linjia.commons.error_response import TOKEN_ERROR, PARAMS_ERROR, NOT_FOUND
 from Linjia.commons.params_validates import parameter_required, validate_phone
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import is_admin, is_tourist
-from Linjia.configs.enums import SERVER_STATUS
+from Linjia.configs.enums import SERVER_STATUS, COMPLAIN_STATUS
 from Linjia.configs.server_config import MOVER_APPOINT_MAX_TIME_ON_ROAD, MOVER_APPOINT_MIN_TIME_ON_ROAD
 from Linjia.configs.timeformat import format_for_db
 from Linjia.service import STrade, SServer, math
@@ -184,8 +184,8 @@ class CTrade(object):
         page = int(args.get('page', 1))
         count = int(args.get('count', 15))
         complain_list = self.strade.get_complaint_list(page, count)
+        map(lambda x: setattr(x, 'UserComplaintstatus', COMPLAIN_STATUS[x.UserComplaintstatus]), complain_list)
         return Success(u'获取投诉列表成功', complain_list)
-
 
     @staticmethod
     def _allow_starttime(str_time):

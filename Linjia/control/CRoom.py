@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+import uuid
+
 from flask import request, current_app
 from raven.contrib import flask
 
-from Linjia.commons.error_response import NOT_FOUND
+from Linjia.commons.error_response import NOT_FOUND, TOKEN_ERROR
 from Linjia.commons.params_validates import parameter_required
 from Linjia.commons.success_response import Success
+from Linjia.commons.token_handler import is_admin
 from Linjia.configs.enums import FACE_CONFIG, RENT_TYPE
 from Linjia.control.base_control import BaseRoomControl
 from Linjia.service import SRoom, SUser, SCity, SIndex
@@ -111,4 +114,18 @@ class CRoom(BaseRoomControl):
             raise NOT_FOUND(u'不存在的线路')
         positions = self.scity.get_subwayposition_by_line_id(line.subwaylineid)
         return Success(u'获取站点信息成功', positions)
+
+    def add_joinroom_banner(self):
+        """添加友家轮播图"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('jrbimage', 'jrbsort', ), others='ignore')
+        data['jrbid'] = str(uuid.uuid4())
+        model_bean = self.sroom.add_model('JoinRoomBanner', data, return_fields=('JRBid', 'JRBimage', 'JRBsort'))
+        return Success(u'添加成功', model_bean)
+
+    def get_joinroom_banner(self):
+        """获取友家轮播图"""
+        join_room_banner_list = self.sroom.get_joinroom_banner_list()
+        return Success(u'获取轮播图成功', join_room_banner_list)
 

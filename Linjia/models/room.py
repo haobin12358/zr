@@ -33,10 +33,6 @@ class Room(Base):
     ROentertime  = Column(String(16), comment=u'入住时间')  # 入住时间
     ROleavetime = Column(String(16), comment=u'离开时间')  # 离开时间
 
-    @orm.reconstructor
-    def __init__(self):
-        self.fields = '__all__'
-
 
 class House(Base):
     """房子信息"""
@@ -47,10 +43,6 @@ class House(Base):
     HObedroomcount = Column(Integer, default=1, comment=u'卧室数目')
     HOparlorcount = Column(Integer, default=1, comment=u'客厅数量')
     VIid = Column(String(64), comment=u'小区id')
-
-    @orm.reconstructor
-    def __init__(self):
-        self.fields = '__all__'
 
 
 class RoomTag(Base):
@@ -89,8 +81,6 @@ class RoomEquirment(Base):
     Heatwatter = Column(Boolean, default=False, comment=u'热水器')
     Desk = Column(Boolean, default=False, comment=u'桌椅')
     Shotbox = Column(Boolean, default=False, comment=u'鞋柜')
-
-
 
 
 class RoomSignInfo(Base):
@@ -133,8 +123,6 @@ class SubwayStationInfo(Base):
     # todo subway
 
 
-
-
 class HomeStayReserve(Base):
     """预约须知"""
     __tablename__ = 'homestayreserve'
@@ -155,7 +143,6 @@ class Icon(Base):
     IConurl = Column(String(255), nullable=False)
     IConame = Column(String(16), nullable=False)
 
-
 class Question(Base):
     """问题"""
     __tablename__ = 'question'
@@ -164,6 +151,14 @@ class Question(Base):
     QUanswer = Column(Text, nullable=False, comment=u'回答')
     QUisshow = Column(Boolean, default=True, comment=u'是否显示')
     QUsort = Column(Integer, comment=u'顺序标志')
+
+
+class JoinRoomBanner(Base):
+    """有家轮播图"""
+    __tablename__ = 'joinroombanner'
+    JRBid = Column(String(64), primary_key=True)
+    JRBimage = Column(String(255), nullable=False)
+    JRBsort = Column(Integer, comment=u'顺序标志')
 
 
 if __name__ == '__main__':

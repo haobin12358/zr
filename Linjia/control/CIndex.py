@@ -127,12 +127,9 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             raise SYSTEM_ERROR(u'上传有误')
         filename = file.filename
         shuffix = os.path.splitext(filename)[-1]
-        # 获取到名称的后缀
         if self.allowed_file(shuffix):
-            # 调用生成随机图片名称的函数
             newName = self.new_name(shuffix)
             img_name = newName
-            # 拼凑完整的图片上传路径
             newPath = os.path.join(BASEDIR, 'img', 'banner', newName)
             file.save(newPath)  # 保存图片
             data = HTTP_HOST + '/img/banner/' + img_name

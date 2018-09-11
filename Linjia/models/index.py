@@ -47,3 +47,9 @@ class IndexBanner(Base):
     IBlink = Column(String(255), comment=u'跳转链接')
     IBsort = Column(Integer, comment=u'顺序标志')
     IBisdelete = Column(Boolean, default=False, comment=u'是否删除')
+
+
+
+# class HomeStayBanner(Base):
+#     """民宿"""
+#
