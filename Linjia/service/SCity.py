@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Linjia.commons.base_service import SBase, close_session
-from Linjia.models import City, RoomCity, MoverCity, Area, CleanerCity, FixerCity
+from Linjia.models import City, RoomCity, MoverCity, Area, CleanerCity, FixerCity, SubwayLine
 
 
 class SCity(SBase):
@@ -57,3 +57,8 @@ class SCity(SBase):
     def is_fixer_oppener(self, city_id):
         """是否开通维修服务"""
         return self.session.query(FixerCity).filter_by(city_id=city_id).first()
+
+    @close_session
+    def get_subwayline_by_city_id(self, city_id):
+        """获取城市内的地铁线路"""
+        return self.session.query(SubwayLine).filter(SubwayLine.city_id==city_id).all()

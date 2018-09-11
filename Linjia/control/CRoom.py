@@ -90,3 +90,8 @@ class CRoom(BaseRoomControl):
         return Success(u'获取城市成功', {
             'area_list': area_list
         })
+
+    def get_subwayline_by_citynum(self):
+        """获取城市内的地铁线路"""
+        data = parameter_required('city_id')
+        city_id = data.get('city_id')
