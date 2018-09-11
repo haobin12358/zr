@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import json
+from flask import json, request
 
 from Linjia.commons.base_error import BaseError
 
@@ -12,16 +12,12 @@ class Success(BaseError):
     message = '获取成功'
     data = None
 
-    def __init__(self, message=None, data=None, page_count=None, all_count=None, *args, **kwargs):
+    def __init__(self, message=None, data=None,  *args, **kwargs):
         self.status_code = None
         if message is not None:
             self.message = message
         if data is not None:
             self.data = data
-        if page_count is not None:
-            self.page_count = page_count
-        if all_count is not None:
-            self.all_count = all_count
         super(Success, self).__init__(*args, **kwargs)
 
     def get_body(self, environ=None):
@@ -31,10 +27,10 @@ class Success(BaseError):
         )
         if self.data is not None:
             body['data'] =self.data
-        if hasattr(self, 'page_count'):
-            body['page_count'] = self.page_count
-        if hasattr(self, 'all_count'):
-            body['all_count'] = self.all_count
+        if hasattr(request, 'page_count'):
+            body['page_count'] = request.page_count
+        if hasattr(request, 'all_count'):
+            body['all_count'] = request.all_count
         text = json.dumps(body)
         return text
 

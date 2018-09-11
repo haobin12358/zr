@@ -93,5 +93,11 @@ class CRoom(BaseRoomControl):
 
     def get_subwayline_by_citynum(self):
         """获取城市内的地铁线路"""
-        data = parameter_required('city_id')
+        data = parameter_required(('city_id', ))
         city_id = data.get('city_id')
+        subway_line = self.scity.get_subwayline_by_city_id(city_id)
+        map(lambda x: x.fill(
+            self.scity.get_subwayposition_by_line_id(x.subwaylineid),
+            'positions'
+        ), subway_line)
+        return Success(u'获取地铁信息成功', subway_line)

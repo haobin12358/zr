@@ -8,7 +8,7 @@ class BaseError(HTTPException):
     status = 404
     status_code = 405001
 
-    def __init__(self, message=None, status=None, status_code=None, header=None):
+    def __init__(self, message=None, status=None, status_code=None, header=None, *args, **kwargs):
         self.code = 200
         if message:
             self.message = message
