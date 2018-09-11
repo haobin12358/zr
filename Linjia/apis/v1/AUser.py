@@ -15,8 +15,7 @@ class AUser(Resource):
             'wechat_login': self.cuser.wechat_login,
             'weixin_callback': self.cuser.weixin_callback,
         }
-        res = apis[user]()
-        return jsonify(res)
+        return apis
 
     def post(self, user):
         apis ={
@@ -25,5 +24,4 @@ class AUser(Resource):
             'login': self.cuser.login,
             'get_wechat_config': self.cuser.get_wx_config,
         }
-        res = apis[user]()
-        return jsonify(res)
+        return apis

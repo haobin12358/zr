@@ -15,8 +15,7 @@ class AIndex(Resource):
             'detail': self.cindex.get_index_room_list,
             'index_server_show': self.cindex.get_index_server,
         }
-        res = apis[index]()
-        return jsonify(res)
+        return apis
 
     def post(self, index):
         apis = {
@@ -29,5 +28,5 @@ class AIndex(Resource):
             'delete_server_show': self.cindex.delete_server_index_show,
             'upload_img': self.cindex.upload_img
         }
-        res = apis[index]()
-        return jsonify(res)
+        return apis
+

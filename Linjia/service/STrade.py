@@ -6,7 +6,7 @@ from flask import request
 
 from Linjia.commons.base_service import SBase, close_session
 from Linjia.configs.timeformat import format_for_db
-from Linjia.models import ProvideHouseApply, UserMoveTrade, UserCleanTrade, UserFixerTrade
+from Linjia.models import ProvideHouseApply, UserMoveTrade, UserCleanTrade, UserFixerTrade, UserComplaint
 
 
 class STrade(SBase):
@@ -60,4 +60,14 @@ class STrade(SBase):
             request.all_count = all_count
             return fixer_order_list.filter(UserFixerTrade.USid==usid).order_by(UserFixerTrade.UFTcreatetime.desc()).offset((page_num - 1) * page_size).limit(page_size).all()
         return self.session.query(UserFixerTrade).order_by(UserFixerTrade.UFTcreatetime.desc()).all()
+
+    @close_session
+    def get_complaint_list(self, page, count, status=None):
+        """查看投诉列表"""
+        all_complaint = self.session.query(UserComplaint)
+        all_count = all_complaint.count()
+        request.page_count = math.ceil(float(all_count) / count)
+        request.all_count = all_count
+        return all_complaint.order_by(UserComplaint.UserComplaintcreatetime.desc()).offset((page - 1) * count).limit(count).all()
+
 

@@ -178,7 +178,14 @@ class CTrade(object):
         return Success(u'投诉成功')
 
     def get_complaint_list(self):
-        pass
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        args = request.args.to_dict()
+        page = int(args.get('page', 1))
+        count = int(args.get('count', 15))
+        complain_list = self.strade.get_complaint_list(page, count)
+        return Success(u'获取投诉列表成功', complain_list)
+
 
     @staticmethod
     def _allow_starttime(str_time):

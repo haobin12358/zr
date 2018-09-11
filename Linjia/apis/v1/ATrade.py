@@ -18,12 +18,11 @@ class ATrade(Resource):
             'fixer_appointment': self.ctrade.fixer_appiontment,
             'add_complaint': self.ctrade.add_complaint
         }
-        res = apis[trade]()
-        return jsonify(res)
+        return apis
 
     def get(self, trade):
         apis = {
             'get_my_appiontlist': self.ctrade.get_my_oppintment,
+            'get_complaint_list': self.ctrade.get_complaint_list
         }
-        res = apis[trade]()
-        return jsonify(res)
+        return apis

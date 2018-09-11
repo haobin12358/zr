@@ -10,7 +10,6 @@ class ARoom(Resource):
         self.croom = CRoom()
 
     def get(self, room):
-        print(room)
         apis = {
             'get_list': self.croom.get_list,
             'get_detail': self.croom.get_detail,
@@ -19,4 +18,4 @@ class ARoom(Resource):
             'get_subway': self.croom.get_subwayline_by_citynum,
             'get_position': self.croom.get_subway_potion_by_lineid
         }
-        return jsonify(apis[room]())
+        return apis

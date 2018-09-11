@@ -18,8 +18,7 @@ class AMover(Aserver):
             'move_list': self.cserver.get_mover_list_by_city,
             'get_detail': self.cserver.get_mover_detail
         }
-        res = apis[mover]()
-        return jsonify(res)
+        return apis
 
 
 class Acleaner(Aserver):
@@ -29,8 +28,7 @@ class Acleaner(Aserver):
             'city_list': self.cserver.get_cleanercity_list,
             'clean_list': self.cserver.get_clean_list_by_cityid
         }
-        res = apis[cleaner]()
-        return jsonify(res)
+        return apis
 
 class AFixer(Aserver):
     def get(self, fixer):
@@ -38,5 +36,4 @@ class AFixer(Aserver):
             'city_list': self.cserver.get_fixercity_list, 
             'fixer_list': self.cserver.get_fixer_list_by_cityid,
         }
-        res = apis[fixer]()
-        return jsonify(res)
+        return apis
