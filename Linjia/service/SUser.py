@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-import math
-
-from flask import request
 from sqlalchemy import and_
 from werkzeug.security import check_password_hash
 
-from Linjia.commons.page_handler import page_handler
 from Linjia.commons.base_service import SBase, close_session
 from Linjia.models import User, UserRoom, Admin, Staff
 
@@ -43,8 +39,7 @@ class SUser(SBase):
         staff_list = self.session.query(Staff).filter(and_(*filter(lambda x: hasattr(x.right, 'value'), filter_list))).filter(Staff.STFisdelete==False)
         if kw is not None:
             staff_list = staff_list.filter(Staff.STFname.contains(kw))
-        page_handler(staff_list.count(), count)
-        return staff_list.order_by(Staff.STFcreatetime).offset((page - 1) * page).limit(count).all()
+        return staff_list.order_by(Staff.STFcreatetime).all_with_page(page, count)
 
     @close_session
     def update_staff_info(self, stfid, data):
@@ -68,6 +63,23 @@ class SUser(SBase):
         """根据管理员的用户名查询"""
         return self.session.query(Admin).filter(Admin.ADusername==adusername).first()
 
+    @close_session
+    def get_admin_by_adid(self, adid):
+        """根据管理员id获取"""
+        return self.session.query(Admin).filter(Admin.ADid==adid).first()
+
+    @close_session
+    def freeze_adiin_by_adid(self, adid):
+        """冻结管理员"""
+        return self.session.query(Admin).filter(Admin.ADid==adid).update({
+            'ADisfreeze': True
+        })
+
+    @close_session
+    def get_admin_list(self, level=None):
+        """获取管理员列表"""
+        level = 1
+        return self.session.query(Admin).filter_ignore_none_args(Admin.ADlevel == level).all()
 
 
 

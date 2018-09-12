@@ -22,38 +22,21 @@ class STrade(SBase):
             mover_order_list = self.session.query(UserMoveTrade).filter(UserMoveTrade.USid==usid)
             page_num = args.get('page_num')
             page_size = args.get('page_size')
-            all_count = mover_order_list.count()
-            page_count = math.ceil(float(all_count) / page_size)
-            request.page_count = page_count  # wf...
-            request.all_count = all_count
-            return mover_order_list.order_by(UserMoveTrade.UMTcreatetime.desc()).offset((page_num - 1) * page_size).limit(page_size).all()
+            return mover_order_list.order_by(UserMoveTrade.UMTcreatetime.desc()).all_with_page(page_num, page_size)
         return self.session.query(UserMoveTrade).order_by(UserMoveTrade.UMTcreatetime.desc()).all()
 
     @close_session
     def get_clean_serverlist_by_usid(self, usid, args=None):
         if args:
             cleanserver_order_list = self.session.query(UserCleanTrade).filter(UserCleanTrade.USid == usid)
-            page_num = args.get('page_num')
-            page_size = args.get('page_size')
-            all_count = cleanserver_order_list.count()
-            page_count = math.ceil(float(all_count) / page_size)
-            request.page_count = page_count  # wf...
-            request.all_count = all_count
-            return cleanserver_order_list.order_by(UserCleanTrade.UCTcreatetime.desc()).offset(
-                (page_num - 1) * page_size).limit(page_size).all()
+            return cleanserver_order_list.order_by(UserCleanTrade.UCTcreatetime.desc()).all_with_page(args.get('page_num'), args.get('page_size') )
         return self.session.query(UserCleanTrade).order_by(UserCleanTrade.UCTcreatetime.desc()).all()
 
     @close_session
     def get_fixer_serverlist_by_usid(self, usid, args=None):
         if args:
             fixer_order_list = self.session.query(UserFixerTrade).filter(UserFixerTrade.USid==usid)
-            page_num = args.get('page_num')
-            page_size = args.get('page_size')
-            all_count = fixer_order_list.count()
-            page_count = math.ceil(float(all_count) / page_size)
-            request.page_count = page_count  # wf...
-            request.all_count = all_count
-            return fixer_order_list.filter(UserFixerTrade.USid==usid).order_by(UserFixerTrade.UFTcreatetime.desc()).offset((page_num - 1) * page_size).limit(page_size).all()
+            return fixer_order_list.filter(UserFixerTrade.USid==usid).order_by(UserFixerTrade.UFTcreatetime.desc()).all_with_count(args.get('page_num'), args.get('page_size'))
         return self.session.query(UserFixerTrade).order_by(UserFixerTrade.UFTcreatetime.desc()).all()
 
     @close_session
@@ -62,10 +45,7 @@ class STrade(SBase):
         all_complaint = self.session.query(UserComplaint)
         if status:
             all_complaint = all_complaint.filter(UserComplaint.UserComplaintstatus==status)
-        all_count = all_complaint.count()
-        request.page_count = math.ceil(float(all_count) / count)
-        request.all_count = all_count
-        return all_complaint.order_by(UserComplaint.UserComplaintcreatetime.desc()).offset((page - 1) * count).limit(count).all()
+        return all_complaint.order_by(UserComplaint.UserComplaintcreatetime.desc()).all_with_page(page, count)
 
     @close_session
     def get_complaint_by_complaintid(self, compid):
@@ -83,10 +63,6 @@ class STrade(SBase):
         provide_list = self.session.query(ProvideHouseApply)
         if status:
             provide_list = provide_list.filter(ProvideHouseApply.PAHstatus==status)
-        all_count = provide_list.count()
-        request.page_count = math.ceil(float(all_count) / count)
-        request.all_count = all_count
-        return provide_list.order_by(ProvideHouseApply.PHAcreatetime).offset((page - 1) * count).limit(count).all()
-
+        return provide_list.order_by(ProvideHouseApply.PHAcreatetime).all_with_page(page, count)
 
 

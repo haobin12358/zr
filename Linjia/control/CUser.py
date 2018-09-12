@@ -210,6 +210,19 @@ class CUser():
             'adid': data.get('adid')
         })
 
+    def freeze_admin(self):
+        """冻结管理员"""
+        if not is_hign_level_admin():
+            raise TOKEN_ERROR(u'需要高级管理权限')
+        parameter_required(('adid', ))
+
+    def get_admin_list(self):
+        """查看管理员列表"""
+        admin_list = self.suser.get_admin_list()
+        return Success(u'ok', {
+            'admins': admin_list
+        })
+
 
     def _async_send_code(self, phone):
         headers = {

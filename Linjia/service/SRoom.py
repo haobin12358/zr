@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-import math
-
-from flask import current_app, request
 from sqlalchemy import or_, and_
 
 from Linjia.commons.base_service import SBase, close_session
-from Linjia.commons.page_handler import page_handler
 from Linjia.models import Room, House, UserSubslease, RoomEquirment, RoomMedia, RoomTag, Icon, JoinRoomBanner, \
     HomeStayBanner, BedroomBehindRoom, UserBedroomBehindRoom, VillegeInfoAndSubway
 
@@ -46,10 +42,7 @@ class SRoom(SBase):
             all_room = all_room.filter(Room.ROcitynum==kwargs.get('city_id'))
         if 'area_id' in kwargs:
             all_room = all_room.filter(Room.ROareanum==kwargs.get('area_id'))
-        page_num = kwargs.get('page')
-        page_size = kwargs.get('count')
-        page_handler(all_room.count(), page_size)
-        return all_room.offset((page_num - 1) * page_size).limit(page_size).all()
+        return all_room.all_with_page(kwargs.get('page'), kwargs.get('count'))
 
     @close_session
     def get_house_by_hoid(self, hoid):

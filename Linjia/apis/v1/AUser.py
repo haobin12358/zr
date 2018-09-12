@@ -13,7 +13,8 @@ class AUser(Resource):
             'wechat_login': self.cuser.wechat_login,
             'weixin_callback': self.cuser.weixin_callback,
             'staff_list': self.cuser.get_staff_list,
-            'get_staff': self.cuser.get_staff_by_id
+            'get_staff': self.cuser.get_staff_by_id,
+            'get_admin_list': self.cuser.get_admin_list
         }
         return apis
 
@@ -26,6 +27,7 @@ class AUser(Resource):
             'update_staff': self.cuser.update_staff,
             'add_staff': self.cuser.add_staff,
             'delete_staff': self.cuser.delete_staff,
-            'add_admin': self.cuser.add_admin
+            'add_admin': self.cuser.add_admin,
+
         }
         return apis
