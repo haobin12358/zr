@@ -38,6 +38,8 @@ def validate_phone(arg):
 
 
 def validate_arg(regex, arg, msg=None):
+    if arg is None:
+        return
     res = re.match(regex, str(arg))
     if not res:
         raise PARAMS_ERROR(msg)

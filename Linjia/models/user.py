@@ -64,6 +64,7 @@ class Admin(Base):
     ADlevel = Column(Integer, default=0, comment=u'用户等级 0: 普通管理员, 1 高级管理员, 2 超管')
     ADmobiel = Column(String(16), comment=u'手机')
     ADphone = Column(String(16), comment=u'电话')
+    ADemail = Column(String(64), comment=u'邮箱')
     ADaddress = Column(String(16), comment=u'地址')
     ADdesc = Column(Text, comment=u'个人简述')
     ADisfreeze = Column(Boolean, default=False, comment=u'是否被冻结')

@@ -32,7 +32,7 @@ class SUser(SBase):
     @close_session
     def verify_admin_login(self, username, password):
         """验证管理员登录帐号和密码"""
-        admin = self.session.query(Admin).filter_by(ADusername=username).first()
+        admin = self.session.query(Admin).filter_by(ADusername=username, ADisfreeze=False).first()
         if admin and check_password_hash(admin.ADpassword, password):
             return admin
 
@@ -62,6 +62,11 @@ class SUser(SBase):
         return self.session.query(Staff).filter(Staff.STFid==stfid, Staff.STFisdelete==False).update({
             'STFisdelete': True
         })
+
+    @close_session
+    def get_admin_by_adusername(self, adusername):
+        """根据管理员的用户名查询"""
+        return self.session.query(Admin).filter(Admin.ADusername==adusername).first()
 
 
 

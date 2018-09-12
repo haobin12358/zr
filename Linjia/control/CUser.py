@@ -8,12 +8,12 @@ from threading import Thread
 from flask import request
 from raven.transport import requests
 from weixin import WeixinLogin
+from werkzeug.security import generate_password_hash
 
-
-from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR, TOKEN_ERROR
-from Linjia.commons.params_validates import parameter_required, validate_phone
+from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR, TOKEN_ERROR, PARAMS_ERROR
+from Linjia.commons.params_validates import parameter_required, validate_phone, validate_arg
 from Linjia.commons.success_response import Success
-from Linjia.commons.token_handler import usid_to_token, is_admin
+from Linjia.commons.token_handler import usid_to_token, is_admin, is_hign_level_admin
 from Linjia.configs.enums import STAFF_TYPE, GENDER_CONFIG
 from Linjia.configs.phone_code import auth_key, code_url
 from Linjia.configs.timeformat import format_for_db
@@ -37,7 +37,7 @@ class CUser():
         if not admin:
             raise NOT_FOUND(u'用户名或者密码错误')
         level = admin.ADlevel  # 管理员等级
-        token = usid_to_token(admin.ADid, 'Admin')
+        token = usid_to_token(admin.ADid, 'Admin', level=level)
         return Success(u'获取token成功', {
             'token': token,
             'level': level
@@ -190,6 +190,24 @@ class CUser():
             })
         return Success(u'删除成功', {
             'stfid': stfid
+        })
+
+    def add_admin(self):
+        # 添加管理员, 默认添加0级别管理员
+        if not is_hign_level_admin():
+            raise TOKEN_ERROR(u'需要高级管理权限')
+        required = ['adname', 'adusername', 'adpassword', 'admobiel', 'ademail']
+        data = parameter_required(required)
+        if self.suser.get_admin_by_adusername(data.get('adusername')):
+            raise PARAMS_ERROR(u'用户名重复')
+        validate_phone(data.get('admobiel'))
+        validate_phone(data.get('adphone'))
+        validate_arg('\w+@\w+\.\w+', data.get('ademail'), u'电子邮箱格式不正确')
+        data['adid'] = str(uuid.uuid4())
+        data['adpassword'] = generate_password_hash(data.get('adpassword'))
+        self.suser.add_model('Admin', data)
+        return Success(u'添加管理员成功', {
+            'adid': data.get('adid')
         })
 
 

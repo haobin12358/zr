@@ -25,6 +25,7 @@ class AUser(Resource):
             'get_wechat_config': self.cuser.get_wx_config,
             'update_staff': self.cuser.update_staff,
             'add_staff': self.cuser.add_staff,
-            'delete_staff': self.cuser.delete_staff
+            'delete_staff': self.cuser.delete_staff,
+            'add_admin': self.cuser.add_admin
         }
         return apis
