@@ -6,7 +6,7 @@ from sqlalchemy import or_, and_
 
 from Linjia.commons.base_service import SBase, close_session
 from Linjia.models import Room, House, UserSubslease, RoomEquirment, RoomMedia, RoomTag, Icon, JoinRoomBanner, \
-    HomeStayBanner
+    HomeStayBanner, BedroomBehindRoom, UserBedroomBehindRoom
 
 
 class SRoom(SBase):
@@ -21,10 +21,12 @@ class SRoom(SBase):
         return self.session.query(Room).filter_by(ROid=roid).first()
 
     @close_session
-    def get_room_list_filter(self, kwargs):
+    def get_room_list_filter(self, kwargs, admin=False):
         """获取所有(合租和整租"""
         # todo 离地铁近
-        all_room = self.session.query(Room).filter(Room.ROstatus >= 1, Room.ROisdelete==False)
+        all_room = self.session.query(Room).filter(Room.ROisdelete==False)
+        if not admin:
+            all_room = all_room.join(BedroomBehindRoom, Room.ROid==BedroomBehindRoom.ROid).filter(BedroomBehindRoom.BBRstatus >= 1, Room.ROisdelete==False)
         if 'type' in kwargs:
             all_room = all_room.filter(Room.ROrenttype == int(kwargs.get('type')))
         if 'style' in kwargs:
@@ -81,10 +83,24 @@ class SRoom(SBase):
         """获取house"""
         return self.session.query(House).filter_by(ROid=roid).all()
 
+    # @close_session
+    # 2018年09月12日 删除
+    # def get_bedroom_by_hoid(self, hoid):
+    #     """获取通过house下的room, (仅用于合租)"""
+    #     return self.session.query(Room).filter_by(HOid=hoid).all()
+
+    # 2018年09月12日 调整
     @close_session
-    def get_bedroom_by_hoid(self, hoid):
-        """获取通过house下的room, (仅用于合租)"""
-        return self.session.query(Room).filter_by(HOid=hoid).all()
+    def get_bedroom_entryinfo_by_roid(self, roid):
+        """获取房源下的卧室"""
+        return self.session.query(BedroomBehindRoom).filter(BedroomBehindRoom.ROid==roid).order_by(BedroomBehindRoom.BBRnum).all()
+
+    # 2018年09月12日 调整
+    @close_session
+    def get_roomates_info_by_bbrid(self, bbrid):
+        """获取卧室的入住情况"""
+        return self.session.query(UserBedroomBehindRoom).filter(UserBedroomBehindRoom.BBRid==bbrid).first()
+
 
     @close_session
     def get_joinroom_banner_list(self):

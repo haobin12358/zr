@@ -49,16 +49,20 @@ class BedroomBehindRoom(Base):
     """2018年09月12日添加卧室信息"""
     __tablename__ = 'bedroombehindroom'
     BBRid = Column(String(64), primary_key=True)
+    ROid = Column(String(64), nullable=False, comment=u'所属房源')
+    BBRnum = Column(Integer, comment=u'卧室号')
     BBRstatus = Column(Integer, default=0, comment=u'房源状态, 0: 待审核, 1: 配置中(可预订), 2: 可入住, 3: 转租, 4: 实习, 5, 已租出')
     BBRshowprice = Column(Float, comment=u'显示价格')
+    BBRshowpriceunit = Column(String(16), default='month', comment=u'价格单位')
 
 
 class UserBedroomBehindRoom(Base):
     """2018年09月12日卧室入住信息, 因为这个是管理员填上去的, 所以不放在trade文件下"""
     __tablename__ = 'userbedroombehindroom'
     UBBRid = Column(String(64), primary_key=True)
+    BBRid = Column(String(64), nullable=False, comment=u'所属卧室')
     UBBRusername = Column(String(64), comment=u'住户姓名')
-    UBBRusergender = Column(Integer, comment=u'性别, 0男, 1女')
+    USgender = Column(Integer, comment=u'性别, 0男, 1女')
     UBBRstatus = Column(Integer, default=0, comment=u'状态, 0已入住, 1 已搬出')
 
 

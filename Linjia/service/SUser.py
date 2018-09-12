@@ -18,6 +18,7 @@ class SUser(SBase):
     def get_user_by_phone(self, phone):
         return self.session.query(User).filter_by(USphone=phone).first()
 
+    # 2018-09-12 不再使用
     @close_session
     def get_user_by_roid(self, roid):
         """获取房间的租户"""
