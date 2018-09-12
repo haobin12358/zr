@@ -12,7 +12,9 @@ class Resource(MethodView):
         if meth is None and request.method == 'HEAD':
             meth = getattr(self, 'get', None)
         assert meth is not None, 'Unimplemented method %r' % request.method
-        apis = meth(*args, **kwargs)  # 字典
+        apis = meth(*args, **kwargs)
+        if not isinstance(apis, dict):
+            super(Resource, self).dispatch_request(*args, **kwargs)
         for kwarg in kwargs.values():
             if kwarg not in apis:
                 raise APIS_WRONG()

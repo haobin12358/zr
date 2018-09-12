@@ -174,5 +174,8 @@ class CRoom(BaseRoomControl):
             'hsbid': hsbid
         })
 
+    def add_homestay_copywriting(self):
+        """添加, 这个需要问前端, 怎么获取"""
+        pass
 
 
