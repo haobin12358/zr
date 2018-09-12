@@ -76,10 +76,9 @@ class SUser(SBase):
         })
 
     @close_session
-    def get_admin_list(self, level=None):
+    def get_admin_list(self, level=None, freeze=None, page=None, count=None):
         """获取管理员列表"""
-        level = 1
-        return self.session.query(Admin).filter_ignore_none_args(Admin.ADlevel == level).all()
+        return self.session.query(Admin).filter_ignore_none_args(Admin.ADlevel == level, Admin.ADisfreeze == freeze).all_with_page(page, count)
 
 
 

@@ -10,7 +10,7 @@ from raven.transport import requests
 from weixin import WeixinLogin
 from werkzeug.security import generate_password_hash
 
-from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR, TOKEN_ERROR, PARAMS_ERROR
+from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR, TOKEN_ERROR, PARAMS_ERROR, AUTHORITY_ERROR
 from Linjia.commons.params_validates import parameter_required, validate_phone, validate_arg
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import usid_to_token, is_admin, is_hign_level_admin
@@ -200,9 +200,13 @@ class CUser():
         data = parameter_required(required)
         if self.suser.get_admin_by_adusername(data.get('adusername')):
             raise PARAMS_ERROR(u'用户名重复')
+
         validate_phone(data.get('admobiel'))
         validate_phone(data.get('adphone'))
         validate_arg('\w+@\w+\.\w+', data.get('ademail'), u'电子邮箱格式不正确')
+        data['adlevel'] = 0 or data.get('adlevel')
+        if data['adlevel'] >= request.user.level:
+            raise AUTHORITY_ERROR()
         data['adid'] = str(uuid.uuid4())
         data['adpassword'] = generate_password_hash(data.get('adpassword'))
         self.suser.add_model('Admin', data)
@@ -214,11 +218,31 @@ class CUser():
         """冻结管理员"""
         if not is_hign_level_admin():
             raise TOKEN_ERROR(u'需要高级管理权限')
-        parameter_required(('adid', ))
+        data = parameter_required(('adid', ))
+        adid = data.get('adid')
+        admin = self.suser.get_admin_by_adid(adid)
+        if admin and admin.ADlevel >= request.user.level:
+            raise AUTHORITY_ERROR()
+        freezed = self.suser.freeze_adiin_by_adid(adid)
+        msg = u'操作成功' if freezed else u'无此记录'
+        return Success(msg, {
+            'adid': adid
+        })
 
     def get_admin_list(self):
         """查看管理员列表"""
-        admin_list = self.suser.get_admin_list()
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = request.args.to_dict()
+        page = data.get('page', 1)
+        count = data.get('count', 15)
+        freeze_args = data.get('freeze')
+        freeze = None
+        if freeze_args is not None:
+            freeze = False if str(freeze_args) == '0' else True
+        print('>>>>>>>>>>>', freeze)
+        admin_list = self.suser.get_admin_list(data.get('level'), freeze, page, count)
+        map(lambda x: x.hide('ADpassword'), admin_list)
         return Success(u'ok', {
             'admins': admin_list
         })

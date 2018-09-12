@@ -5,6 +5,9 @@ from flask import request
 from sqlalchemy import inspection, log, util
 from sqlalchemy.orm import Query as _Query, Session as _Session
 from sqlalchemy.sql import expression
+from sqlalchemy.sql.sqltypes import NullType
+
+from Linjia.commons.error_response import PARAMS_ERROR
 
 
 def _generative(*assertions):
@@ -30,25 +33,30 @@ class Query(_Query):
         super(Query, self)._no_statement_condition(meth)
 
     # 此处可以自定义查询操作
-    @_generative(_no_statement_condition, _no_limit_offset)
     def filter_ignore_none_args(self, *criterion):
-        for criterion in list(criterion):
-            if not hasattr(criterion.right, 'value'):
-                continue
-            criterion = expression._expression_literal_as_text(criterion)
-            criterion = self._adapt_clause(criterion, True, True)
-            if self._criterion is not None:
-                self._criterion = self._criterion & criterion
-            else:
-                self._criterion = criterion
-        
-    def all_with_page(self, page, count):
+        """只有查询, 但是会无视双等号后为None的值
+        例子: self.session.query(Admin).filter_ignore_none_args(Admin.ADisfreeze == freeze)
+                如果freeze是None则不执行过滤
+        """
+        criterion = filter(lambda x: not isinstance(x.right.type, NullType), list(criterion))
+        if not criterion:
+            return self
+        return super(Query, self).filter(*criterion)
+
+    def all_with_page(self, page=None, count=None):
         """
         计算总页数和总数
         :param page: 当前页码
         :param count: 页面大小
         :return: sqlalchemy对象列表
         """
+        if not page and not count:
+            return self.all()
+        try:
+            page = int(page)
+            count = int(count)
+        except TypeError as e:
+            raise PARAMS_ERROR(u'分页参数错误')
         mount = self.count()
         page_count = math.ceil(float(mount) / count)
         request.page_count = page_count  # wf...

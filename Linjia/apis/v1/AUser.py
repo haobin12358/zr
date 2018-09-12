@@ -28,6 +28,6 @@ class AUser(Resource):
             'add_staff': self.cuser.add_staff,
             'delete_staff': self.cuser.delete_staff,
             'add_admin': self.cuser.add_admin,
-
+            'freeze_admin': self.cuser.freeze_admin
         }
         return apis
