@@ -54,6 +54,8 @@ class BaseRoomControl(object):
             elif room_in_same_house.BBRstatus == 5:  # 已经租出
                 room_in_same_house.fields = ['BBRnum']
                 user = self.sroom.get_roomates_info_by_bbrid(room_in_same_house.BBRid)
+                if not user:
+                    return
                 user.fields = ['USgender' ]
                 user.USgender = GENDER_CONFIG[int(user.USgender)]
                 room_in_same_house.fill(user, 'user')

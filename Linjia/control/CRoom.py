@@ -61,6 +61,7 @@ class CRoom(BaseRoomControl):
         return data
 
     def get_detail(self):
+        """房源详细信息"""
         data = parameter_required(('roid', ))
         roid = data.get('roid')
         room = self.sroom.get_room_by_roid(roid)

@@ -116,32 +116,39 @@ class RoomSignInfo(Base):
     RSIshow = Column(Boolean, default=False, comment=u'是否显示')
 
 
-class Villege(Base):
-    """小区"""
-    __tablename__ = 'villege'
-    VIid = Column(String(64), primary_key=True)
-    VIyears = Column(String(4), comment=u'建筑年代')
-    VItype = Column(String(8), comment=u'建筑类型')
-    VIdesc = Column(String(255), comment=u'小区介绍')
-    VIgreen = Column(Float, comment=u'绿化率')
-    VIviolumetric = Column(Float, comment=u'容积率')
-    VIcarrate = Column(Float, comment=u'车位配比')
-    VIisclose = Column(Boolean, comment=u'是否封闭')
-    VIcarpay = Column(Float, comment=u'停车费')
-    VIcompany = Column(String(16), comment=u'物业公司')
-    VIphone = Column(String(16), comment=u'物业电话')
-    VILatitude = Column(Float, comment=u'纬度')
-    VIlongitude = Column(Float, comment=u'经度')
-    VIcitynum = Column(String(64), comment=u'城市编号')
-    VIlocationnum = Column(String(64), comment=u'区域编号')  # todo 区域编号
+class VillegeInfoAndSubway(Base):
+    """小区的地铁信息"""
+    __tablename__ = 'villegeinfo'
+    _id = Column(Integer, primary_key=True)
+    city_id = Column(String(8), nullable=False)
+    name = Column(String(32), nullable=False, comment=u'小区名字')
+    build_year = Column(String(6), comment=u'建筑年份')
+    build_type = Column(String(16), comment=u'建筑风格')
+    subway = Column(String(125), comment=u'多条地铁描述')
+    subway_primary = Column(String(64), comment=u'最近地铁')
+    location = Column(String(64), comment=u'坐标')
+    linenum = Column(String(32), comment=u'地铁线路名')
+    position = Column(String(32), comment=u'站点')
 
-# 代定
-class SubwayStationInfo(Base):
-    """地铁距离信息"""
-    __tablename__ = 'subwaystationinfo'
-    SSIid = Column(String(64), primary_key=True)
-    VIid = Column(String(64), comment=u'小区id')
-    # todo subway
+
+# class Villege(Base):
+#     """小区"""
+#     __tablename__ = 'villege'
+#     VIid = Column(String(64), primary_key=True)
+#     VIyears = Column(String(4), comment=u'建筑年代')
+#     VItype = Column(String(8), comment=u'建筑类型')
+#     VIdesc = Column(String(255), comment=u'小区介绍')
+#     VIgreen = Column(Float, comment=u'绿化率')
+#     VIviolumetric = Column(Float, comment=u'容积率')
+#     VIcarrate = Column(Float, comment=u'车位配比')
+#     VIisclose = Column(Boolean, comment=u'是否封闭')
+#     VIcarpay = Column(Float, comment=u'停车费')
+#     VIcompany = Column(String(16), comment=u'物业公司')
+#     VIphone = Column(String(16), comment=u'物业电话')
+#     VILatitude = Column(Float, comment=u'纬度')
+#     VIlongitude = Column(Float, comment=u'经度')
+#     VIcitynum = Column(String(64), comment=u'城市编号')
+#     VIlocationnum = Column(String(64), comment=u'区域编号')  # todo 区域编号
 
 
 class HomeStayReserve(Base):
