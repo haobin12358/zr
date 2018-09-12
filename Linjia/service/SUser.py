@@ -51,6 +51,20 @@ class SUser(SBase):
         """修改工作人员"""
         return self.session.query(Staff).filter(Staff.STFid==stfid).update(data)
 
+    @close_session
+    def get_staff_by_stfid(self, stfid):
+        """根据id获取工作人员"""
+        return self.session.query(Staff).filter(Staff.STFid==stfid, Staff.STFisdelete==False).first()
+
+    @close_session
+    def delete_staff_by_stfid(self, stfid):
+        """根据id删除工作人员"""
+        return self.session.query(Staff).filter(Staff.STFid==stfid, Staff.STFisdelete==False).update({
+            'STFisdelete': True
+        })
+
+
+
 
 
 

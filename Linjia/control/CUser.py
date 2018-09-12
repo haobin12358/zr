@@ -164,7 +164,33 @@ class CUser():
                 'stfid': stfid
             })
 
+    def get_staff_by_id(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('stfid', ))
+        staff = self.suser.get_staff_by_stfid(data.get('stfid'))
+        if not staff:
+            raise NOT_FOUND(u'无记录')
+        staff.all.hide('STFisdelete')
+        setattr(staff,  'STFlevel', STAFF_TYPE.get(staff.STFlevel, u'其他'))
+        setattr(staff, 'STFgender', GENDER_CONFIG.get(staff.STFgender, u'未知'))
+        return Success(u'获取成功', {
+            'staff': staff
+        })
 
+    def delete_staff(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('stfid',))
+        stfid = data.get('stfid')
+        staff = self.suser.delete_staff_by_stfid(stfid)
+        if not staff:
+            return Success(u'无此记录', {
+                'stfid': stfid
+            })
+        return Success(u'删除成功', {
+            'stfid': stfid
+        })
 
 
     def _async_send_code(self, phone):
