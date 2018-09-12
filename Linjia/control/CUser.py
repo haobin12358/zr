@@ -118,6 +118,10 @@ class CUser():
             'staff': staff_list
         })
 
+    def add_staff(self):
+        """添加工作人员"""
+        pass
+
     def _async_send_code(self, phone):
         headers = {
             'Authorization': auth_key
