@@ -82,6 +82,7 @@ class Staff(Base):
     ADaddressnum = Column(String(16), comment=u'负责区域编号')
     APid = Column(String(64), comment=u'单独负责某个公寓')  # 不存在则为空
     ADdesc = Column(Text, comment=u'个人简述')
+    STFcreatetime = Column(String(16), comment=u'创建时间')
 
 
 # 以下可能会需要

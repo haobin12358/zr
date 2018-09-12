@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
 
-# from Linjia.commons.base_query import Query
 from Linjia.commons.error_response import DB_ERROR
 from Linjia.commons.base_model import Base
 from Linjia import models
 from Linjia.commons.base_model import mysql_engine
-db_session = sessionmaker(bind=mysql_engine)
+from Linjia.commons.query_session import Session
+
+db_session = sessionmaker(bind=mysql_engine, class_=Session)
 
 
 def get_session():

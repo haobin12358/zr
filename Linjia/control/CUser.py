@@ -10,10 +10,10 @@ from raven.transport import requests
 from weixin import WeixinLogin
 
 
-from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR
+from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR, TOKEN_ERROR
 from Linjia.commons.params_validates import parameter_required, validate_phone
 from Linjia.commons.success_response import Success
-from Linjia.commons.token_handler import usid_to_token
+from Linjia.commons.token_handler import usid_to_token, is_admin
 from Linjia.configs.enums import STAFF_TYPE, GENDER_CONFIG
 from Linjia.configs.phone_code import auth_key, code_url
 from Linjia.configs.timeformat import format_for_db
@@ -120,7 +120,31 @@ class CUser():
 
     def add_staff(self):
         """添加工作人员"""
-        pass
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('stfname', 'stfmobiel', 'stfaddress', 'stfgender', 'stflevel'), others='allow', forbidden=('STFid', ))
+        validate_phone(data.get('STFmobiel'))
+        if 'STFphone' in data:
+            validate_phone(data.get('STFphone'))
+        data['stfid'] = str(uuid.uuid4())
+        self.suser.add_model('Staff', data)
+        return Success(u'添加成功', {
+            'stfid': data.get('stfid')
+        })
+
+    def update_staff(self):
+        """修改工作人员信息"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        json_data = parameter_required(('stfid', ), others='allow')
+        data = {
+
+        }
+        data = {
+            k: v for k, v in data.items() if v is not None
+        }
+
+
 
     def _async_send_code(self, phone):
         headers = {

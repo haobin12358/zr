@@ -46,6 +46,10 @@ class SUser(SBase):
         page_handler(staff_list.count(), count)
         return staff_list.offset((page - 1) * page).limit(count).all()
 
+    @close_session
+    def update_staff_info(self, stfid):
+        """修改工作人员"""
+        return self.session.query(Staff).filter(Staff.STFid==stfid).update()
 
 
 
