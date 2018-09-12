@@ -21,7 +21,6 @@ class Room(Base):
     ROrenttype = Column(Integer, default=0, comment=u'租赁方式, 0: 合租, 1: 整租, 2: 公寓, 3: 民宿')
     ROdecorationstyle = Column(Integer, default=2, comment=u'装修风格, 0: 毛坯, 1: 简装, 2: 精装, 3: 豪华')
     ROnum = Column(Integer, comment=u'卧室号')  # 合租才有值
-    ROstatus = Column(Integer, default=0, comment=u'房源状态, 0: 待审核, 1: 配置中(可预订), 2: 可入住, 3: 转租, 4: 实习, 5, 已租出')
     ROisdelete = Column(Boolean, default=False, comment=u'是否删除')
     ROcreatetime = Column(String(16), comment=u'创建时间')
     ROshowtime = Column(String(16), comment=u'发布时间')
@@ -34,7 +33,6 @@ class Room(Base):
     ROleavetime = Column(String(16), comment=u'离开时间')  # 离开时间
 
 
-# 调整: 此时room和house是同一个事物, 因为以前的业务代码此时不合并, 但是需要再建立一个卧室表
 class House(Base):
     """房子信息"""
     __tablename__ = 'house'
@@ -44,6 +42,24 @@ class House(Base):
     HObedroomcount = Column(Integer, default=1, comment=u'卧室数目')
     HOparlorcount = Column(Integer, default=1, comment=u'客厅数量')
     VIid = Column(String(64), comment=u'小区id')
+
+
+# 调整: 此时room和house是同一个事物, 以前的业务代码此时不合并, 但是需要再建立卧室表和入住信息表, 原来的userroom表被抛弃
+class BedroomBehindRoom(Base):
+    """2018年09月12日添加卧室信息"""
+    __tablename__ = 'bedroombehindroom'
+    BBRid = Column(String(64), primary_key=True)
+    BBRstatus = Column(Integer, default=0, comment=u'房源状态, 0: 待审核, 1: 配置中(可预订), 2: 可入住, 3: 转租, 4: 实习, 5, 已租出')
+    BBRshowprice = Column(Float, comment=u'显示价格')
+
+
+class UserBedroomBehindRoom(Base):
+    """2018年09月12日卧室入住信息, 因为这个是管理员填上去的, 所以不放在trade文件下"""
+    __tablename__ = 'userbedroombehindroom'
+    UBBRid = Column(String(64), primary_key=True)
+    UBBRusername = Column(String(64), comment=u'住户姓名')
+    UBBRusergender = Column(Integer, comment=u'性别, 0男, 1女')
+    UBBRstatus = Column(Integer, default=0, comment=u'状态, 0已入住, 1 已搬出')
 
 
 class RoomTag(Base):
