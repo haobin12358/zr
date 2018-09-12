@@ -49,7 +49,7 @@ class House(Base):
 class VillegeInfoAndSubway(Base):
     """小区的地铁信息"""
     __tablename__ = 'villegeinfo'
-    _id = Column(Integer, primary_key=True)
+    _id = Column(Integer, primary_key=True)  # house的viid就是这个id
     city_id = Column(String(8), nullable=False)
     name = Column(String(32), nullable=False, comment=u'小区名字')
     build_year = Column(String(6), comment=u'建筑年份')

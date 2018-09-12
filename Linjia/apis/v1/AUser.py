@@ -22,5 +22,7 @@ class AUser(Resource):
             'get_code': self.cuser.get_code,
             'login': self.cuser.login,
             'get_wechat_config': self.cuser.get_wx_config,
+            'update_staff': self.cuser.update_staff,
+            'add_staff': self.cuser.add_staff,
         }
         return apis

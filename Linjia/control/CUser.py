@@ -123,10 +123,11 @@ class CUser():
         if not is_admin():
             raise TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('stfname', 'stfmobiel', 'stfaddress', 'stfgender', 'stflevel'), others='allow', forbidden=('STFid', ))
-        validate_phone(data.get('STFmobiel'))
-        if 'STFphone' in data:
-            validate_phone(data.get('STFphone'))
+        validate_phone(data.get('stfmobiel'))
+        if 'stfphone' in data:
+            validate_phone(data.get('stfphone'))
         data['stfid'] = str(uuid.uuid4())
+        data['STFcreatetime'] = datetime.strftime(datetime.now(), format_for_db)
         self.suser.add_model('Staff', data)
         return Success(u'添加成功', {
             'stfid': data.get('stfid')
@@ -137,12 +138,32 @@ class CUser():
         if not is_admin():
             raise TOKEN_ERROR(u'请使用管理员登录')
         json_data = parameter_required(('stfid', ), others='allow')
+        stfid = json_data.get('stfid')
         data = {
-
+            'STFname': json_data.get('stfname'),
+            'STFmobiel': json_data.get('stfmobiel'),
+            'STFphone': json_data.get('stfphone'),
+            'STFaddress': json_data.get('stfaddress'),
+            'STFgender': json_data.get('stfgender'),
+            'STFlevel': json_data.get('stflevel'),
+            'ADaddressnum': json_data.get('adaddressnum'),
+            'APid': json_data.get('apid'),
+            'ADdesc': json_data.get('addesc'),
+            'STFisblocked': json_data.get('stfisblocked'),
         }
         data = {
             k: v for k, v in data.items() if v is not None
         }
+        staff = self.suser.update_staff_info(stfid, data)
+        if not staff:
+            return Success(u'无此记录', {
+                'stfid': stfid
+            })
+        else:
+            return Success(u'修改成功', {
+                'stfid': stfid
+            })
+
 
 
 

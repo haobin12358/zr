@@ -83,6 +83,8 @@ class Staff(Base):
     APid = Column(String(64), comment=u'单独负责某个公寓')  # 不存在则为空
     ADdesc = Column(Text, comment=u'个人简述')
     STFcreatetime = Column(String(16), comment=u'创建时间')
+    STFisblocked = Column(Boolean, default=False, comment=u'是否拉黑')
+    STFisdelete = Column(Boolean, default=False, comment=u'是否删除')
 
 
 # 以下可能会需要
