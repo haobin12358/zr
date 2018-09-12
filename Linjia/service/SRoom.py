@@ -5,6 +5,7 @@ from flask import current_app, request
 from sqlalchemy import or_, and_
 
 from Linjia.commons.base_service import SBase, close_session
+from Linjia.commons.page_handler import page_handler
 from Linjia.models import Room, House, UserSubslease, RoomEquirment, RoomMedia, RoomTag, Icon, JoinRoomBanner, \
     HomeStayBanner, BedroomBehindRoom, UserBedroomBehindRoom, VillegeInfoAndSubway
 
@@ -47,10 +48,7 @@ class SRoom(SBase):
             all_room = all_room.filter(Room.ROareanum==kwargs.get('area_id'))
         page_num = kwargs.get('page')
         page_size = kwargs.get('count')
-        all_count = all_room.count()
-        page_count = math.ceil(float(all_count) / page_size)
-        request.page_count = page_count  # wf...
-        request.all_count = all_count
+        page_handler(all_room.count(), page_size)
         return all_room.offset((page_num - 1) * page_size).limit(page_size).all()
 
     @close_session
@@ -75,7 +73,6 @@ class SRoom(SBase):
 
     @close_session
     def get_room_equirment_by_roid(self, roid):
-        # return self.session.query(Icon).join(RoomEquirment, Icon.IConid==RoomEquirment.IConid).filter(RoomEquirment.ROid==roid).all()
         return self.session.query(RoomEquirment).filter(RoomEquirment.ROid==roid).first()
 
     @close_session

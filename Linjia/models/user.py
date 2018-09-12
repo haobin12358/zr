@@ -73,6 +73,7 @@ class Staff(Base):
     """公司员工"""
     __tablename__ = 'staff'
     STFid = Column(String(64), primary_key=True)
+    STFname = Column(String(32), comment=u'姓名')
     STFmobiel = Column(String(16), comment=u'手机')
     STFphone = Column(String(16), comment=u'电话')
     STFaddress = Column(String(16), comment=u'地址')

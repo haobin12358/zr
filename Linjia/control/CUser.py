@@ -14,6 +14,7 @@ from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR
 from Linjia.commons.params_validates import parameter_required, validate_phone
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import usid_to_token
+from Linjia.configs.enums import STAFF_TYPE, GENDER_CONFIG
 from Linjia.configs.phone_code import auth_key, code_url
 from Linjia.configs.timeformat import format_for_db
 from Linjia.configs.url_config import HTTP_HOST
@@ -103,8 +104,19 @@ class CUser():
 
     def get_staff_list(self):
         """获取工作人员"""
-        pass
-
+        data = request.args.to_dict()
+        level = data.get('level')
+        page = int(data.get('page', 1))
+        count = int(data.get('count', 15))
+        gender = int(data.get('gender')) if 'gender' in data else None
+        kw = data.get('kw')  # 员工姓名模糊搜索
+        staff_list = self.suser.get_staff_list(level, page, count, gender, kw)
+        for staff in staff_list:
+            setattr(staff,  'STFlevel', STAFF_TYPE.get(staff.STFlevel, u'其他'))
+            setattr(staff, 'STFgender', GENDER_CONFIG.get(staff.STFgender, u'未知'))
+        return Success(u'获取工作人员成功', {
+            'staff': staff_list
+        })
 
     def _async_send_code(self, phone):
         headers = {

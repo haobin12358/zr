@@ -12,6 +12,7 @@ class AUser(Resource):
         apis = {
             'wechat_login': self.cuser.wechat_login,
             'weixin_callback': self.cuser.weixin_callback,
+            'staff_list': self.cuser.get_staff_list,
         }
         return apis
 

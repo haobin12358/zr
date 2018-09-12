@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from Linjia.extensions import weixin
+from Linjia.extensions import msg
 
 
-@weixin.all
-def all(**kwargs):
-    return weixin.reply(kwargs['sender'], sender=kwargs['receiver'], content='all')
+# @msg.all
+# def all(**kwargs):
+#     return msg.reply(kwargs['sender'], sender=kwargs['receiver'], content='all')
 
 
-@weixin.text()
+@msg.text()
 def hello(**kwargs):
     """
     监听所有文本消息
@@ -15,7 +15,7 @@ def hello(**kwargs):
     return "hello too"
 
 
-@weixin.text("help")
+@msg.text("help")
 def world(**kwargs):
     """
     监听help消息
@@ -23,7 +23,7 @@ def world(**kwargs):
     return dict(content="hello world!")
 
 
-@weixin.subscribe
+@msg.subscribe
 def subscribe(**kwargs):
     """
     监听订阅消息
