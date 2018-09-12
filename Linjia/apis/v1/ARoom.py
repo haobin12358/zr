@@ -17,6 +17,7 @@ class ARoom(Resource):
             'get_position': self.croom.get_subway_potion_by_lineid,
             'get_joinroom_banner': self.croom.get_joinroom_banner,
             'get_homestay_banner': self.croom.get_homestay_banner,
+            'get_villege_info': self.croom.get_villegeinfo_by_namekeyword
         }
         return apis
 

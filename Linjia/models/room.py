@@ -28,6 +28,8 @@ class Room(Base):
     ROareanum = Column(String(64), comment=u'区编号')
     ROsubwayaround = Column(Boolean, default=False, comment=u'地铁附近')
     ROaroundequirment = Column(Text, comment=u'周边设施介绍')
+    # 需要添加地铁信息
+    ROsubwayposionname = Column(String(32), comment=u'地铁站点')  # 冗余
     # 类型为民宿的时候需要用到的字段
     ROentertime  = Column(String(16), comment=u'入住时间')  # 入住时间
     ROleavetime = Column(String(16), comment=u'离开时间')  # 离开时间
@@ -42,6 +44,22 @@ class House(Base):
     HObedroomcount = Column(Integer, default=1, comment=u'卧室数目')
     HOparlorcount = Column(Integer, default=1, comment=u'客厅数量')
     VIid = Column(String(64), comment=u'小区id')
+
+
+class VillegeInfoAndSubway(Base):
+    """小区的地铁信息"""
+    __tablename__ = 'villegeinfo'
+    _id = Column(Integer, primary_key=True)
+    city_id = Column(String(8), nullable=False)
+    name = Column(String(32), nullable=False, comment=u'小区名字')
+    build_year = Column(String(6), comment=u'建筑年份')
+    build_type = Column(String(16), comment=u'建筑风格')
+    subway = Column(String(125), comment=u'多条地铁描述')
+    subway_primary = Column(String(64), comment=u'最近地铁')
+    location = Column(String(64), comment=u'坐标')
+    linenum = Column(String(32), comment=u'地铁线路名')
+    position = Column(String(32), comment=u'站点')
+    ROaroundequirment = Column(Text, comment=u'周边设施介绍')
 
 
 # 调整: 此时room和house是同一个事物, 以前的业务代码此时不合并, 但是需要再建立卧室表和入住信息表, 原来的userroom表被抛弃
@@ -115,22 +133,6 @@ class RoomSignInfo(Base):
     RSIdeadline = Column(String(16), comment=u'可签约至')
     RSIshow = Column(Boolean, default=False, comment=u'是否显示')
 
-
-class VillegeInfoAndSubway(Base):
-    """小区的地铁信息"""
-    __tablename__ = 'villegeinfo'
-    _id = Column(Integer, primary_key=True)
-    city_id = Column(String(8), nullable=False)
-    name = Column(String(32), nullable=False, comment=u'小区名字')
-    build_year = Column(String(6), comment=u'建筑年份')
-    build_type = Column(String(16), comment=u'建筑风格')
-    subway = Column(String(125), comment=u'多条地铁描述')
-    subway_primary = Column(String(64), comment=u'最近地铁')
-    location = Column(String(64), comment=u'坐标')
-    linenum = Column(String(32), comment=u'地铁线路名')
-    position = Column(String(32), comment=u'站点')
-
-
 # class Villege(Base):
 #     """小区"""
 #     __tablename__ = 'villege'
@@ -148,7 +150,7 @@ class VillegeInfoAndSubway(Base):
 #     VILatitude = Column(Float, comment=u'纬度')
 #     VIlongitude = Column(Float, comment=u'经度')
 #     VIcitynum = Column(String(64), comment=u'城市编号')
-#     VIlocationnum = Column(String(64), comment=u'区域编号')  # todo 区域编号
+#     VIlocationnum = Column(String(64), comment=u'区域编号')
 
 
 class HomeStayReserve(Base):

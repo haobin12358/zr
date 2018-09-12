@@ -46,11 +46,12 @@ class CRoom(BaseRoomControl):
         # 区
         args_dict['area_id'] = args.get('area_id')
         print(args_dict)
+        admin = True if is_admin() else None
         # 地址 区, 附近 todo
         args_dict = {
             k: v for k, v in args_dict.items() if v is not None
         }
-        room_detail_list = self.sroom.get_room_list_filter(args_dict)
+        room_detail_list = self.sroom.get_room_list_filter(args_dict, admin)
         map(self._fill_detail_for_list, room_detail_list)
         map(self._fill_house_info, room_detail_list)  # 楼层和规格
         map(lambda x: x.fill(self.sroom.get_tags_by_roid(x.ROid), 'tags', hide=('ROid', )), room_detail_list)  # 填充tag信息
@@ -177,5 +178,12 @@ class CRoom(BaseRoomControl):
     def add_homestay_copywriting(self):
         """添加, 这个需要问前端, 怎么获取"""
         pass
+
+    def get_villegeinfo_by_namekeyword(self):
+        """根据公寓关键字获取公寓信息, 主要是地铁距离"""
+        data = parameter_required(('kw', ))
+        kw = data.get('kw')
+        info = self.sroom.get_villege_info_by_name(kw)
+        return Success(u'获取成功', info)
 
 

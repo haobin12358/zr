@@ -6,7 +6,7 @@ from sqlalchemy import or_, and_
 
 from Linjia.commons.base_service import SBase, close_session
 from Linjia.models import Room, House, UserSubslease, RoomEquirment, RoomMedia, RoomTag, Icon, JoinRoomBanner, \
-    HomeStayBanner, BedroomBehindRoom, UserBedroomBehindRoom
+    HomeStayBanner, BedroomBehindRoom, UserBedroomBehindRoom, VillegeInfoAndSubway
 
 
 class SRoom(SBase):
@@ -121,6 +121,12 @@ class SRoom(SBase):
     def delete_homestay_banner(self, hsbid):
         """删除民宿页的轮播图"""
         return self.session.query(HomeStayBanner).filter(HomeStayBanner.HSBid==hsbid).delete()
+
+    @close_session
+    def get_villege_info_by_name(self, name):
+        """根据公寓名字获取公寓地铁信息"""
+        return self.session.query(VillegeInfoAndSubway).filter(VillegeInfoAndSubway.name.contains(name)).all()
+
 
 
 

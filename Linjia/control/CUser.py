@@ -101,6 +101,11 @@ class CUser():
         response = Success(u'返回签名成功', data)
         return response
 
+    def get_staff_list(self):
+        """获取工作人员"""
+        pass
+
+
     def _async_send_code(self, phone):
         headers = {
             'Authorization': auth_key
