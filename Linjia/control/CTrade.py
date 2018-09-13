@@ -226,6 +226,74 @@ class CTrade(object):
             'provide': provice_house_list
         })
 
+    def get_appointment_list(self):
+        """后台获取预约列表"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required()
+        data['page_num'] = int(data.get('page', 1))
+        data['page_size'] = int(data.get('count', 15))
+        usid = data.get('usid')
+        server_type = data.get('type')
+        if server_type == 'mover':
+            order_list = self.strade.get_mover_serverlist_by_usid(usid, data)
+            map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr',
+                                      'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish',
+                                      'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid', 'UMTcreatetime'), order_list)
+            map(lambda x: x.fill(SERVER_STATUS.get(x.UMTstatus), 'umtstatus'), order_list)
+            map(lambda x: x.fill(self.sserver.get_mover_by_smsid(x.SMSid).SMStitle, 'name'), order_list)
+            map(lambda x: x.fill('mover', 'type'), order_list)
+        elif server_type == 'fixer':
+            order_list = self.strade.get_fixer_serverlist_by_usid(usid, data)
+            map(lambda x: setattr(x, 'UFTstatus', SERVER_STATUS.get(x.UFTstatus)), order_list)
+            map(lambda x: x.fill(u'fixer', 'type'), order_list)
+        elif server_type == 'cleaner':
+            order_list = self.strade.get_clean_serverlist_by_usid(usid, data)
+            map(lambda x: setattr(x, 'UCTstatus', SERVER_STATUS.get(x.UCTstatus)), order_list)
+            map(lambda x: x.fill(self.sserver.get_cleanerserver_by_sceid(x.SCEid).SCMtitle, 'name'), order_list)
+            map(lambda x: x.fill('cleaner', 'type'), order_list)
+        else:
+            mover_order_list = self.strade.get_mover_serverlist_by_usid(usid)
+            fixer_order_list = self.strade.get_fixer_serverlist_by_usid(usid)
+            cleaner_list = self.strade.get_clean_serverlist_by_usid(usid)
+            order_list = mover_order_list + fixer_order_list + cleaner_list
+            len_order_list = len(order_list)
+            page_size = data['page_size']
+            start = (data['page_num'] - 1) * data['page_size']
+            end = start + page_size
+            if end > len_order_list:
+                end = len_order_list
+            if start > end:
+                start = end
+            order_list = order_list[start: end]
+ 
+
+           # 搬家
+
+            map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr',
+                                      'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish',
+                                      'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid', 'UMTcreatetime'), mover_order_list)
+            map(lambda x: x.fill(getattr(self.sserver.get_mover_by_smsid(x.SMSid), 'SMStitle', u'未知'), 'name'),
+                mover_order_list)
+            map(lambda x: x.fill('mover', 'type'), mover_order_list)
+            map(lambda x: x.fill(SERVER_STATUS.get(x.UMTstatus), 'umtstatus'), mover_order_list)
+            map(lambda x: setattr(x, 'createtime', x.UMTcreatetime), mover_order_list)
+            # 清洁
+            map(lambda x: x.fill(getattr(self.sserver.get_cleanerserver_by_sceid(x.SCEid), 'SCMtitle', u'未知'), 'name'), cleaner_list)
+            map(lambda x: setattr(x, 'UCTstatus', SERVER_STATUS.get(x.UCTstatus)), cleaner_list)
+            map(lambda x: setattr(x, 'createtime', x.UCTcreatetime), cleaner_list)
+            map(lambda x: x.fill('cleaner', 'type'), cleaner_list)
+            # 维修
+            map(lambda x: setattr(x, 'createtime', x.UFTcreatetime), fixer_order_list)
+            map(lambda x: x.fill(u'邻家维修', 'name'), fixer_order_list)
+            map(lambda x: setattr(x, 'UFTstatus', SERVER_STATUS.get(x.UFTstatus)), fixer_order_list)
+            map(lambda x: x.fill(u'fixer', 'type'), fixer_order_list)
+            order_list = sorted(order_list, key=lambda x: x.createtime)
+            request.page_count = math.ceil(float(len_order_list) / page_size)
+            request.all_count = len_order_list
+        return Success(u'获取列表成功', order_list)
+
+
     @staticmethod
     def _allow_starttime(str_time):
         try:

@@ -229,6 +229,21 @@ class CUser():
             'adid': adid
         })
 
+    def unfreeze_admin(self):
+        """管理员解冻"""
+        if not is_hign_level_admin():
+            raise TOKEN_ERROR(u'需要高级管理权限')
+        data = parameter_required(('adid', ))
+        adid = data.get('adid')
+        admin = self.suser.get_admin_by_adid(adid)
+        if admin and admin.ADlevel >= request.user.level:
+            raise AUTHORITY_ERROR()
+        unfreezed = self.suser.unfreeze_admin_by_adid(adid)
+        msg = u'操作成功' if unfreezed else u'无此记录'
+        return Success(msg, {
+            'adid': adid     
+        })
+        
     def get_admin_list(self):
         """查看管理员列表"""
         if not is_admin():

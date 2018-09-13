@@ -22,6 +22,7 @@ class ATrade(Resource):
         apis = {
             'get_my_appiontlist': self.ctrade.get_my_oppintment,
             'get_complaint_list': self.ctrade.get_complaint_list,
-            'get_provide_house_list': self.ctrade.get_provide_house_list
+            'get_provide_house_list': self.ctrade.get_provide_house_list,
+            'get_appointment_list': self.ctrade.get_appointment_list,
         }
         return apis

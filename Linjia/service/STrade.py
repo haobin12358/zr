@@ -17,26 +17,26 @@ class STrade(SBase):
             filter(ProvideHouseApply.USid==usid, ProvideHouseApply.PHAvillege==villege).first()
 
     @close_session
-    def get_mover_serverlist_by_usid(self, usid, args=None):
+    def get_mover_serverlist_by_usid(self, usid=None, args=None):
         if args:
-            mover_order_list = self.session.query(UserMoveTrade).filter(UserMoveTrade.USid==usid)
+            mover_order_list = self.session.query(UserMoveTrade).filter_ignore_none_args(UserMoveTrade.USid==usid)
             page_num = args.get('page_num')
             page_size = args.get('page_size')
             return mover_order_list.order_by(UserMoveTrade.UMTcreatetime.desc()).all_with_page(page_num, page_size)
         return self.session.query(UserMoveTrade).order_by(UserMoveTrade.UMTcreatetime.desc()).all()
 
     @close_session
-    def get_clean_serverlist_by_usid(self, usid, args=None):
+    def get_clean_serverlist_by_usid(self, usid=None, args=None):
         if args:
-            cleanserver_order_list = self.session.query(UserCleanTrade).filter(UserCleanTrade.USid == usid)
+            cleanserver_order_list = self.session.query(UserCleanTrade).filter_ignore_none_args(UserCleanTrade.USid == usid)
             return cleanserver_order_list.order_by(UserCleanTrade.UCTcreatetime.desc()).all_with_page(args.get('page_num'), args.get('page_size') )
         return self.session.query(UserCleanTrade).order_by(UserCleanTrade.UCTcreatetime.desc()).all()
 
     @close_session
-    def get_fixer_serverlist_by_usid(self, usid, args=None):
+    def get_fixer_serverlist_by_usid(self, usid=None, args=None):
         if args:
-            fixer_order_list = self.session.query(UserFixerTrade).filter(UserFixerTrade.USid==usid)
-            return fixer_order_list.filter(UserFixerTrade.USid==usid).order_by(UserFixerTrade.UFTcreatetime.desc()).all_with_count(args.get('page_num'), args.get('page_size'))
+            fixer_order_list = self.session.query(UserFixerTrade).filter_ignore_none_args(UserFixerTrade.USid==usid)
+            return fixer_order_list.order_by(UserFixerTrade.UFTcreatetime.desc()).all_with_count(args.get('page_num'), args.get('page_size'))
         return self.session.query(UserFixerTrade).order_by(UserFixerTrade.UFTcreatetime.desc()).all()
 
     @close_session
@@ -64,5 +64,28 @@ class STrade(SBase):
         if status:
             provide_list = provide_list.filter(ProvideHouseApply.PAHstatus==status)
         return provide_list.order_by(ProvideHouseApply.PHAcreatetime).all_with_page(page, count)
+    
+    @close_session
+    def get_mover_serverlist(self, args=None):
+        if args:
+            mover_order_list = self.session.query(UserMoveTrade)
+            page_num = args.get('page_num')
+            page_size = args.get('page_size')
+            return mover_order_list.order_by(UserMoveTrade.UMTcreatetime.desc()).all_with_page(page_num, page_size)
+        return self.session.query(UserMoveTrade).order_by(UserMoveTrade.UMTcreatetime.desc()).all()
 
+    @close_session
+    def get_clean_serverlist(self, args=None):
+        if args:
+            cleanserver_order_list = self.session.query(UserCleanTrade)
+            return cleanserver_order_list.order_by(UserCleanTrade.UCTcreatetime.desc()).all_with_page(args.get('page_num'), args.get('page_size') )
+        return self.session.query(UserCleanTrade).order_by(UserCleanTrade.UCTcreatetime.desc()).all()
 
+    @close_session
+    def get_fixer_serverlist(self, args=None):
+        if args:
+            fixer_order_list = self.session.query(UserFixerTrade)
+            return fixer_order_list.order_by(UserFixerTrade.UFTcreatetime.desc()).all_with_count(args.get('page_num'), args.get('page_size'))
+        return self.session.query(UserFixerTrade).order_by(UserFixerTrade.UFTcreatetime.desc()).all()
+
+ 
