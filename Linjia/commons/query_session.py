@@ -34,7 +34,7 @@ class Query(_Query):
 
     # 此处可以自定义查询操作
     def filter_ignore_none_args(self, *criterion):
-        """只有查询, 但是会无视双等号后为None的值
+        """等同于filter查询, 但是会无视双等号后为None的值
         例子: session.query(Admin).filter_ignore_none_args(Admin.ADisfreeze == freeze)
                 如果freeze是None则不执行过滤
         """
