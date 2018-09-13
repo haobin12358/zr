@@ -4,12 +4,11 @@ from datetime import datetime
 from flask.wrappers import Request as _Request
 from flask_cors import CORS
 from flask import Flask as _Flask, Response, current_app, json
-from werkzeug.exceptions import HTTPException, BadRequest
+from flask.json import JSONEncoder as _JSONEncoder
+from werkzeug.exceptions import HTTPException
 
 from Linjia.apis.v1 import AUser, ARoom, AIndex, ATrade, AServer, AMover, Acleaner, AFixer
 from Linjia.apis.v1.verify_wechat import register_blueprint
-from flask.json import JSONEncoder as _JSONEncoder
-
 from Linjia.commons.error_response import PARAMS_ERROR
 from Linjia.commons.logger_handler import error_handler
 from Linjia.commons.request_handler import request_first_handler

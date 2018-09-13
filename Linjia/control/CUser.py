@@ -5,9 +5,10 @@ import uuid
 from datetime import datetime
 from threading import Thread
 
-from flask import request
+from flask import request, current_app
 from raven.transport import requests
 from weixin import WeixinLogin
+from weixin.login import WeixinLoginError
 from werkzeug.security import generate_password_hash
 
 from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR, TOKEN_ERROR, PARAMS_ERROR, AUTHORITY_ERROR
@@ -83,8 +84,12 @@ class CUser():
         """通过code, 获取用户信息"""
         args = parameter_required(('code', ))
         code = args.get('code')
-        data = self.wxlogin.access_token(code)
-        data = self.wxlogin.user_info(data.access_token, data.openid)
+        try:
+            data = self.wxlogin.access_token(code)
+            data = self.wxlogin.user_info(data.access_token, data.openid)
+            current_app.logger.error(str(data))
+        except WeixinLoginError as e:
+            raise PARAMS_ERROR(u'登录出现错误')
         return data
 
     def get_wx_config(self):

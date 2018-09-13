@@ -35,7 +35,7 @@ class Query(_Query):
     # 此处可以自定义查询操作
     def filter_ignore_none_args(self, *criterion):
         """只有查询, 但是会无视双等号后为None的值
-        例子: self.session.query(Admin).filter_ignore_none_args(Admin.ADisfreeze == freeze)
+        例子: session.query(Admin).filter_ignore_none_args(Admin.ADisfreeze == freeze)
                 如果freeze是None则不执行过滤
         """
         criterion = filter(lambda x: not isinstance(x.right.type, NullType), list(criterion))
@@ -59,7 +59,7 @@ class Query(_Query):
             raise PARAMS_ERROR(u'分页参数错误')
         mount = self.count()
         page_count = math.ceil(float(mount) / count)
-        request.page_count = page_count  # wf...
+        request.page_count = page_count
         request.all_count = mount
         return self.offset((page - 1) * page).limit(count).all()
 
