@@ -53,11 +53,13 @@ class CUser():
         if not usercode:
             return NOT_FOUND(u'验证码已过期或不正确')
         user = self.suser.get_user_by_phone(phone)
+        now_time = datetime.strftime(datetime.now(), format_for_db)
         if not user:  # 如果是新用户
             user_dict = {
                 'usid': str(uuid.uuid4()),
                 'USphone': str(phone),
-                'UScreatetime': datetime.strftime(datetime.now(), format_for_db)
+                'UScreatetime': now_time,
+                'USlastlogin': now_time
             }
             self.suser.add_model('User', user_dict)
             token = usid_to_token(user_dict['usid'])
@@ -67,6 +69,10 @@ class CUser():
                 'redirect_url': redirect_url
             })
         else:
+            # 如果是已经存在的用户则记录上次登录时间
+            updated = self.suser.update_user_by_phone(phone, {
+                'USlastlogin': now_time
+            })
             token = usid_to_token(user.USid)
         return Success(u'获取token成功', {
             'token': token
@@ -291,6 +297,15 @@ class CUser():
         page = data.get('page', 1)
         count = data.get('count', 15)
         gender = data.get('gender')
+        phone = data.get('phone')
+        user_list = self.suser.get_user_list(page, count, gender, phone)
+        for user in user_list:
+            user.all.hide('WXprivilege', 'WXheader', 'WXnickname', 'USaddr', 'USstar', 'UShobby', 'USpassword')
+            user.USgender = GENDER_CONFIG.get(user.USgender)
+        return Success(u'获取用户列表成功', user_list)
+        # import ipdb
+        # ipdb.set_trace()
+
 
 
 

@@ -14,7 +14,8 @@ class AUser(Resource):
             'weixin_callback': self.cuser.weixin_callback,
             'staff_list': self.cuser.get_staff_list,
             'get_staff': self.cuser.get_staff_by_id,
-            'get_admin_list': self.cuser.get_admin_list
+            'get_admin_list': self.cuser.get_admin_list,
+            'get_user_list': self.cuser.get_user_list
         }
         return apis
 

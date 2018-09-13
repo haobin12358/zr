@@ -16,6 +16,13 @@ class SUser(SBase):
         return self.session.query(User).filter_by(USid=usid).all()
 
     @close_session
+    def get_user_list(self, page=None, count=None, gender=None, contain_filter=None):
+        """获取用户列表, 管理员使用"""
+        return self.session.query(User).filter_ignore_none_args(User.USisdelete==False, User.USgender==gender).\
+            contain(User.USphone==contain_filter).\
+            order_by(User.USlastlogin.desc()).all_with_page(page, count)
+
+    @close_session
     def get_user_by_phone(self, phone):
         return self.session.query(User).filter_by(USphone=phone).first()
 
@@ -23,6 +30,10 @@ class SUser(SBase):
     def update_user_by_usid(self, usid, data):
         """更新用户资料"""
         return self.session.query(User).filter_by(USid=usid).update(data)
+
+    @close_session
+    def update_user_by_phone(self, phone, data):
+        return self.session.query(User).filter(User.USphone==phone).update(data)
 
     # 2018-09-12 不再使用
     @close_session
