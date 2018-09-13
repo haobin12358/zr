@@ -17,13 +17,14 @@ class User(Base):
     UShobby = Column(String(64), comment=u'用户爱好')
     USstar = Column(String(8), comment=u'星座')
     USaddr = Column(String(125), comment=u'地址')
+    UScity = Column(String(16), comment=u'城市')
     USisdelete = Column(Boolean, default=False, comment=u'是否删除')
     WXopenid = Column(String(125), comment=u'微信openid')
     WXnickname = Column(String(32), comment=u'微信用户名')
     WXprovice = Column(String(16), comment=u'微信')
     WXheader = Column(String(125), comment=u'微信头像')
     WXprivilege = Column(String(125), comment=u'微信用户特权信息, 比如微信沃卡用户为（chinaunicom）')
-
+    UScreatetime = Column(String(16), comment=u'创建时间')
 
 
 class UserCode(Base):

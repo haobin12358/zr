@@ -53,13 +53,19 @@ class CUser():
         if not usercode:
             return NOT_FOUND(u'验证码已过期或不正确')
         user = self.suser.get_user_by_phone(phone)
-        if not user:
+        if not user:  # 如果是新用户
             user_dict = {
                 'usid': str(uuid.uuid4()),
                 'USphone': str(phone),
+                'UScreatetime': datetime.strftime(datetime.now(), format_for_db)
             }
             self.suser.add_model('User', user_dict)
             token = usid_to_token(user_dict['usid'])
+            redirect_url = self.wxlogin.authorize(HTTP_HOST + "/user/weixin_callback/", WXSCOPE, state=user_dict['usid'])
+            return Success(u'注册成功', status=302, data={
+                'token': token,
+                'redirect_url': redirect_url
+            })
         else:
             token = usid_to_token(user.USid)
         return Success(u'获取token成功', {
@@ -87,8 +93,19 @@ class CUser():
         try:
             data = self.wxlogin.access_token(code)
             data = self.wxlogin.user_info(data.access_token, data.openid)
-            current_app.logger.error(str(data))
+            usid = args.get('state')
+            to_model = {
+                'UScity': data.get('city'),
+                'WXopenid': data.get('openid'),
+                'WXnickname': data.get('nickname'),
+                'USnickname': data.get('nickname'),
+                'USheader': data.get('headimgurl'),
+                'WXprovice': data.get('province')
+            }
+            to_model['USgender'] = 0 if data.get('sex') == 1 else 1
+            updated = self.suser.update_user_by_usid(usid, to_model)
         except WeixinLoginError as e:
+            current_app.logger.error(str(data))
             raise PARAMS_ERROR(u'登录出现错误')
         return data
 
@@ -267,12 +284,17 @@ class CUser():
         })
 
     def get_user_list(self):
-        """查看普通列表"""
+        """查看普通列表, 筛选参数为: 手机号, 性别, """
         if not is_admin():
             raise TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(())
         page = data.get('page', 1)
         count = data.get('count', 15)
+        gender = data.get('gender')
+
+
+
+
 
 
 

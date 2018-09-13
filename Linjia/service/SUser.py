@@ -19,6 +19,11 @@ class SUser(SBase):
     def get_user_by_phone(self, phone):
         return self.session.query(User).filter_by(USphone=phone).first()
 
+    @close_session
+    def update_user_by_usid(self, usid, data):
+        """更新用户资料"""
+        return self.session.query(User).filter_by(USid=usid).update(data)
+
     # 2018-09-12 不再使用
     @close_session
     def get_user_by_roid(self, roid):
