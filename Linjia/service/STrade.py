@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-import math
-from datetime import datetime
-
-from flask import request
-
 from Linjia.commons.base_service import SBase, close_session
-from Linjia.configs.timeformat import format_for_db
 from Linjia.models import ProvideHouseApply, UserMoveTrade, UserCleanTrade, UserFixerTrade, UserComplaint
 
 
@@ -26,6 +20,11 @@ class STrade(SBase):
         return self.session.query(UserMoveTrade).order_by(UserMoveTrade.UMTcreatetime.desc()).all()
 
     @close_session
+    def get_mover_order_by_umtid(self, umtid):
+        """id获取单个订单"""
+        return self.session.query(UserMoveTrade).filter(UserMoveTrade.UMTid==umtid).first()
+
+    @close_session
     def get_clean_serverlist_by_usid(self, usid=None, args=None):
         if args:
             cleanserver_order_list = self.session.query(UserCleanTrade).filter_ignore_none_args(UserCleanTrade.USid == usid)
@@ -33,11 +32,20 @@ class STrade(SBase):
         return self.session.query(UserCleanTrade).order_by(UserCleanTrade.UCTcreatetime.desc()).all()
 
     @close_session
+    def get_clean_order_by_uctid(self, uctid):
+        """"""
+        return self.session.query(UserCleanTrade).filter(UserCleanTrade.UCTid==uctid).first()
+
+    @close_session
     def get_fixer_serverlist_by_usid(self, usid=None, args=None):
         if args:
             fixer_order_list = self.session.query(UserFixerTrade).filter_ignore_none_args(UserFixerTrade.USid==usid)
             return fixer_order_list.order_by(UserFixerTrade.UFTcreatetime.desc()).all_with_page(args.get('page_num'), args.get('page_size'))
         return self.session.query(UserFixerTrade).order_by(UserFixerTrade.UFTcreatetime.desc()).all()
+
+    @close_session
+    def get_fixer_order_by_uftid(self, uftid):
+        return self.session.query(UserFixerTrade).filter(UserFixerTrade.UFTid == uftid).first()
 
     @close_session
     def get_complaint_list(self, page, count, status=None):
@@ -66,9 +74,9 @@ class STrade(SBase):
         return provide_list.order_by(ProvideHouseApply.PHAcreatetime).all_with_page(page, count)
     
     @close_session
-    def udpate_fixertrade_status_by_utfid(self, utfid, status):
-        """根据订单id维修服务状态"""
-        return self.session.query(UserFixerTrade).filter_by(UTFid=utfid).update({
+    def update_fixertrade_status_by_utfid(self, utfid, status):
+        """根据订单id更新维修服务状态"""
+        return self.session.query(UserFixerTrade).filter_by(UFTid=utfid).update({
             'UFTstatus': status     
         })
 
@@ -85,4 +93,19 @@ class STrade(SBase):
         return self.session.query(UserCleanTrade).filter_by(UCTid=uctid).update({
             'UCTstatus': status     
         })
-        
+
+    @close_session
+    def update_fixerorder_detail_by_uftid(self, uftid, data):
+        """更新维修订单任意"""
+        return self.session.query(UserFixerTrade).filter(UserFixerTrade.UFTid==uftid).update(data)
+
+    @close_session
+    def update_cleanorder_detail_by_uctid(self, uctid, data):
+        """更新维修订单任意"""
+        return self.session.query(UserCleanTrade).filter(UserCleanTrade.UCTid==uctid).update(data)
+
+    @close_session
+    def update_movertrade_detail_by_umtid(self, umtid, data):
+        """更新搬家订单任意"""
+        return self.session.query(UserMoveTrade).filter(UserMoveTrade.UMTid==umtid).update(data)
+

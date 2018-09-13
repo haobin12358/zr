@@ -245,14 +245,14 @@ class CTrade(object):
                                       'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid', 'UMTcreatetime')
                 mover_order.fill(getattr(self.sserver.get_mover_by_smsid(mover_order.SMSid), 'SMStitle', u'未知'), 'name'),
                 mover_order.fill('mover', 'type')
-                mover_order.fill(SERVER_STATUS.get(mover_order.UMTstatus), 'umtstatus')
+                mover_order.fill(SERVER_STATUS.get(mover_order.UMTstatus, u'其它'), 'umtstatus')
                 setattr(mover_order, 'createtime', mover_order.UMTcreatetime)
         elif server_type == 'fixer':
             order_list = self.strade.get_fixer_serverlist_by_usid(usid, data)
             for fixer_order in order_list:
                 setattr(fixer_order, 'createtime', fixer_order.UFTcreatetime)
                 fixer_order.fill(u'邻家维修', 'name')
-                setattr(fixer_order, 'uftstatus', SERVER_STATUS.get(fixer_order.UFTstatus))
+                setattr(fixer_order, 'UFTstatus', SERVER_STATUS.get(fixer_order.UFTstatus, u'其它'))
                 fixer_order.fill(u'fixer', 'type')
         elif server_type == 'cleaner':
             order_list = self.strade.get_clean_serverlist_by_usid(usid, data)
@@ -294,7 +294,7 @@ class CTrade(object):
             for fixer_order in fixer_order_list:
                 setattr(fixer_order, 'createtime', fixer_order.UFTcreatetime)
                 fixer_order.fill(u'邻家维修', 'name')
-                setattr(fixer_order, 'uftstatus', SERVER_STATUS.get(fixer_order.UFTstatus))
+                setattr(fixer_order, 'UFTstatus', SERVER_STATUS.get(fixer_order.UFTstatus))
                 fixer_order.fill(u'fixer', 'type')
             # 员工id 姓名.
             # map(lambda x: setattr( x, 'staff', self.suser.get_staff_by_stfid(x.STFid)) if not x.STFid order_list)
@@ -310,9 +310,109 @@ class CTrade(object):
         # request.all_count = len_order_list
         return Success(u'获取列表成功', order_list)
 
-    def udpate_fixer_status(self):
-        """更新维修订单状态"""
+    def update_fixerorder_status(self):
+        """更新维修订单状态, 订单状态先使用随意改变的"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('uftid', 'status'))
+        uftid = data.get('uftid')
+        fix_order = self.strade.get_fixer_order_by_uftid(uftid)
+        if not fix_order:
+            raise NOT_FOUND()
+        status = data.get('status')
+        self._allow_order_status(fix_order.UFTstatus, int(status))
+        updated = self.strade.update_fixertrade_status_by_utfid(uftid, status)
+        msg = u'修改成功'
+        return Success(msg, {
+            'uftid': uftid
+        })
 
+    def update_fixorder_price(self):
+        """修改维修价格"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('uftid', 'price'), others='ignore')
+        uftid = data.get('uftid')
+        fix_order = self.strade.get_fixer_order_by_uftid(uftid)
+        if not fix_order:
+            raise NOT_FOUND()
+        if fix_order.UFTstatus != 0:
+            raise PARAMS_ERROR(u'当前订单状态为{}, 只可以修改未付款的订单'.format(SERVER_STATUS.get(fix_order.UFTstatus)))
+        updated = self.strade.update_fixerorder_detail_by_uftid(uftid, {
+            'UFTprice': data.get('price')
+        })
+        return Success(u'修改成功', {
+            'uftid': uftid
+        })
+
+    def update_cleanorder_status(self):
+        """"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('uctid', 'status'))
+        status = data.get('status')
+        uctid = data.get('uctid')
+        cleaner_order = self.strade.get_clean_order_by_uctid(uctid)
+        if not cleaner_order:
+            raise NOT_FOUND()
+        self._allow_order_status(cleaner_order.UCTstatus, int(status))
+        msg = u'修改成功'
+        return Success(msg, {
+            'uctid': uctid
+        })
+
+    def update_cleanerorder_price(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('uctid', 'price'))
+        price = data.get('price')
+        uctid = data.get('uctid')
+        cleaner_order = self.strade.get_clean_order_by_uctid(uctid)
+        if not cleaner_order:
+            raise NOT_FOUND()
+        if cleaner_order.UCTstatus != 0:
+            raise PARAMS_ERROR(u'当前订单状态为{}, 只可以修改未付款的订单'.format(SERVER_STATUS.get(cleaner_order.UCTstatus)))
+        updated = self.strade.update_cleanorder_detail_by_uctid(uctid, {
+            "UCTprice": price
+        })
+        return Success(u'修改成功', {
+            'uctid': uctid
+        })
+
+    def update_moverorder_status(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('umtid', 'status'))
+        status = data.get('status')
+        umtid = data.get('umtid')
+        mover_order = self.strade.get_mover_order_by_umtid(umtid)
+        if not mover_order:
+            raise NOT_FOUND()
+        self._allow_order_status(mover_order.UMTstatus, int(status))
+        updated = self.strade.update_movertrade_status_by_umtid(umtid, status)
+        msg = u'修改成功' if updated else u'无此记录'
+        return Success(msg, {
+            'umtid': umtid
+        })
+
+    def update_moverorder_price(self):
+        """更新订单价格"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('umtid', 'price'))
+        price = data.get('price')
+        umtid = data.get('umtid')
+        mover_order = self.strade.get_mover_order_by_umtid(umtid)
+        if not mover_order:
+            raise NOT_FOUND()
+        if mover_order.UMTstatus != 0:
+            raise PARAMS_ERROR(u'当前订单状态为{}, 只可以修改未付款的订单'.format(SERVER_STATUS.get(mover_order.UMTstatus)))
+        updated = self.strade.update_movertrade_detail_by_umtid(umtid, {
+            'UMTpreviewprice': price
+        })
+        return Success(u'修改成功', {
+            'umtid': umtid
+        })
 
 
     @staticmethod
@@ -326,3 +426,22 @@ class CTrade(object):
             return str_time
         raise PARAMS_ERROR(u'时间不合理')
 
+    @staticmethod
+    def _allow_order_status(old, new):
+        if old == 0:
+            # 0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消'
+            forbidden = [2]
+        elif old == 1:
+            forbidden = [0]
+        elif old == 2:
+            forbidden = [0, 1]
+        else:
+            forbidden = [0, 1, 2, 3]
+        if new in forbidden:
+            raise PARAMS_ERROR(u'状态不合理, 当前状态为: {} '
+                               u''.format(SERVER_STATUS.get(old)))
+
+    @staticmethod
+    def refund():
+        # todo 退款状态
+        pass

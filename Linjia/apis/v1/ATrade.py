@@ -15,6 +15,14 @@ class ATrade(Resource):
             'fixer_appointment': self.ctrade.fixer_appiontment,
             'add_complaint': self.ctrade.add_complaint,
             'update_complaint': self.ctrade.update_complaint,
+            # 改状态
+            'update_fixerorder_status': self.ctrade.update_fixerorder_status,
+            'update_cleanorder_status': self.ctrade.update_cleanorder_status,
+            'update_moverorder_status': self.ctrade.update_moverorder_status,
+            # 改价
+            'update_fixorder_price': self.ctrade.update_fixorder_price,
+            'update_cleanerorder_price': self.ctrade.update_cleanerorder_price,
+            'update_moverorder_price': self.ctrade.update_moverorder_price,
         }
         return apis
 
