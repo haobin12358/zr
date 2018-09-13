@@ -252,7 +252,7 @@ class CTrade(object):
             for fixer_order in order_list:
                 setattr(fixer_order, 'createtime', fixer_order.UFTcreatetime)
                 fixer_order.fill(u'邻家维修', 'name')
-                setattr('uftstatus', SERVER_STATUS.get(fixer_order.UFTstatus))
+                setattr(fixer_order, 'uftstatus', SERVER_STATUS.get(fixer_order.UFTstatus))
                 fixer_order.fill(u'fixer', 'type')
         elif server_type == 'cleaner':
             order_list = self.strade.get_clean_serverlist_by_usid(usid, data)
@@ -298,16 +298,16 @@ class CTrade(object):
                 fixer_order.fill(u'fixer', 'type')
             # 员工id 姓名.
             # map(lambda x: setattr( x, 'staff', self.suser.get_staff_by_stfid(x.STFid)) if not x.STFid order_list)
-            for order in order_list:
-                stfid = order.STFid
-                staff = {}
-                if stfid:
-                    staff = self.suser.get_staff_by_stfid(stfid).clean.add('STFid', 'STFname')
-                setattr(order, 'staff', staff)
-                order.add('staff')
-            order_list = sorted(order_list, key=lambda x: x.createtime)
-            request.page_count = math.ceil(float(len_order_list) / page_size)
-            request.all_count = len_order_list
+        for order in order_list:
+            stfid = order.STFid
+            staff = {}
+            if stfid:
+                staff = self.suser.get_staff_by_stfid(stfid).clean.add('STFid', 'STFname')
+            setattr(order, 'staff', staff)
+            order.add('staff')
+        order_list = sorted(order_list, key=lambda x: x.createtime)
+        # request.page_count = math.ceil(float(len_order_list) / page_size)
+        # request.all_count = len_order_list
         return Success(u'获取列表成功', order_list)
 
     def udpate_fixer_status(self):
