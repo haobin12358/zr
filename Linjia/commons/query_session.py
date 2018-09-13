@@ -25,13 +25,13 @@ def _generative(*assertions):
 @inspection._self_inspects
 @log.class_logger
 class Query(_Query):
+    """定义查询方法"""
     def _no_limit_offset(self, meth):
         super(Query, self)._no_limit_offset(meth)
 
     def _no_statement_condition(self, meth):
         super(Query, self)._no_statement_condition(meth)
 
-    # 此处可以自定义查询操作
     def filter_ignore_none_args(self, *criterion):
         """等同于filter查询, 但是会无视双等号后为None的值
         例子: session.query(Admin).filter_ignore_none_args(Admin.ADisfreeze == freeze)
@@ -65,17 +65,16 @@ class Query(_Query):
     def contain(self, cen):
         """
         使用 session.query(User).contain(User.phone='187')
-        等同于: session.query.filter(User.phone.contains('187')),
+        与使用 session.query.filter(User.phone.contains('187'))的效果一致
         唯一不同在于:
             如果: session.query(User).contain(User.phone=None) 则不执行过滤
-            而使用 session.query.filter(User.phone.contains('187'))则会出现异常
+            而使用 session.query.filter(User.phone.contains(None))则会出现异常
         暂不支持多个参数
         """
 
         if isinstance(cen.right.type, NullType):
             return self
         return self.filter(cen.left.contains(cen.right))
-
 
 
 class Session(_Session):
