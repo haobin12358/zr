@@ -260,12 +260,21 @@ class CUser():
         freeze = None
         if freeze_args is not None:
             freeze = False if str(freeze_args) == '0' else True
-        print('>>>>>>>>>>>', freeze)
         admin_list = self.suser.get_admin_list(data.get('level'), freeze, page, count)
         map(lambda x: x.hide('ADpassword'), admin_list)
         return Success(u'ok', {
             'admins': admin_list
         })
+
+    def get_user_list(self):
+        """查看普通列表"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(())
+        page = data.get('page', 1)
+        count = data.get('count', 15)
+
+
 
 
     def _async_send_code(self, phone):

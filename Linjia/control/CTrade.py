@@ -356,6 +356,7 @@ class CTrade(object):
         if not cleaner_order:
             raise NOT_FOUND()
         self._allow_order_status(cleaner_order.UCTstatus, int(status))
+        updated = self.strade.update_cleanertrade_status(uctid, status)
         msg = u'修改成功'
         return Success(msg, {
             'uctid': uctid
