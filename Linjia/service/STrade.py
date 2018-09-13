@@ -36,7 +36,7 @@ class STrade(SBase):
     def get_fixer_serverlist_by_usid(self, usid=None, args=None):
         if args:
             fixer_order_list = self.session.query(UserFixerTrade).filter_ignore_none_args(UserFixerTrade.USid==usid)
-            return fixer_order_list.order_by(UserFixerTrade.UFTcreatetime.desc()).all_with_count(args.get('page_num'), args.get('page_size'))
+            return fixer_order_list.order_by(UserFixerTrade.UFTcreatetime.desc()).all_with_page(args.get('page_num'), args.get('page_size'))
         return self.session.query(UserFixerTrade).order_by(UserFixerTrade.UFTcreatetime.desc()).all()
 
     @close_session
@@ -66,26 +66,23 @@ class STrade(SBase):
         return provide_list.order_by(ProvideHouseApply.PHAcreatetime).all_with_page(page, count)
     
     @close_session
-    def get_mover_serverlist(self, args=None):
-        if args:
-            mover_order_list = self.session.query(UserMoveTrade)
-            page_num = args.get('page_num')
-            page_size = args.get('page_size')
-            return mover_order_list.order_by(UserMoveTrade.UMTcreatetime.desc()).all_with_page(page_num, page_size)
-        return self.session.query(UserMoveTrade).order_by(UserMoveTrade.UMTcreatetime.desc()).all()
+    def udpate_fixertrade_status_by_utfid(self, utfid, status):
+        """根据订单id维修服务状态"""
+        return self.session.query(UserFixerTrade).filter_by(UTFid=utfid).update({
+            'UFTstatus': status     
+        })
 
     @close_session
-    def get_clean_serverlist(self, args=None):
-        if args:
-            cleanserver_order_list = self.session.query(UserCleanTrade)
-            return cleanserver_order_list.order_by(UserCleanTrade.UCTcreatetime.desc()).all_with_page(args.get('page_num'), args.get('page_size') )
-        return self.session.query(UserCleanTrade).order_by(UserCleanTrade.UCTcreatetime.desc()).all()
+    def update_movertrade_status_by_umtid(self, umtid, status):
+        """根据订单id更改状态, 搬家"""
+        return self.session.query(UserMoveTrade).filter_by(UMTid=umtid).update({
+            'UMTstatus': status     
+        })
 
     @close_session
-    def get_fixer_serverlist(self, args=None):
-        if args:
-            fixer_order_list = self.session.query(UserFixerTrade)
-            return fixer_order_list.order_by(UserFixerTrade.UFTcreatetime.desc()).all_with_count(args.get('page_num'), args.get('page_size'))
-        return self.session.query(UserFixerTrade).order_by(UserFixerTrade.UFTcreatetime.desc()).all()
-
- 
+    def update_cleanertrade_status(self, uctid, status):
+        """更改保洁订单维修状态"""
+        return self.session.query(UserCleanTrade).filter_by(UCTid=uctid).update({
+            'UCTstatus': status     
+        })
+        
