@@ -4,7 +4,6 @@ import math
 from flask import request
 from sqlalchemy import inspection, log, util
 from sqlalchemy.orm import Query as _Query, Session as _Session
-from sqlalchemy.sql import expression
 from sqlalchemy.sql.sqltypes import NullType
 
 from Linjia.commons.error_response import PARAMS_ERROR
@@ -62,6 +61,21 @@ class Query(_Query):
         request.page_count = page_count
         request.all_count = mount
         return self.offset((page - 1) * page).limit(count).all()
+
+    def contain(self, cen):
+        """
+        使用 session.query(User).contain(User.phone='187')
+        等同于: session.query.filter(User.phone.contains('187')),
+        唯一不同在于:
+            如果: session.query(User).contain(User.phone=None) 则不执行过滤
+            而使用 session.query.filter(User.phone.contains('187'))则会出现异常
+        暂不支持多个参数
+        """
+
+        if isinstance(cen.right.type, NullType):
+            return self
+        return self.filter(cen.left.contains(cen.right))
+
 
 
 class Session(_Session):
