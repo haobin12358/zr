@@ -32,5 +32,6 @@ class ARoom(Resource):
             'update_villeginfo': self.croom.update_villeginfo,
             'add_bedroom': self.croom.add_bedroom,
             'update_bedroom': self.croom.update_bedroom,
+            'delete_bedroom': self.croom.delete_bedroom,
         }
         return apis

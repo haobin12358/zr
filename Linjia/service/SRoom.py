@@ -77,7 +77,7 @@ class SRoom(SBase):
     @close_session
     def get_bedroom_entryinfo_by_roid(self, roid):
         """获取房源下的卧室"""
-        return self.session.query(BedroomBehindRoom).filter(BedroomBehindRoom.ROid == roid, BBRisdelete == False).order_by(
+        return self.session.query(BedroomBehindRoom).filter(BedroomBehindRoom.ROid == roid, BedroomBehindRoom.BBRisdelete == False).order_by(
             BedroomBehindRoom.BBRnum).all()
 
     # 2018年09月12日 调整
@@ -98,7 +98,7 @@ class SRoom(SBase):
     @close_session
     def update_bedroom_by_bbrid(self, bbrid, data):
         """根据卧室id更新卧室"""
-        return self.session.query(BedroomBehindRoom).filter_by(BBRid=bbrid).update(data)
+        return self.session.query(BedroomBehindRoom).filter_by(BBRid=bbrid, BBRisdelete=False).update(data)
 
     @close_session
     def get_joinroom_banner_list(self):

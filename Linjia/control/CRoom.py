@@ -313,8 +313,16 @@ class CRoom(BaseRoomControl):
             'bbrid': bbrid     
         })
 
-
-
+    def delete_bedroom(self):
+        """删除卧室"""
+        data = parameter_required(('bbrid', ))
+        deleted = self.sroom.update_bedroom_by_bbrid(data.get('bbrid'), {
+            'BBRisdelete': 1
+        })
+        msg = u'删除成功' if deleted else u'无此记录'
+        return Success(msg, {
+            'bbrid': data.get('bbrid')
+        })
 
     def add_villegetinfo(self):
         """添加小区信息"""
