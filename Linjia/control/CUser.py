@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from threading import Thread
 
-from flask import request, current_app
+from flask import request
 from raven.transport import requests
 from weixin import WeixinLogin
 from weixin.login import WeixinLoginError
@@ -18,7 +18,7 @@ from Linjia.commons.token_handler import usid_to_token, is_admin, is_hign_level_
 from Linjia.configs.enums import STAFF_TYPE, GENDER_CONFIG
 from Linjia.configs.phone_code import auth_key, code_url
 from Linjia.configs.timeformat import format_for_db
-from Linjia.configs.url_config import HTTP_HOST
+from Linjia.configs.url_config import API_HOST, HTTP_HOST
 from Linjia.configs.wxconfig import APPID, APPSECRET, WXSCOPE
 from Linjia.service import SUser, SUserCode
 
@@ -46,9 +46,10 @@ class CUser():
 
     def login(self):
         """登录, 没有用户则自动创建"""
-        data = parameter_required(('phone', 'code'), others='ignore')
+        data = parameter_required(('phone', 'code', 'redirect'), others='ignore')
         phone = str(data.get('phone'))
         code = int(data.get('code'))
+        redirect = data.get('redirect', HTTP_HOST)
         usercode = self.susercode.get_active_usercode_by_phone_code(phone, code)
         if not usercode:
             return NOT_FOUND(u'验证码已过期或不正确')
@@ -63,7 +64,8 @@ class CUser():
             }
             self.suser.add_model('User', user_dict)
             token = usid_to_token(user_dict['usid'])
-            redirect_url = self.wxlogin.authorize(HTTP_HOST + "/user/weixin_callback/", WXSCOPE, state=user_dict['usid'])
+            state = user_dict['usid'] + u'|' + redirect
+            redirect_url = self.wxlogin.authorize(API_HOST + "/wechat/callback", WXSCOPE, state=state)
             return Success(u'注册成功', status=302, data={
                 'token': token,
                 'redirect_url': redirect_url
@@ -86,34 +88,38 @@ class CUser():
         send.start()
         message = u'获取成功'
         return Success(message)
-
-    def wechat_login(self):
-        """获取微信跳转链接"""
-        url = self.wxlogin.authorize(HTTP_HOST + "/user/weixin_callback/", WXSCOPE)
-        return Success(u'获取跳转链接成功',  {'url': url}, status=302)
-
-    def weixin_callback(self):
-        """通过code, 获取用户信息"""
-        args = parameter_required(('code', ))
-        code = args.get('code')
-        try:
-            data = self.wxlogin.access_token(code)
-            data = self.wxlogin.user_info(data.access_token, data.openid)
-            usid = args.get('state')
-            to_model = {
-                'UScity': data.get('city'),
-                'WXopenid': data.get('openid'),
-                'WXnickname': data.get('nickname'),
-                'USnickname': data.get('nickname'),
-                'USheader': data.get('headimgurl'),
-                'WXprovice': data.get('province')
-            }
-            to_model['USgender'] = 0 if data.get('sex') == 1 else 1
-            updated = self.suser.update_user_by_usid(usid, to_model)
-        except WeixinLoginError as e:
-            current_app.logger.error(str(data))
-            raise PARAMS_ERROR(u'登录出现错误')
-        return data
+    #
+    # def wechat_login(self):
+    #     """获取微信跳转链接"""
+    #     url = self.wxlogin.authorize(API_HOST + "/user/weixin_callback/", WXSCOPE)
+    #     return Success(u'获取跳转链接成功',  {'url': url}, status=302)
+    #
+    # def weixin_callback(self):
+    #     """通过code, 获取用户信息"""
+    #     args = parameter_required(('code', ))
+    #     code = args.get('code')
+    #     try:
+    #         data = self.wxlogin.access_token(code)
+    #         data = self.wxlogin.user_info(data.access_token, data.openid)
+    #         state = args.get('state').split('|')
+    #         usid = state[0]
+    #         redirect_url = state[1]
+    #         to_model = {
+    #             'UScity': data.get('city'),
+    #             'WXopenid': data.get('openid'),
+    #             'WXnickname': data.get('nickname'),
+    #             'USnickname': data.get('nickname'),
+    #             'USheader': data.get('headimgurl'),
+    #             'WXprovice': data.get('province')
+    #         }
+    #         to_model['USgender'] = 0 if data.get('sex') == 1 else 1
+    #         updated = self.suser.update_user_by_usid(usid, to_model)
+    #         return redirect(u'http://www.baidu.com')
+    #     except WeixinLoginError as e:
+    #         # current_app.logger.error(str(data))
+    #         # raise PARAMS_ERROR(u'登录出现错误')
+    #         return redirect(u'http://www.baidu.com')
+    #         return redirect(HTTP_HOST)
 
     def get_wx_config(self):
         data = request.json
@@ -298,19 +304,12 @@ class CUser():
         count = data.get('count', 15)
         gender = data.get('gender')
         phone = data.get('phone')
-        user_list = self.suser.get_user_list(page, count, gender, phone)
+        usid = data.get('usid')
+        user_list = self.suser.get_user_list(page, count, gender, phone, usid)
         for user in user_list:
             user.all.hide('WXprivilege', 'WXheader', 'WXnickname', 'USaddr', 'USstar', 'UShobby', 'USpassword')
             user.USgender = GENDER_CONFIG.get(user.USgender)
         return Success(u'获取用户列表成功', user_list)
-        # import ipdb
-        # ipdb.set_trace()
-
-
-
-
-
-
 
 
 

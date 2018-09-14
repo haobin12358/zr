@@ -60,22 +60,42 @@ class Query(_Query):
         page_count = math.ceil(float(mount) / count)
         request.page_count = page_count
         request.all_count = mount
-        return self.offset((page - 1) * page).limit(count).all()
+        return self.offset((page - 1) * count).limit(count).all()
 
     def contain(self, cen):
         """
-        使用 session.query(User).contain(User.phone='187')
+        使用 session.query(User).contain(User.phone=='187')
         与使用 session.query.filter(User.phone.contains('187'))的效果一致
-        唯一不同在于:
-            如果: session.query(User).contain(User.phone=None) 则不执行过滤
-            而使用 session.query.filter(User.phone.contains(None))则会出现异常
-        暂不支持多个参数
+        二者唯一不同在于: session.query(User).contain(User.age == None) 将不过滤不异常
         """
-
         if isinstance(cen.right.type, NullType):
             return self
         return self.filter(cen.left.contains(cen.right))
 
+    def gt(self, cen):
+        """
+        使用session.query(User).filter(User.age > 13)
+        类似于 session.query(User).gt(User.age == 13)
+        二者唯一不同在于: session.query(User).gt(User.age == None) 将不过滤不异常
+        """
+        if isinstance(cen.right.type, NullType):
+            return self
+        return self.filter(cen.left > cen.right)
+
+    def lt(self, cen):
+        """
+        使用session.query(User).filter(User.age < 13)
+        类似于 session.query(User).lt(User.age == 13)
+        二者唯一不同在于: session.query(User).lt(User.age == None) 将不过滤不异常
+        """
+        if isinstance(cen.right.type, NullType):
+            return self
+        return self.filter(cen.left < cen.right)
+
+    def test(self, cen):
+        """测试"""
+        import ipdb
+        ipdb.set_trace()
 
 class Session(_Session):
     # 此处制定session

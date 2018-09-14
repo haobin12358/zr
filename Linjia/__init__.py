@@ -3,7 +3,8 @@ from datetime import datetime
 
 from flask.wrappers import Request as _Request
 from flask_cors import CORS
-from flask import Flask as _Flask, Response, current_app, json
+from flask import Flask as _Flask, current_app, json, redirect
+from werkzeug.wrappers import Response
 from flask.json import JSONEncoder as _JSONEncoder
 from werkzeug.exceptions import HTTPException
 
@@ -28,6 +29,7 @@ class JSONEncoder(_JSONEncoder):
             return res
         if isinstance(o, Response):
             return o
+            current_app.logger.error(str(o))
         if isinstance(o, datetime):
             # 也可以序列化时间类型的对象
             return o.strftime('%Y%m%d%H%M%S')

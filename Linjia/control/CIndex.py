@@ -10,7 +10,7 @@ from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import is_admin
 from Linjia.configs.appsettings import BASEDIR
 from Linjia.configs.enums import RENT_TYPE
-from Linjia.configs.url_config import HTTP_HOST
+from Linjia.configs.url_config import API_HOST
 from Linjia.control.base_control import BaseRoomControl, BaseIndexControl
 from Linjia.service import SIndex, SRoom, SCity
 
@@ -132,7 +132,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             img_name = newName
             newPath = os.path.join(BASEDIR, 'img', 'banner', newName)
             file.save(newPath)  # 保存图片
-            data = HTTP_HOST + '/img/banner/' + img_name
+            data = API_HOST + '/img/banner/' + img_name
             return Success(u'上传成功', data)
         else:
             return SYSTEM_ERROR(u'上传有误')

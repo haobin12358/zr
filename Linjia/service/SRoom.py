@@ -18,30 +18,24 @@ class SRoom(SBase):
         return self.session.query(Room).filter_by(ROid=roid).first()
 
     @close_session
-    def get_room_list_filter(self, kwargs, admin=False):
+    def get_room_list_filter(self, kwargs, admin=False, style=[], face_args=[]):
         """获取所有(合租和整租"""
         # todo 离地铁近
-        all_room = self.session.query(Room).filter(Room.ROisdelete==False)
-        if not admin:
-            all_room = all_room.join(BedroomBehindRoom, Room.ROid==BedroomBehindRoom.ROid).filter(BedroomBehindRoom.BBRstatus >= 1, Room.ROisdelete==False)
-        if 'type' in kwargs:
-            all_room = all_room.filter(Room.ROrenttype == int(kwargs.get('type')))
-        if 'style' in kwargs:
-            all_room = all_room.filter(or_(Room.ROdecorationstyle == int(v) for v in kwargs.get('style')))
-        if 'lowprice' in kwargs:
-            all_room = all_room.filter(Room.ROshowprice > float(kwargs.get('lowprice')))
-        if 'highprice' in kwargs:
-            all_room = all_room.filter(Room.ROshowprice < float(kwargs.get('highprice')))
-        if 'face_args' in kwargs:
-            all_room = all_room.filter(or_(Room.ROface == int(v) for v in kwargs.get('face_args')))
+        all_room = self.session.query(Room).filter(Room.ROisdelete == False)
+        all_room = all_room.filter_ignore_none_args(Room.ROrenttype == kwargs.get('type'),
+                                                    Room.ROcitynum == kwargs.get('city_id'),
+                                                    Room.ROareanum == kwargs.get('area_id')). \
+            gt(Room.ROshowprice == kwargs.get('lowprice')).\
+            lt(Room.ROshowprice == kwargs.get('highprice')).\
+            filter(or_(Room.ROdecorationstyle == v for v in style)).\
+            filter(or_(Room.ROface == v for v in face_args))
         if 'show_type' in kwargs:
-            all_room = all_room.join(RoomMedia, RoomMedia.ROid == Room.ROid).filter(RoomMedia.REtype == kwargs.get('show_type'))
+            all_room = all_room.join(RoomMedia, RoomMedia.ROid == Room.ROid).filter(
+                RoomMedia.REtype == kwargs.get('show_type'))
         if 'bed_count' in kwargs:
-            all_room = all_room.join(House, House.HOid==Room.HOid).filter(or_(House.HObedroomcount == int(v) for v in kwargs.get('bed_count')))
-        if 'city_id' in kwargs:
-            all_room = all_room.filter(Room.ROcitynum==kwargs.get('city_id'))
-        if 'area_id' in kwargs:
-            all_room = all_room.filter(Room.ROareanum==kwargs.get('area_id'))
+            all_room = all_room.join(House, House.HOid == Room.HOid).filter(
+                or_(House.HObedroomcount == int(v) for v in kwargs.get('bed_count')))
+
         return all_room.all_with_page(kwargs.get('page'), kwargs.get('count'))
 
     @close_session
@@ -66,7 +60,7 @@ class SRoom(SBase):
 
     @close_session
     def get_room_equirment_by_roid(self, roid):
-        return self.session.query(RoomEquirment).filter(RoomEquirment.ROid==roid).first()
+        return self.session.query(RoomEquirment).filter(RoomEquirment.ROid == roid).first()
 
     @close_session
     def get_house_by_roid(self, roid):
@@ -83,14 +77,14 @@ class SRoom(SBase):
     @close_session
     def get_bedroom_entryinfo_by_roid(self, roid):
         """获取房源下的卧室"""
-        return self.session.query(BedroomBehindRoom).filter(BedroomBehindRoom.ROid==roid).order_by(BedroomBehindRoom.BBRnum).all()
+        return self.session.query(BedroomBehindRoom).filter(BedroomBehindRoom.ROid == roid).order_by(
+            BedroomBehindRoom.BBRnum).all()
 
     # 2018年09月12日 调整
     @close_session
     def get_roomates_info_by_bbrid(self, bbrid):
         """获取卧室的入住情况"""
-        return self.session.query(UserBedroomBehindRoom).filter(UserBedroomBehindRoom.BBRid==bbrid).first()
-
+        return self.session.query(UserBedroomBehindRoom).filter(UserBedroomBehindRoom.BBRid == bbrid).first()
 
     @close_session
     def get_joinroom_banner_list(self):
@@ -100,7 +94,7 @@ class SRoom(SBase):
     @close_session
     def delete_joinroom_banner(self, jrbid):
         """删除友家页的轮播图"""
-        return self.session.query(JoinRoomBanner).filter(JoinRoomBanner.JRBid==jrbid).delete()
+        return self.session.query(JoinRoomBanner).filter(JoinRoomBanner.JRBid == jrbid).delete()
 
     @close_session
     def get_homestay_banner_list(self):
@@ -110,14 +104,12 @@ class SRoom(SBase):
     @close_session
     def delete_homestay_banner(self, hsbid):
         """删除民宿页的轮播图"""
-        return self.session.query(HomeStayBanner).filter(HomeStayBanner.HSBid==hsbid).delete()
+        return self.session.query(HomeStayBanner).filter(HomeStayBanner.HSBid == hsbid).delete()
 
     @close_session
     def get_villege_info_by_name(self, name):
         """根据公寓名字获取公寓地铁信息"""
         return self.session.query(VillegeInfoAndSubway).filter(VillegeInfoAndSubway.name.contains(name)).all()
-
-
 
 
 '''

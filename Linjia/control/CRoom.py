@@ -31,12 +31,12 @@ class CRoom(BaseRoomControl):
         # 租赁方式, 合租整租公寓民宿
         args_dict['type'] = args.get('type')
         # 装修风格 0 毛坯, 1简装, 2: 精装, 3: 豪华
-        args_dict['style'] = args.get('style').split('|') if 'style' in args else None
+        style = args.get('style').split('|') if 'style' in args else []
         # 租金
         args_dict['lowprice'] = args.get('lowprice')
         args_dict['highprice'] = args.get('highprice')
         # 朝向 face=1|2|3 ==> [1, 2, 3]
-        args_dict['face_args'] = args.get('face').split('|') if 'face' in args else None
+        face_args = args.get('face').split('|') if 'face' in args else []
         # 展现方式 image or video
         args_dict['show_type'] = args.get('show_type')
         # 房型 一室,二室,三室,五室以上
@@ -51,7 +51,7 @@ class CRoom(BaseRoomControl):
         args_dict = {
             k: v for k, v in args_dict.items() if v is not None
         }
-        room_detail_list = self.sroom.get_room_list_filter(args_dict, admin)
+        room_detail_list = self.sroom.get_room_list_filter(args_dict, admin, style=style, face_args=face_args)
         map(self._fill_detail_for_list, room_detail_list)
         map(self._fill_house_info, room_detail_list)  # 楼层和规格
         map(lambda x: x.fill(self.sroom.get_tags_by_roid(x.ROid), 'tags', hide=('ROid', )), room_detail_list)  # 填充tag信息

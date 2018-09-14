@@ -18,10 +18,10 @@ def error_handler(app):
     def error404(e):
         return APIS_WRONG(u'接口未注册' + request.path)
 
-    @app.errorhandler(ValueError)
-    def error_value_error(e):
-        generic_log(e)
-        return APIS_WRONG(u'类型错误' + str(request.args.to_dict()))
+    # @app.errorhandler(ValueError)
+    # def error_value_error(e):
+    #     generic_log(e)
+    #     return APIS_WRONG(u'类型错误' + str(request.args.to_dict()))
 
     @app.errorhandler(Exception)
     def framework_error(e):

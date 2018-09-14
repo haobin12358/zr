@@ -16,9 +16,9 @@ class SUser(SBase):
         return self.session.query(User).filter_by(USid=usid).all()
 
     @close_session
-    def get_user_list(self, page=None, count=None, gender=None, contain_filter=None):
+    def get_user_list(self, page=None, count=None, gender=None, contain_filter=None, usid=None):
         """获取用户列表, 管理员使用"""
-        return self.session.query(User).filter_ignore_none_args(User.USisdelete==False, User.USgender==gender).\
+        return self.session.query(User).filter_ignore_none_args(User.USisdelete==False, User.USgender==gender, User.USid==usid).\
             contain(User.USphone==contain_filter).\
             order_by(User.USlastlogin.desc()).all_with_page(page, count)
 
