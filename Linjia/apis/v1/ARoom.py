@@ -17,7 +17,7 @@ class ARoom(Resource):
             'get_position': self.croom.get_subway_potion_by_lineid,
             'get_joinroom_banner': self.croom.get_joinroom_banner,
             'get_homestay_banner': self.croom.get_homestay_banner,
-            'get_villege_info': self.croom.get_villegeinfo_by_namekeyword
+            'get_villege_info': self.croom.get_villegeinfo_by_namekeyword,
         }
         return apis
 
@@ -27,5 +27,8 @@ class ARoom(Resource):
             'add_homestay_banner': self.croom.add_homestay_banner,
             'delete_join_room_banner': self.croom.delete_joinroom_banner,
             'delete_homestay_banner': self.croom.delete_homestay_banner,
+            'add_room': self.croom.add_room,
+            'add_villegetinfo': self.croom.add_villegetinfo,
+            'update_villeginfo': self.croom.update_villeginfo
         }
         return apis

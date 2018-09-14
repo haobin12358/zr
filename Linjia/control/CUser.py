@@ -64,13 +64,21 @@ class CUser():
             }
             self.suser.add_model('User', user_dict)
             token = usid_to_token(user_dict['usid'])
-            state = user_dict['usid'] + u'|' + redirect
+            state = str(user_dict['usid']) + u'P' + redirect
             redirect_url = self.wxlogin.authorize(API_HOST + "/wechat/callback", WXSCOPE, state=state)
             return Success(u'注册成功', status=302, data={
                 'token': token,
                 'redirect_url': redirect_url
             })
-        else:
+        elif not user.WXopenid:  # 无用户资料
+            token = usid_to_token(user.USid)
+            state = str(user.USid) + u'P' + redirect
+            redirect_url = self.wxlogin.authorize(API_HOST + "/wechat/callback", WXSCOPE, state=state)
+            return Success(u'注册成功', status=302, data={
+                'token': token,
+                'redirect_url': redirect_url
+            })
+        else:  # 老用户
             # 如果是已经存在的用户则记录上次登录时间
             updated = self.suser.update_user_by_phone(phone, {
                 'USlastlogin': now_time

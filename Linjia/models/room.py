@@ -43,13 +43,13 @@ class House(Base):
     HOtotalfloor = Column(Integer, comment=u'总楼层')
     HObedroomcount = Column(Integer, default=1, comment=u'卧室数目')
     HOparlorcount = Column(Integer, default=1, comment=u'客厅数量')
-    VIid = Column(String(64), comment=u'小区id')
+    VIid = Column(String(64), comment=u'小区id')  # house的viid就是villegeinfo的_id
 
 
 class VillegeInfoAndSubway(Base):
-    """小区的地铁信息"""
+    """小区和地铁信息"""
     __tablename__ = 'villegeinfo'
-    _id = Column(Integer, primary_key=True)  # house的viid就是这个id
+    id = Column(String(64), primary_key=True)  # house的viid就是这个id
     city_id = Column(String(8), nullable=False)
     name = Column(String(32), nullable=False, comment=u'小区名字')
     build_year = Column(String(6), comment=u'建筑年份')
@@ -59,6 +59,8 @@ class VillegeInfoAndSubway(Base):
     location = Column(String(64), comment=u'坐标')
     linenum = Column(String(32), comment=u'地铁线路名')
     position = Column(String(32), comment=u'站点')
+    traffic = Column(Text, comment=u'交通介绍')
+    around = Column(Text, comment=u'周边')
     ROaroundequirment = Column(Text, comment=u'周边设施介绍')
 
 

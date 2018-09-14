@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
+import random
+import time
 import uuid
+from datetime import datetime
 
 from flask import request, current_app
 from raven.contrib import flask
 
-from Linjia.commons.error_response import NOT_FOUND, TOKEN_ERROR
+from Linjia.commons.error_response import NOT_FOUND, TOKEN_ERROR, PARAMS_ERROR
 from Linjia.commons.params_validates import parameter_required
 from Linjia.commons.success_response import Success
 from Linjia.commons.token_handler import is_admin
 from Linjia.configs.enums import FACE_CONFIG, RENT_TYPE
+from Linjia.configs.timeformat import format_for_db
 from Linjia.control.base_control import BaseRoomControl
 from Linjia.service import SRoom, SUser, SCity, SIndex
 
@@ -185,5 +189,85 @@ class CRoom(BaseRoomControl):
         kw = data.get('kw')
         info = self.sroom.get_villege_info_by_name(kw)
         return Success(u'获取成功', info)
+
+    def add_room(self):
+        """添加房源"""
+        # if not is_admin():
+        #     raise TOKEN_ERROR(u'请使用管理员登录')
+        required = ('roname', 'roimage', 'roareanum', 'roface', 'roarea', 'roshowprice', 'roshowpriceunit',
+                    'rorenttype', 'rodecorationstyle', 'rocitynum', 'roareanum', 'rosubwayaround',
+                     'house', 'villegeid', 'medias')
+        data = parameter_required(required, forbidden=('roid', 'hoid', ))
+        house = data.pop('house', None)
+        medias = data.pop('medias', [])
+        tags = data.pop('tags', [])
+        roomrequirment = data.pop('roomrequirment', None)
+        roid = str(uuid.uuid4())
+        house['hoid'] = data['hoid'] = data['roid'] = roid
+
+        # 是否存在公寓
+        villege = self.sroom.get_villege_info_by_id(data.get('villegeid'))
+        if not villege:
+            raise NOT_FOUND(u'请添加公寓信息')
+
+        # 添加房源
+        create_time = datetime.strftime(datetime.now(), format_for_db)
+        data['ROcreatetime'] = create_time
+        data['ROdistance'] = villege.subway_primary
+        data['ROaroundequirment'] = villege.around
+        data['ROsubwayposionname'] = villege.position
+        added = self.sroom.add_model('Room', data, return_fields=('ROid', ))
+        # 添加媒体
+        try:
+            for media in medias:
+                media['REid'] = str(uuid.uuid4())
+                media['roid'] = roid
+                self.sroom.add_model('RoomMedia', media)
+        except Exception as e:
+            raise PARAMS_ERROR(u'medias参数有误')
+        # 添加house
+        houseinfo_required = ('hofloor', 'hototalfloor', 'hobedroomcount', 'hoparlorcount')
+        parameter_required(houseinfo_required, datafrom=house)
+        added = self.sroom.add_model('House', house)
+        # 添加tag
+        try:
+            for tag in tags:
+                tag['RTid'] = str(uuid.uuid4())
+                tag['roid'] = roid
+                self.sroom.add_model('RoomTag', tag)
+        except Exception as e:
+            raise PARAMS_ERROR(u'tags参数有误')
+        # 添加设备:
+        if roomrequirment:
+            roomrequirment['roid'] = roid
+            roomrequirment['reid'] = str(uuid.uuid4())
+            self.sroom.add_model('RoomEquirment', roomrequirment)
+        import ipdb
+        ipdb.set_trace()
+        return Success(u'添加成功', {
+            'roid': roid
+        })
+
+
+
+
+
+    def add_villegetinfo(self):
+        """添加小区信息"""
+        data = parameter_required(('city_id', 'name', ), forbidden=('id', ))
+        data['id'] = str(uuid.uuid4())
+        added = self.sroom.add_model('VillegeInfoAndSubway', data, return_fields=(['id', 'name']))
+        return added
+
+    def update_villeginfo(self):
+        """修改小区信息"""
+        data = parameter_required(('id', ))
+        updated = self.sroom.update_villege_info(data.get('id'), data)
+        msg = u'更新成功' if updated else u'无此记录'
+        return Success(msg, {
+            'id': data.get('id')
+        })
+
+
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import current_app
+from flask import current_app, request
 from weixin import Weixin, WeixinMsg, WeixinLogin
 from weixin.login import WeixinLoginError
 from werkzeug.utils import redirect
@@ -58,7 +58,7 @@ def reigster_extensions(app):
         try:
             data = wxlogin.access_token(code)
             data = wxlogin.user_info(data.access_token, data.openid)
-            state = args.get('state').split('|')
+            state = args.get('state').split('P')
             usid = state[0]
             redirect_url = state[1]
             to_model = {
@@ -74,6 +74,6 @@ def reigster_extensions(app):
             updated = suser.update_user_by_usid(usid, to_model)
             return redirect(redirect_url)
         except WeixinLoginError as e:
-            current_app.logger.error(u'wechat登录出现错误')
+            current_app.logger.error(request.url)
             # raise PARAMS_ERROR(u'登录出现错误')
             return redirect(HTTP_HOST)
