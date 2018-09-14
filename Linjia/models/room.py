@@ -74,6 +74,7 @@ class BedroomBehindRoom(Base):
     BBRstatus = Column(Integer, default=0, comment=u'房源状态, 0: 待审核, 1: 配置中(可预订), 2: 可入住, 3: 转租, 4: 实习, 5, 已租出')
     BBRshowprice = Column(Float, comment=u'显示价格')
     BBRshowpriceunit = Column(String(16), default='month', comment=u'价格单位')
+    BBRisdelete = Column(Boolean, default=False, comment=u'是否删除')
 
 
 class UserBedroomBehindRoom(Base):
