@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import traceback
+
 from sqlalchemy.orm import sessionmaker
 
 from Linjia.commons.error_response import DB_ERROR
@@ -31,7 +33,7 @@ def close_session(fn):
             self.session.commit()
             return result
         except Exception as e:
-            print("DBERROR" + e.message)
+            print("DBERROR" + traceback.format_exc().decode('unicode-escape'))
             self.session.rollback()
             # raise e
             raise DB_ERROR(message=e.message)
@@ -48,6 +50,45 @@ class SBase(object):
         except Exception as e:
             # raise e
             print(e.message)
+
+
+    @close_session
+    def add_models(self, mod):
+        """
+        多model添加, 可保证原子性
+        :param kwargs: {model_name: data, model_name2: [data2, data21], model_name3: data ....}
+        """
+        model_beans = []
+        for model_name, datadict_or_list in mod.items():
+            if isinstance(datadict_or_list, list):
+                for data_dict in datadict_or_list:
+                    model_bean = self.get_model_bean(model_name, data_dict)
+                    model_beans.append(model_bean)
+            else:
+                model_bean = self.get_model_bean(model_name, datadict_or_list)
+                model_beans.append(model_bean)
+        self.session.add_all(model_beans)
+
+    @staticmethod
+    def get_model_bean(model_name, data_dict):
+        print(model_name)
+        if not getattr(models, model_name):
+            print("model name = {0} error ".format(model_name))
+            return
+        model_bean = eval(" models.{0}()".format(model_name))
+        model_bean_key = model_bean.__table__.columns.keys()
+        model_bean_key_without_line = list(map(lambda x: x.strip('_'), model_bean_key))
+        lower_table_key = list(map(lambda x: x.lower().strip('_'), model_bean_key))  # 数据库的字段转小写
+        for item_key in data_dict.keys():
+            if item_key.lower() in lower_table_key:  # 如果json中的key同时也存在与数据库的话
+                # 找到此key在model_beankey中的位置
+                index = lower_table_key.index(item_key.lower())
+                if data_dict.get(item_key) is not None:  # 如果传入的字段有值
+                    setattr(model_bean, model_bean_key_without_line[index], data_dict.get(item_key))
+        for key in model_bean.__table__.columns.keys():
+            if key in data_dict:
+                setattr(model_bean, key, data_dict.get(key))
+        return model_bean
 
     @close_session
     def add_model(self, model_name, data_dict, return_fields=None):

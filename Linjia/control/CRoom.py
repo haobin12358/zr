@@ -202,51 +202,53 @@ class CRoom(BaseRoomControl):
         medias = data.pop('medias', [])
         tags = data.pop('tags', [])
         roomrequirment = data.pop('roomrequirment', None)
-        roid = str(uuid.uuid4())
-        house['hoid'] = data['hoid'] = data['roid'] = roid
-
-        # 是否存在公寓
+        # 是否存在小区
         villege = self.sroom.get_villege_info_by_id(data.get('villegeid'))
         if not villege:
-            raise NOT_FOUND(u'请添加公寓信息')
-
-        # 添加房源
+            raise NOT_FOUND(u'请添加小区信息')
+        # 初始化添加参数
+        mod = {}
+        roid = str(uuid.uuid4())
         create_time = datetime.strftime(datetime.now(), format_for_db)
+        house['hoid'] = data['hoid'] = data['roid'] = roid
+        # 添加房源
         data['ROcreatetime'] = create_time
         data['ROdistance'] = villege.subway_primary
         data['ROaroundequirment'] = villege.around
         data['ROsubwayposionname'] = villege.position
-        added = self.sroom.add_model('Room', data, return_fields=('ROid', ))
+        mod['Room'] = data
         # 添加媒体
         try:
-            for media in medias:
-                media['REid'] = str(uuid.uuid4())
-                media['roid'] = roid
-                self.sroom.add_model('RoomMedia', media)
+            map(lambda x: x.setdefault('roid', roid), medias)
+            map(lambda x: x.setdefault('reid', str(uuid.uuid4())), medias)
+            mod['RoomMedia'] = medias
         except Exception as e:
             raise PARAMS_ERROR(u'medias参数有误')
         # 添加house
         houseinfo_required = ('hofloor', 'hototalfloor', 'hobedroomcount', 'hoparlorcount')
         parameter_required(houseinfo_required, datafrom=house)
-        added = self.sroom.add_model('House', house)
+        mod['House'] = house
         # 添加tag
         try:
-            for tag in tags:
-                tag['RTid'] = str(uuid.uuid4())
-                tag['roid'] = roid
-                self.sroom.add_model('RoomTag', tag)
+            map(lambda x: x.setdefault('roid', roid), tags)
+            map(lambda x: x.setdefault('rtid', str(uuid.uuid4())), tags)
+            mod['RoomTag'] = tags
         except Exception as e:
             raise PARAMS_ERROR(u'tags参数有误')
         # 添加设备:
         if roomrequirment:
             roomrequirment['roid'] = roid
             roomrequirment['reid'] = str(uuid.uuid4())
-            self.sroom.add_model('RoomEquirment', roomrequirment)
-        import ipdb
-        ipdb.set_trace()
+            mod['RoomEquirment'] = roomrequirment
+        self.sroom.add_models(mod)
         return Success(u'添加成功', {
             'roid': roid
         })
+
+
+    def add_bedroom(self):
+        """添加卧室"""
+        data = parameter_required(('roid', 'bbrnum', 'bbrstatus', 'bbrshowprice', 'bbrshowpriceunit'), forbidden=('BBRid', ))
 
 
 
