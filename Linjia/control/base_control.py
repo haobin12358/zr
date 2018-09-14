@@ -52,7 +52,7 @@ class BaseRoomControl(object):
                 room_in_same_house.fields = ['BBRid', 'BBRnum', 'BBRshowprice', 'BBRshowpriceunit']
                 room_in_same_house.fill(u'未租出', 'status')
             elif room_in_same_house.BBRstatus == 5:  # 已经租出
-                room_in_same_house.fields = ['BBRnum']
+                room_in_same_house.fields = ['BBRnum', 'BBRid']
                 user = self.sroom.get_roomates_info_by_bbrid(room_in_same_house.BBRid)
                 if not user:
                     return

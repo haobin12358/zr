@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import random
-import time
 import uuid
 from datetime import datetime
 
@@ -265,17 +263,55 @@ class CRoom(BaseRoomControl):
                 'BBRid': data['bbrid'],
                 'USgender': data.get('usgender')
             }
+        else:
+            raise PARAMS_ERROR(u'缺少必要的参数')
         self.sroom.add_models(mod)
         return Success(u'添加成功', {
             'bbrid': data['bbrid']
         })
-
-    def add_bedroom_user(self):
-        data = parameter_required(('bbrid', 'gender'), forbidden=('ubbrid',))
-        bedroom = self.sroom.get_roomates_info_by_bbrid
+    
+    def update_bedroom(self):
+        """更新卧室信息, 比如改为已租出, 或者价格之类"""
+        data = parameter_required(('bbrid', ))
+        bbrid = data.pop('bbrid')
+        bedroom = self.sroom.get_bedroom_by_bbrid(bbrid)
         if not bedroom:
-            raise NOT_FOUND(u'不存在的卧室')
-
+            raise NOT_FOUND(u'此卧室不存在')
+        if 'bbrshowprice' in data:
+            # 需要改为未租出的状态
+            self.sroom.update_bedroom_by_bbrid(bbrid, {
+                'BBRshowprice': data.get('bbrshowprice'),
+                'BBRshowpriceunit': data.get('bbrshowpriceunit', 'month'),
+                'BBRstatus': 2
+            })
+            userbedroom = self.sroom.update_roomates_info_by_bbrid(bbrid, {
+                'UBBRstatus': 1
+            })  # 同时需要更新卧室住户的状态
+            msg = u'改为未入住成功'
+        elif 'usgender' in data:
+            # 需要改为入住状态
+            self.sroom.update_bedroom_by_bbrid(bbrid, {
+                "BBRstatus": 5
+            })
+            # 同时需要添加入住信息, 修改以往的入住信息为已搬(如果有)
+            self.sroom.update_roomates_info_by_bbrid(bbrid, {
+                'UBBRstatus': 1
+            })
+            model_dict = dict(
+                UBBRid=str(uuid.uuid4()),
+                BBRid=bbrid,
+                USgender=data.get('usgender')
+            )
+            mod = dict(
+                UserBedroomBehindRoom=model_dict
+            )
+            self.sroom.add_models(mod)
+            msg = u'改为已入住成功'
+        else:
+            raise PARAMS_ERROR(u'缺少必要的参数')
+        return Success(msg, {
+            'bbrid': bbrid     
+        })
 
 
 
@@ -295,7 +331,4 @@ class CRoom(BaseRoomControl):
         return Success(msg, {
             'id': data.get('id')
         })
-
-
-
 

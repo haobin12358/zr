@@ -84,7 +84,21 @@ class SRoom(SBase):
     @close_session
     def get_roomates_info_by_bbrid(self, bbrid):
         """获取卧室的入住情况"""
-        return self.session.query(UserBedroomBehindRoom).filter(UserBedroomBehindRoom.BBRid == bbrid).first()
+        return self.session.query(UserBedroomBehindRoom).filter(UserBedroomBehindRoom.BBRid == bbrid, UserBedroomBehindRoom.UBBRstatus == 0).first()
+    
+    @close_session
+    def update_roomates_info_by_bbrid(self, bbrid, data):
+        return self.session.query(UserBedroomBehindRoom).filter(UserBedroomBehindRoom.BBRid == bbrid).update(data)
+
+    @close_session
+    def get_bedroom_by_bbrid(self, bbrid):
+        """根据卧室id获取卧室"""
+        return self.session.query(BedroomBehindRoom).filter_by(BBRid=bbrid).first()
+
+    @close_session
+    def update_bedroom_by_bbrid(self, bbrid, data):
+        """根据卧室id更新卧室"""
+        return self.session.query(BedroomBehindRoom).filter_by(BBRid=bbrid).update(data)
 
     @close_session
     def get_joinroom_banner_list(self):
@@ -120,43 +134,4 @@ class SRoom(SBase):
     def update_villege_info(self,viid, data):
         """更新小区信息"""
         return self.session.query(VillegeInfoAndSubway).filter(VillegeInfoAndSubway.id==viid).update(data)
-
-
-'''
-
- 待删除
-        if 'filter_type_list' in kwargs:
-            filter_type_list = kwargs.get('filter_type_list')
-            renttype_list = [and_(
-                    Room.ROrenttype == int(ROrenttype),
-                    *filter(lambda x: x.right.value != 0, [Room.ROpersoncount == int(ROpersoncount)])
-
-            ) for ROrenttype, ROpersoncount in filter_type_list]
-            all_room = all_room.filter(or_(*renttype_list))
-        if 'lowprice' in kwargs:
-            all_room.filter(RoomPayPrice.RPPprice > float(kwargs.get('lowprice')))
-        if 'highprice' in kwargs:
-            all_room.filter(RoomPayPrice.RPPprice < float(kwargs.get('highprice')))
-        if 'faceargs' in kwargs:
-            face_args = kwargs.get('faceargs')
-            face_arg = or_(*[Room.ROface == x for x in face_args])
-            all_room = all_room.filter(face_arg)
-        if 'sign_args' in kwargs:
-            all_room = all_room.join(RoomSignInfo, Room.ROid == RoomSignInfo.ROid)
-            all_room = all_room.filter(RoomSignInfo.PSIsigntype == int(kwargs.get('Dbcreater')))
-        if 'lowarea' in kwargs:
-            all_room = all_room.filter(Room.ROarea > float(kwargs.get('lowarea')))
-        if 'hignarea' in kwargs:
-            all_room = all_room.filter(Room.ROarea < float(kwargs.get('hignarea')))
-        if 'green_rate' in kwargs:
-            all_room = all_room.join(Villege, House.VIid == Villege.VIid)
-            all_room.filter(Villege.VIgreen > float(kwargs.get('green_rate')))
-        if 'status' in kwargs:
-            all_room = all_room.filter(Room.ROstatus == int(kwargs.get('status')))
-        if 'feature' in kwargs:
-            all_room = all_room.filter(or_(*[FEATURE_CONFG[int(k)] for k in kwargs.get('feature')]))
-        if 'kw' in kwargs:
-            all_room = all_room.filter(and_(*[Room.ROname.like('%' + w + '%') for w in kwargs.get('kw')]))
-        
-
-'''
+''

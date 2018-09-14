@@ -31,5 +31,6 @@ class ARoom(Resource):
             'add_villegetinfo': self.croom.add_villegetinfo,
             'update_villeginfo': self.croom.update_villeginfo,
             'add_bedroom': self.croom.add_bedroom,
+            'update_bedroom': self.croom.update_bedroom,
         }
         return apis
