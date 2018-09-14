@@ -29,6 +29,7 @@ class ARoom(Resource):
             'delete_homestay_banner': self.croom.delete_homestay_banner,
             'add_room': self.croom.add_room,
             'add_villegetinfo': self.croom.add_villegetinfo,
-            'update_villeginfo': self.croom.update_villeginfo
+            'update_villeginfo': self.croom.update_villeginfo,
+            'add_bedroom': self.croom.add_bedroom,
         }
         return apis

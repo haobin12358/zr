@@ -245,10 +245,36 @@ class CRoom(BaseRoomControl):
             'roid': roid
         })
 
-
     def add_bedroom(self):
-        """添加卧室"""
-        data = parameter_required(('roid', 'bbrnum', 'bbrstatus', 'bbrshowprice', 'bbrshowpriceunit'), forbidden=('BBRid', ))
+        """添加卧室, 以及卧室入住信息"""
+        data = parameter_required(('roid', 'bbrnum'), forbidden=('bbrid', 'bbrstatus'))
+        room = self.sroom.get_room_by_roid(data.get('roid'))
+        mod = {}
+        data['bbrid'] = str(uuid.uuid4())
+        mod['BedroomBehindRoom'] = data
+        if not room:
+            raise NOT_FOUND(u'不存在的房源id')
+        if 'bbrshowprice' in data:
+            # 卧室未租出
+            data['BBRstatus'] = 2
+        elif 'usgender' in data:
+            # 已经租出
+            data['BBRstatus'] = 5
+            mod['UserBedroomBehindRoom'] = {
+                'UBBRid': str(uuid.uuid4()),
+                'BBRid': data['bbrid'],
+                'USgender': data.get('usgender')
+            }
+        self.sroom.add_models(mod)
+        return Success(u'添加成功', {
+            'bbrid': data['bbrid']
+        })
+
+    def add_bedroom_user(self):
+        data = parameter_required(('bbrid', 'gender'), forbidden=('ubbrid',))
+        bedroom = self.sroom.get_roomates_info_by_bbrid
+        if not bedroom:
+            raise NOT_FOUND(u'不存在的卧室')
 
 
 
