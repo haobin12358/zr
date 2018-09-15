@@ -173,12 +173,11 @@ class SRoom(SBase):
         return self.session.query(VillegeInfoAndSubway).filter(VillegeInfoAndSubway.name.contains(name)).all()
 
     @close_session
-    def get_villege_info_by_id(self, id):
+    def get_villege_info_by_id(self, viid):
         """根据id获取小区"""
-        return self.session.query(VillegeInfoAndSubway).filter(VillegeInfoAndSubway.id==id).first()
+        return self.session.query(VillegeInfoAndSubway).filter(VillegeInfoAndSubway.id == viid).first()
 
     @close_session
-    def update_villege_info(self,viid, data):
+    def update_villege_info(self, viid, data):
         """更新小区信息"""
         return self.session.query(VillegeInfoAndSubway).filter(VillegeInfoAndSubway.id==viid).update(data)
-''

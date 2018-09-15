@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import traceback
 
+from flask import current_app
 from sqlalchemy.orm import sessionmaker
 
 from Linjia.commons.error_response import DB_ERROR
@@ -34,6 +35,7 @@ def close_session(fn):
             return result
         except Exception as e:
             print("DBERROR" + traceback.format_exc().decode('unicode-escape'))
+            # current_app.logger.error(traceback.format_exc().decode('unicode-escape'))
             self.session.rollback()
             # raise e
             raise DB_ERROR(message=e.message)

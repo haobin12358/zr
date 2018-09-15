@@ -279,11 +279,14 @@ class CRoom(BaseRoomControl):
         # medias信息
         # tags
         # roomequi设备
+        # 公寓信息
         house = data.pop('house', None)
         medias = data.pop('medias', [])
         tags = data.pop('tags', [])
         roomrequirment = data.pop('roomrequirment', None)
         room = self.sroom.get_room_by_roid(roid)
+        if not room:
+            raise NOT_FOUND(u'无此房源')
         room_data = {
             'ROname': data.get('roname'),
             'ROimage': data.get('roimage'),
@@ -304,8 +307,6 @@ class CRoom(BaseRoomControl):
             raise PARAMS_ERROR('修改room需要的参数缺失')
         room_updated = self.sroom.update_room_by_roid(roid, room_data)
         print('更新了room')
-        if not room_updated:
-            raise NOT_FOUND(u'无此房源')
         if house:
             hoid = room.ROid
             houseinfo_required = ('hofloor', 'hototalfloor', 'hobedroomcount', 'hoparlorcount')
@@ -345,6 +346,15 @@ class CRoom(BaseRoomControl):
             roomrequirment['reid'] = str(uuid.uuid4())
             self.sroom.add_model('RoomEquirment', roomrequirment)
             print('修改设备')
+        if 'villegeid' in data:
+            hoid = room.HOid
+            # house = self.sroom.get_house_by_hoid(hoid)
+            villege = self.sroom.get_villege_info_by_id(data.get('villegeid'))
+            if not villege:
+                raise PARAMS_ERROR(u'villege id有误')
+            self.sroom.update_house_by_hoid(hoid, {
+                'VIid': data.get('villegeid')
+            })
         return Success(u'修改成功', {
             'roid': roid
         })

@@ -7,6 +7,7 @@ from datetime import datetime
 from flask import request
 from werkzeug.exceptions import HTTPException
 
+from Linjia.commons.base_error import BaseError
 from Linjia.commons.error_response import SYSTEM_ERROR, APIS_WRONG
 from Linjia.commons.success_response import Success
 from Linjia.configs.appsettings import BASEDIR
@@ -28,7 +29,7 @@ def error_handler(app):
         if isinstance(e, Success):
             return e
         generic_log(e)
-        if isinstance(e, HTTPException):
+        if isinstance(e, BaseError):
             return e
         else:
             if not app.debug:
@@ -41,10 +42,15 @@ def error_handler(app):
         handler = logging.FileHandler(logger_dir, encoding='UTF-8')
         data = traceback.format_exc()
         logging_format = logging.Formatter(
-            ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
-            "%(asctime)s] {%(pathname)s: \n"
-            "%(lineno)d} %(levelname)s - %(message)s   \n path is: " + request.path + \
-            '\n more info:' + data.decode('unicode-escape'))
+            # "%(asctime)s - %(levelname)s - %(filename)s \n- %(funcName)s - %(lineno)s - %(message)s"
+            "%(asctime)s - %(levelname)s - %(filename)s \n %(message)s"
+            )
         handler.setFormatter(logging_format)
         app.logger.addHandler(handler)
-        app.logger.info(e)
+        app.logger.info('>>>>>>>>>>>>>>>>>>bug<<<<<<<<<<<<<<<<<<<')
+        app.logger.error(data.decode('unicode-escape'))
+        app.logger.info('request.url is {}'.format(request.url))
+        app.logger.info('request.data is {} '.format(request.data))
+        app.logger.info('request.args is {} '.format(request.args))
+        app.logger.info('method : {} '.format(request.method))
+
