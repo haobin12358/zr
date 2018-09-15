@@ -13,6 +13,7 @@ class BaseRoomControl(object):
         room.ROrenttype = RENT_TYPE.get(int(room.ROrenttype), u'未知')
         room.ROdecorationstyle = DECORATOR_STYLE.get(int(room.ROdecorationstyle), u'未知')
         # room.ROstatus = ROSTATUS.get(int(room.ROstatus), u'未知')
+        self._fix_villege_subway_info(room)
         return self
 
     def _fill_house_info(self, room):
@@ -28,8 +29,18 @@ class BaseRoomControl(object):
         house.size = str(house.HObedroomcount) + u'室' + str(house.HOparlorcount) + u'厅'
         house.floor = str(house.HOfloor) + '/' + str(house.HOtotalfloor) + u'层'
         house.all.add('size', 'floor')
+        villege = self.sroom.get_villege_info_by_id(house.VIid)
+        room.fill(villege, 'villege')
         room.fill(house, 'house')  # room.house = house
         return self
+
+    def _fix_villege_subway_info(self, room):
+        """调整room中的冗余字段, 不再使用冗余字段中的数据"""
+        hoid = room.HOid
+        villege = self.sroom.get_villege_info_by_hoid(hoid)
+        room.ROdistance = villege.subway_primary
+        room.ROaroundequirment = villege.around
+        room.ROsubwayposionname = villege.position
 
     def _fill_release_info(self, room):
         """填充轉租"""

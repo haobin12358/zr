@@ -20,7 +20,7 @@ class SRoom(SBase):
     @close_session
     def update_room_by_roid(self, roid, data):
         """根据房源信息"""
-        return self.session.query(Room).filter(Room.rOid == roid).update(data)
+        return self.session.query(Room).filter(Room.ROid == roid).update(data)
 
     @close_session
     def get_room_list_filter(self, kwargs, admin=False, style=[], face_args=[]):
@@ -49,10 +49,33 @@ class SRoom(SBase):
         return self.session.query(House).filter_by(HOid=hoid).first()
 
     @close_session
+    def get_villege_info_by_hoid(self, hoid):
+        """通过hoid获取小区信息"""
+        return self.session.query(VillegeInfoAndSubway).join(House, House.VIid == VillegeInfoAndSubway.id).first()
+
+    @close_session
+    def update_house_by_hoid(self, hoid, data):
+        """更新house"""
+        return self.session.query(House).filter_by(HOid=hoid).update(data)
+
+    @close_session
     def get_room_media_by_roid(self, roid):
         """获取房源的显示图片或视频信息"""
         return self.session.query(RoomMedia).filter_by(ROid=roid).all()
 
+    @close_session
+    def get_room_media_by_link(self, link):
+        """根据图片或视频链接获得"""
+        return self.session.query(RoomMedia).filter(RoomMedia.REpic == link).first()
+
+    @close_session
+    def delete_room_media_by_link(self, link):
+        return self.session.query(RoomMedia).filter(RoomMedia.REpic == link).delete()
+
+    @close_session
+    def delete_room_media_by_roid(self, roid):
+        return self.session.query(RoomMedia).filter(RoomMedia.ROid == roid).delete()
+    
     @close_session
     def get_reaseinfo_by_roid(self, roid):
         """通过roid获取转租信息"""
@@ -64,8 +87,18 @@ class SRoom(SBase):
         return self.session.query(RoomTag).filter_by(ROid=roid).all()
 
     @close_session
+    def delete_tag_by_roid(self, roid):
+        """删除某个房源的tag"""
+        return self.session.query(RoomTag).filter_by(ROid=roid).delete()
+
+    @close_session
     def get_room_equirment_by_roid(self, roid):
         return self.session.query(RoomEquirment).filter(RoomEquirment.ROid == roid).first()
+
+    @close_session
+    def delete_room_equirment_by_roid(self, roid):
+        """删除某个房源的设备信息"""
+        return self.session.query(RoomEquirment).filter(RoomEquirment.ROid == roid).delete()
 
     @close_session
     def get_house_by_roid(self, roid):

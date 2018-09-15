@@ -146,7 +146,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
 
     @staticmethod
     def allowed_file(shuffix):
-        return shuffix in ['.jpg','.jpeg','.png','.gif']
+        return shuffix in ['.jpg', '.jpeg', '.png', '.gif', '.mp4', '.avi', ]
 
     @staticmethod
     def new_name(shuffix):

@@ -78,6 +78,7 @@ class CRoom(BaseRoomControl):
         room.ROface = FACE_CONFIG.get(room.ROface, u'未知')
         room.ROrenttype = RENT_TYPE.get(room.ROrenttype, u'未知')
         room.fill(self.sroom.get_tags_by_roid(roid), 'tags', hide=('ROid', ))   # 填充tag信息
+        self._fix_villege_subway_info(room)
         room.add('ROisdelete', 'ROcreatetime', 'ROcitynum')
         return Success(u'获取房源信息成功', room)
 
@@ -276,25 +277,72 @@ class CRoom(BaseRoomControl):
         medias = data.pop('medias', [])
         tags = data.pop('tags', [])
         roomrequirment = data.pop('roomrequirment', None)
-        room = {
+        room = self.sroom.get_room_by_roid(roid)
+        room_data = {
+            'ROname': data.get('roname'),
             'ROimage': data.get('roimage'),
             'ROareanum': data.get('roareanum'),
             'ROface': data.get('roface'),
             'ROarea': data.get('roarea'),
-            'ROhowpriceunit': data.get('roshowpriceunit'),
+            'ROshowpriceunit': data.get('roshowpriceunit'),
             'ROrenttype': data.get('rorenttype'),
             'ROdecorationstyle': data.get('rodecorationstyle'),
             'ROshowprice': data.get('roshowprice'),
             'ROcitynum': data.get('rocitynum'),
             'ROsubwayaround': data.get('rosubwayaround'),
         }
-        room = {
-            k: v for k, v in room.items() if v is not None
+        room_data = {
+            k: v for k, v in room_data.items() if v is not None
         }
-        room_updated = self.sroom.update_room_by_roid(roid)
+        if not room_data:
+            raise PARAMS_ERROR('修改room需要的参数缺失')
+        room_updated = self.sroom.update_room_by_roid(roid, room_data)
+        print('更新了room')
         if not room_updated:
             raise NOT_FOUND(u'无此房源')
-
+        if house:
+            hoid = room.ROid
+            houseinfo_required = ('hofloor', 'hototalfloor', 'hobedroomcount', 'hoparlorcount')
+            parameter_required(houseinfo_required, datafrom=house)
+            house_data = {
+                'HOfloor': house.get('hofloor'),
+                'HOtotalfloor': house.get('hototalfloor'),
+                'HObedroomcount': house.get('hobedroomcount'),
+                'HOparlorcount': house.get('hoparlorcount'),
+            }
+            house_updated = self.sroom.update_house_by_hoid(hoid, house_data)
+        if medias:
+            # 此处接受到的media数据是没有删除的和信添加的, 删除的将不会在传过来
+            # 此处有点罗嗦, 只需删除原来的数据, 再重新添加即可
+            deleted = self.sroom.delete_room_media_by_roid(roid)
+            for new_media in medias:
+                new_media['reid'] = str(uuid.uuid4())
+                new_media['roid'] = roid
+                self.sroom.add_model('RoomMedia', new_media)
+                print('添加多媒体') 
+        if tags:
+            # 删除原来的tag
+            self.sroom.delete_tag_by_roid(roid)
+            print('删除了原来的tag')
+            mod = {} 
+            mod['RoomTag'] = []
+            for tag in tags:
+                tag['roid'] = roid
+                tag['rtid'] = str(uuid.uuid4())
+                mod['RoomTag'].append(tag)
+            self.sroom.add_models(mod)
+            print('添加tag')
+        if roomrequirment:
+            self.sroom.delete_room_equirment_by_roid(roid)
+            print('删除了原来的设备')
+            roomrequirment['roid'] = roid
+            roomrequirment['reid'] = str(uuid.uuid4())
+            self.sroom.add_model('RoomEquirment', roomrequirment)
+            print('修改设备')
+        return Success(u'修改成功', {
+            'roid': roid
+        })
+            
 
 
 
