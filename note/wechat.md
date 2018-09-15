@@ -1,23 +1,28 @@
-### 用户首次登录
+## 用户首次登录
 
-#### 开始登录
+### 开始登录
 
-在用户使用登录的功能时会跳转到登录页面, 同时需要记录登录前的页面
+在用户使用需要登录的功能时会跳转到登录页面, 同时需要记录登录前的页面
 
-链接:
+- api:
 
 ```
 {{api}}/user/login/
 ```
 
-参数:
+- method: POST
+
+- body: 
+
 ```
 {
     "phone": "13753392801",
     "code": "123456",
-    "redirect": "http://www"
+    "redirect": "http://www.oldurl.com/example"
 }
 ```
+
+#### 如果是新用户: 
 
 如果用户是首次使用手机号码登录, 则会收到token和跳转链接, 格式为:
 
@@ -33,8 +38,23 @@
 
 ```
 
+前端对redirect_url执行跳转, 然后微信服务器执行302跳转到回调网址. 这时可以记录用户的基本信息, 包括唯一标志`oppenid`, 最后跳转到登录前的页面, 这次跳转可以由后端执行.
 
-#### 跳转
 
-前端使用跳转链接做跳转, 这时后端会将用户的资料存下, 跳转到之前的页面
+#### 如果是已经授权微信的用户:
+
+如果是已经授权的用户则不会收到跳转链接, 不执行到微信服务器的跳转
+
+```
+{
+    "data": {
+        "token": "eyJhbGciOiJIUzI1NiIsImV4cCI6MTUzNzgwMzczOSwiaWF0IjoxNTM3MDA0NTM5fQ.eyJtb2RlbCI6IlVzZXIiLCJpZCI6IjI3YjQ0ZDViLThiZDMtNGE0Zi1hOWVhLTczNGI5MGVhNjE0MiIsImxldmVsIjowfQ.D_ndlAloGupoSz_VN1cZPxw4uKT_4zS3oDj8wCRD-NI"
+    },
+    "message": "获取token成功",
+    "status": 200
+}}
+
+
+```
+
 
