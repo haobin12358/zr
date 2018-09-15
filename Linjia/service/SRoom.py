@@ -18,6 +18,11 @@ class SRoom(SBase):
         return self.session.query(Room).filter_by(ROid=roid).first()
 
     @close_session
+    def update_room_by_roid(self, roid, data):
+        """根据房源信息"""
+        return self.session.query(Room).filter(Room.rOid == roid).update(data)
+
+    @close_session
     def get_room_list_filter(self, kwargs, admin=False, style=[], face_args=[]):
         """获取所有(合租和整租"""
         # todo 离地铁近

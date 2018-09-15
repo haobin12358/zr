@@ -77,6 +77,25 @@ class CRoom(BaseRoomControl):
         room.fill(self.scity.get_city_by_city_id(room.ROcitynum), 'city')
         room.ROface = FACE_CONFIG.get(room.ROface, u'未知')
         room.ROrenttype = RENT_TYPE.get(room.ROrenttype, u'未知')
+        room.fill(self.sroom.get_tags_by_roid(roid), 'tags', hide=('ROid', ))   # 填充tag信息
+        room.add('ROisdelete', 'ROcreatetime', 'ROcitynum')
+        return Success(u'获取房源信息成功', room)
+
+    def get_detail_the_same_like_add(self):
+        """房源信息接口2"""
+        data = parameter_required(('roid', ))
+        roid = data.get('roid')
+        room = self.sroom.get_house_by_hoid(roid)
+        if not room:
+            raise NOT_FOUND(u'房源不存在')
+        # room.fill(self.sroom.get_house_by_hoid(room.HOid), 'house')  # 楼层和规格
+        self._fill_house_info(room)  # 楼层和规格
+        self._fill_roomate_info(room)  # 室友信息
+        room.fill(self.sroom.get_room_equirment_by_roid(room.ROid), 'equirment', hide=('IConid', 'REid', 'ROid'))
+        room.fill(self.sroom.get_room_media_by_roid(room.ROid), 'media')
+        room.fill(self.scity.get_city_by_city_id(room.ROcitynum), 'city')
+        room.ROface = FACE_CONFIG.get(room.ROface, u'未知')
+        room.ROrenttype = RENT_TYPE.get(room.ROrenttype, u'未知')
         room.add('ROisdelete', 'ROcreatetime', 'ROcitynum')
         return Success(u'获取房源信息成功', room)
 
@@ -225,6 +244,7 @@ class CRoom(BaseRoomControl):
         # 添加house
         houseinfo_required = ('hofloor', 'hototalfloor', 'hobedroomcount', 'hoparlorcount')
         parameter_required(houseinfo_required, datafrom=house)
+        house['VIid'] = data.get('villegeid')
         mod['House'] = house
         # 添加tag
         try:
@@ -242,6 +262,46 @@ class CRoom(BaseRoomControl):
         return Success(u'添加成功', {
             'roid': roid
         })
+
+    def update_room(self):
+        """更新房源信息"""
+        data = parameter_required(('roid', ))
+        roid = data.get('roid')
+        # 房源主体的参数
+        # house信息
+        # medias信息
+        # tags
+        # roomequi设备
+        house = data.pop('house', None)
+        medias = data.pop('medias', [])
+        tags = data.pop('tags', [])
+        roomrequirment = data.pop('roomrequirment', None)
+        room = {
+            'ROimage': data.get('roimage'),
+            'ROareanum': data.get('roareanum'),
+            'ROface': data.get('roface'),
+            'ROarea': data.get('roarea'),
+            'ROhowpriceunit': data.get('roshowpriceunit'),
+            'ROrenttype': data.get('rorenttype'),
+            'ROdecorationstyle': data.get('rodecorationstyle'),
+            'ROshowprice': data.get('roshowprice'),
+            'ROcitynum': data.get('rocitynum'),
+            'ROsubwayaround': data.get('rosubwayaround'),
+        }
+        room = {
+            k: v for k, v in room.items() if v is not None
+        }
+        room_updated = self.sroom.update_room_by_roid(roid)
+        if not room_updated:
+            raise NOT_FOUND(u'无此房源')
+
+
+
+
+
+    def delte_room(self):
+        """删除房源"""
+        pass
 
     def add_bedroom(self):
         """添加卧室, 以及卧室入住信息"""
@@ -294,9 +354,7 @@ class CRoom(BaseRoomControl):
                 "BBRstatus": 5
             })
             # 同时需要添加入住信息, 修改以往的入住信息为已搬(如果有)
-            self.sroom.update_roomates_info_by_bbrid(bbrid, {
-                'UBBRstatus': 1
-            })
+            self.sroom.update_roomates_info_by_bbrid(bbrid, { 'UBBRstatus': 1 })
             model_dict = dict(
                 UBBRid=str(uuid.uuid4()),
                 BBRid=bbrid,
@@ -329,7 +387,7 @@ class CRoom(BaseRoomControl):
         data = parameter_required(('city_id', 'name', ), forbidden=('id', ))
         data['id'] = str(uuid.uuid4())
         added = self.sroom.add_model('VillegeInfoAndSubway', data, return_fields=(['id', 'name']))
-        return added
+        return added   # 返回值风格出现失误, 既然前端已经用了就不改了吧
 
     def update_villeginfo(self):
         """修改小区信息"""

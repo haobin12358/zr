@@ -27,7 +27,7 @@ class BaseRoomControl(object):
             return self
         house.size = str(house.HObedroomcount) + u'室' + str(house.HOparlorcount) + u'厅'
         house.floor = str(house.HOfloor) + '/' + str(house.HOtotalfloor) + u'层'
-        house.fields = ['size', 'floor']
+        house.all.add('size', 'floor')
         room.fill(house, 'house')  # room.house = house
         return self
 
