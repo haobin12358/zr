@@ -10,12 +10,19 @@ class SRoom(SBase):
     @close_session
     def get_joint_room_list(self):
         """获取合租列表"""
-        return self.session.query(Room).filter_by(ROrenttype=0).all()
+        return self.session.query(Room).filter_by(ROrenttype=0, ROisdelete=False).all()
 
     @close_session
     def get_room_by_roid(self, roid):
-        """根据id获取房间"""
-        return self.session.query(Room).filter_by(ROid=roid).first()
+        """根据id获取房源"""
+        return self.session.query(Room).filter_by(ROid=roid, ROisdelete=False).first()
+
+    @close_session
+    def delete_room_by_roid(self, roid):
+        """删除房源"""
+        return self.session.query(Room).filter_by(ROid=roid).update({
+            'ROisdelete': True
+        })
 
     @close_session
     def update_room_by_roid(self, roid, data):

@@ -347,9 +347,15 @@ class CRoom(BaseRoomControl):
 
 
 
-    def delte_room(self):
+    def delete_room(self):
         """删除房源"""
-        pass
+        data = parameter_required(('roid', ))
+        roid = data.get('roid')
+        deleted = self.sroom.delete_room_by_roid(roid)
+        msg = u'删除成功' if deleted else u'无此记录'
+        return Success(msg, {
+            'roid': roid
+        })
 
     def add_bedroom(self):
         """添加卧室, 以及卧室入住信息"""

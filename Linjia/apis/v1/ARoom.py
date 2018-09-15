@@ -35,5 +35,6 @@ class ARoom(Resource):
             'update_bedroom': self.croom.update_bedroom,
             'delete_bedroom': self.croom.delete_bedroom,
             'update_room': self.croom.update_room,
+            'delete_room': self.croom.delete_room,
         }
         return apis
