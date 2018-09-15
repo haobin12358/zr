@@ -14,7 +14,7 @@ class Room(Base):
     ROimage = Column(String(255), comment=u'主图')
     ROarea = Column(Float, nullable=False, comment=u'面积')
     ROface = Column(Integer, default=u'未知', comment=u'朝向{1-8分别代表东,东南,南,西南...')
-    ROdistance = Column(String(32), comment=u'交通设施距离描述')
+    ROdistance = Column(String(32), comment=u'交通设施距离描述')  # 不使用
     # ROshowpricetype = Column(Integer, default=1, comment=u'显示价格标准 0: 月付, 1 季付, 2 半年付, 3 年付')  # 根据这个标准去价格表中查价格
     ROshowprice = Column(Float, comment=u'显示价格')
     ROshowpriceunit = Column(String(64), default=u'month', comment=u'价格单位,month,night')
@@ -27,9 +27,9 @@ class Room(Base):
     ROcitynum = Column(String(64), comment=u'城市编号, 冗余字段')
     ROareanum = Column(String(64), comment=u'区编号')
     ROsubwayaround = Column(Boolean, default=False, comment=u'地铁附近')
-    ROaroundequirment = Column(Text, comment=u'周边设施介绍')
+    ROaroundequirment = Column(Text, comment=u'周边设施介绍')  # 不使用
     # 需要添加地铁信息
-    ROsubwayposionname = Column(String(32), comment=u'地铁站点')  # 冗余
+    ROsubwayposionname = Column(String(32), comment=u'地铁站点')  # 不使用
     # 类型为民宿的时候需要用到的字段
     ROentertime  = Column(String(16), comment=u'入住时间')  # 入住时间
     ROleavetime = Column(String(16), comment=u'离开时间')  # 离开时间

@@ -47,13 +47,16 @@ class CRoom(BaseRoomControl):
         args_dict['city_id'] = args.get('city_id')
         # 区
         args_dict['area_id'] = args.get('area_id')
+        # 地铁
+        args_dict['subway'] = args.get('subway')
         print(args_dict)
         admin = True if is_admin() else None
-        # 地址 区, 附近 todo
+
         args_dict = {
             k: v for k, v in args_dict.items() if v is not None
         }
         room_detail_list = self.sroom.get_room_list_filter(args_dict, admin, style=style, face_args=face_args)
+        request.subway = args.get('subway')
         map(self._fill_detail_for_list, room_detail_list)
         map(self._fill_house_info, room_detail_list)  # 楼层和规格
         map(lambda x: x.fill(self.sroom.get_tags_by_roid(x.ROid), 'tags', hide=('ROid', )), room_detail_list)  # 填充tag信息
@@ -75,6 +78,7 @@ class CRoom(BaseRoomControl):
         room.fill(self.sroom.get_room_equirment_by_roid(room.ROid), 'equirment', hide=('IConid', 'REid', 'ROid'))
         room.fill(self.sroom.get_room_media_by_roid(room.ROid), 'media')
         room.fill(self.scity.get_city_by_city_id(room.ROcitynum), 'city')
+        room.fill(self.scity.get_areainfo_by_id(room.ROareanum), 'area')
         room.ROface = FACE_CONFIG.get(room.ROface, u'未知')
         room.ROrenttype = RENT_TYPE.get(room.ROrenttype, u'未知')
         room.fill(self.sroom.get_tags_by_roid(roid), 'tags', hide=('ROid', ))   # 填充tag信息
@@ -342,9 +346,6 @@ class CRoom(BaseRoomControl):
         return Success(u'修改成功', {
             'roid': roid
         })
-            
-
-
 
 
     def delete_room(self):
@@ -352,6 +353,8 @@ class CRoom(BaseRoomControl):
         data = parameter_required(('roid', ))
         roid = data.get('roid')
         deleted = self.sroom.delete_room_by_roid(roid)
+        # 同时取消在首页的显示
+        self.sindex.delete_room_show_by_roid(roid)
         msg = u'删除成功' if deleted else u'无此记录'
         return Success(msg, {
             'roid': roid
@@ -440,6 +443,8 @@ class CRoom(BaseRoomControl):
         """添加小区信息"""
         data = parameter_required(('city_id', 'name', ), forbidden=('id', ))
         data['id'] = str(uuid.uuid4())
+        if 'subway' not in data:
+            data['subway'] = data.get('subway_primary')
         added = self.sroom.add_model('VillegeInfoAndSubway', data, return_fields=(['id', 'name']))
         return added   # 返回值风格出现失误, 既然前端已经用了就不改了吧
 

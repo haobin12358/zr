@@ -14,6 +14,11 @@ class SCity(SBase):
         return self.session.query(City).filter_by(city_id=city_id).first()
 
     @close_session
+    def get_areainfo_by_id(self, id):
+        """根据id获取地区"""
+        return self.session.query(Area).filter(Area.area_id == id).first()
+
+    @close_session
     def get_citylist_by_provinceid(self, province_id):
         """根据省份编号获取城市列表"""
         return self.session.query(City).filter_by(province_id=province_id).all()

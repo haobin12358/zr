@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+from flask import request
+
 from Linjia.configs.enums import FACE_CONFIG, RENT_TYPE, GENDER_CONFIG, DECORATOR_STYLE, ROSTATUS
 from Linjia.commons.error_response import NOT_FOUND
 
 
 class BaseRoomControl(object):
-    def _fill_detail_for_list(self, room):
+    def _fill_detail_for_list(self, room, subway=None):
         """调整返回列表的格式"""
         room.fields = ['ROid', 'ROname', 'ROarea', 'face',
                         'ROdistance', 'ROshowprice', 'ROshowpriceunit',
@@ -13,10 +15,12 @@ class BaseRoomControl(object):
         room.ROrenttype = RENT_TYPE.get(int(room.ROrenttype), u'未知')
         room.ROdecorationstyle = DECORATOR_STYLE.get(int(room.ROdecorationstyle), u'未知')
         # room.ROstatus = ROSTATUS.get(int(room.ROstatus), u'未知')
-        self._fix_villege_subway_info(room)
+        self._fix_villege_subway_info(room, subway)
         return self
 
     def _fill_house_info(self, room):
+        if not room:
+            return self
         hoid = room.HOid
         house = self.sroom.get_house_by_hoid(hoid)
         if not house:
@@ -34,11 +38,24 @@ class BaseRoomControl(object):
         room.fill(house, 'house')  # room.house = house
         return self
 
-    def _fix_villege_subway_info(self, room):
+    def _fix_villege_subway_info(self, room, subway=None):
         """调整room中的冗余字段, 不再使用冗余字段中的数据"""
+        subway = getattr(request, 'subway', None)
         hoid = room.HOid
         villege = self.sroom.get_villege_info_by_hoid(hoid)
-        room.ROdistance = villege.subway_primary
+        if not villege:
+            return
+        if subway is None:
+            room.ROdistance = villege.subway_primary
+        else:
+            subway_list = villege.subway.split('.')
+            try:
+                print(subway_list)
+                need_info = [x for x in subway_list if subway in x][0]
+                room.ROdistance = need_info
+            except IndexError as e:
+                print('地铁站信息出错')
+                room.ROdistance = villege.subway_primary
         room.ROaroundequirment = villege.around
         room.ROsubwayposionname = villege.position
 
@@ -78,6 +95,9 @@ class BaseRoomControl(object):
 class BaseIndexControl(object):
     def _fill_index_room_detail(self, index_room):
         room = self.sroom.get_room_by_roid(index_room.ROid)  # 与首页显示项目关联的room
+        if not room:
+            # 如果已经没有这个房间了, 则说明该房源已经删除, 因此该首页显示项目也不应该显示
+            return
         self._fill_house_info(room)
         fields = ['ROid', 'ROname', 'ROimage', 'ROshowprice', 'ROshowpriceunit', 'ROrenttype', 'ROdecorationstyle', 'house']
         map(lambda x: index_room.fill(getattr(room, x), x), fields)

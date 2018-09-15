@@ -48,6 +48,8 @@ class SRoom(SBase):
             all_room = all_room.join(House, House.HOid == Room.HOid).filter(
                 or_(House.HObedroomcount == int(v) for v in kwargs.get('bed_count')))
 
+        if 'subway' in kwargs:
+            all_room = all_room.join(House, House.HOid == Room.HOid).join(VillegeInfoAndSubway, House.VIid == VillegeInfoAndSubway.id).contain(VillegeInfoAndSubway.subway == kwargs.get('subway'))
         return all_room.all_with_page(kwargs.get('page'), kwargs.get('count'))
 
     @close_session
@@ -58,7 +60,7 @@ class SRoom(SBase):
     @close_session
     def get_villege_info_by_hoid(self, hoid):
         """通过hoid获取小区信息"""
-        return self.session.query(VillegeInfoAndSubway).join(House, House.VIid == VillegeInfoAndSubway.id).first()
+        return self.session.query(VillegeInfoAndSubway).join(House, House.VIid == VillegeInfoAndSubway.id).filter(House.HOid==hoid).first()
 
     @close_session
     def update_house_by_hoid(self, hoid, data):
