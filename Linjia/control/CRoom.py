@@ -140,6 +140,8 @@ class CRoom(BaseRoomControl):
         if not line:
             raise NOT_FOUND(u'不存在的线路')
         positions = self.scity.get_subwayposition_by_line_id(line.subwaylineid)
+        # 过滤空的地铁站
+        positions = list(filter(lambda x: x.position, positions))
         return Success(u'获取站点信息成功', positions)
 
     def add_joinroom_banner(self):

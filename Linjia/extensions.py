@@ -14,7 +14,7 @@ msg = WeixinMsg('token')
 
 
 def reigster_extensions(app):
-    app.add_url_rule("/wechat", view_func=msg.view_func)
+    app.add_url_rule("/token", view_func=msg.view_func)
     wxlogin = WeixinLogin(APPID, APPSECRET)
     @msg.all
     def all_test(**kwargs):
@@ -38,12 +38,12 @@ def reigster_extensions(app):
     @msg.image
     def image(**kwargs):
         print kwargs
-        return ""
+        return "11111"
 
     @msg.subscribe
     def subscribe(**kwargs):
         print kwargs
-        return ""
+        return "11111"
 
     @msg.unsubscribe
     def unsubscribe(**kwargs):
@@ -57,6 +57,7 @@ def reigster_extensions(app):
         code = args.get('code')
         try:
             data = wxlogin.access_token(code)
+            print(data)
             data = wxlogin.user_info(data.access_token, data.openid)
             state = args.get('state').split('P')
             usid = state[0]
