@@ -226,6 +226,30 @@ class CServer(object):
             'fixers': fixer_list     
         })
 
+    def add_fixer_city(self):
+        """添加维修开通城市"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('city_id', ))
+        city_id = data.get('city_id')
+        fixer_city = self.scity.is_fixer_oppener(city_id)
+        if fixer_city:
+            raise PARAMS_ERROR(u'重复添加')
+        data['fcid'] = str(uuid.uuid4())
+        added = self.scity.add_model('FixerCity', data)
+        return Success(u'添加维修服务开通城市成功', {'city_id': city_id})
+    
+    def del_fixer_city(self):
+        """取消维修服务开通城市"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('city_id', ))
+        city_id = data.get('city_id')
+        deleted = self.scity.delete_fixeroppencity(city_id)
+        msg = u'取消成功' if deleted else u'无此记录'
+        return Success(msg, {'city_id': city_id})
+
+
     def add_city(self):
         """添加开通城市, 租房以及服务"""
         data = parameter_required(('city_id', ), others='ignore')

@@ -61,3 +61,10 @@ class AFixer(Aserver):
             'fixer_list': self.cserver.get_fixer_list_by_cityid,
         }
         return apis
+
+    def post(self, fixer):
+        apis = {
+            'add_fixercity': self.cserver.add_fixer_city,
+            'delete_fixercity': self.cserver.del_fixer_city,
+        }
+        return apis
