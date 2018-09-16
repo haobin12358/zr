@@ -9,7 +9,13 @@ from Linjia.commons.error_response import TOKEN_ERROR, PARAMS_ERROR
 from Linjia.commons.token_handler import is_admin
 
 
-class CMover(object):
+class CServer():
+    def __init__(self):
+        self.sserver = SServer()
+        self.scity = SCity()
+
+
+class CMover(CServer):
     # 弃用
     def get_move_list(self):
         """获取所有的服务"""
@@ -178,7 +184,7 @@ class CMover(object):
         })
 
 
-class CLeaner(object):
+class CLeaner(CServer):
     # 保洁
     def get_cleanercity_list(self):
         """获取开通清洁的城市"""
@@ -274,7 +280,7 @@ class CLeaner(object):
         })
 
 
-class CFixer(object):
+class CFixer(CServer):
     def get_fixercity_list(self):
         """获取开通维修服务的城市"""
         city_list = self.scity.get_fixeroppencitylist()
@@ -332,9 +338,4 @@ class CFixer(object):
             'city_id': data.get('city_id')
         })
 
-
-class CServer(CMover, CLeaner, CFixer):
-    def __init__(self):
-        self.sserver = SServer()
-        self.scity = SCity()
 
