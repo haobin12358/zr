@@ -38,6 +38,13 @@ class CMover(object):
         if not is_in_oppner:
             raise NOT_FOUND(u'该城市暂未开通搬家服务')
         move_list = self.sserver.get_mover_serverlist()
+        for move in move_list:
+            smsid = move.SMSid
+            price = self.sserver.get_mover_price_by_smsid(smsid)
+            if price is None:
+                continue
+            move.fill(price, 'pricedetail')
+            move.SMSshowprice = price.SMSPstartprice
         return Success(u'获取列表成功', {
             'movers': move_list
         })
@@ -61,6 +68,13 @@ class CMover(object):
         if not is_admin():
             raise TOKEN_ERROR(u'请使用管理员登录')
         move_list = self.sserver.get_mover_serverlist()
+        for move in move_list:
+            smsid = move.SMSid
+            price = self.sserver.get_mover_price_by_smsid(smsid)
+            if price is None:
+                continue
+            move.fill(price, 'pricedetail')
+            move.SMSshowprice = price.SMSPstartprice
         map(lambda x: x.hide('SMStatus'), move_list)
         return Success(u'获取列表成功', {
             'movers': move_list
@@ -148,50 +162,23 @@ class CMover(object):
             'smsid': smsid
         })
 
-    def update_mover_price_detail(self):
-        if not is_admin():
-            raise TOKEN_ERROR(u'请使用管理员登录')
-        data = parameter_required(('smspid', ))
-        smspid = data.get('smspid')
-        update_data = {
-            'SMSPstartprice': data.get('smspstartprice'),
-            'SMSPpricestartdeadline': data.get('smsppricestartdeadline'),
-            'SMSPpricesoverstartperkg': data.get('smsppricesoverstartperkg'),
-        }
-        update_data = {k: v for k, v in update_data.items() if v is not None}
-        updated = self.sserver.udpate_mover_prricedetail_by_smspid(smspid, update_data)
-        msg = u'更新成功' if updated else u'无此记录'
-        return Success(msg, {
-            'smspid': smspid
-        })
-
-    def add_mover_price_detail(self):
-        if not is_admin():
-            raise TOKEN_ERROR(u'请使用管理员登录')
-        data = parameter_required(('smsid', 'smspstartprice', 'smsppricestartdeadline', 'smsppricesoverstartperkg'))
-        data['smspid'] = str(uuid.uuid4())
-        already_has = self.sserver.get_mover_price_by_smsid(data.get('smsid'))
-        if already_has:
-            raise PARAMS_ERROR(u'该服务已经存在价格详情')
-        self.sserver.add_model('ServersMoveSelectorPrice', data)
-        return Success(u'添加价格详情成功', {
-            'smspid': data['smspid']
-        })
-
     def get_mover_detail(self):
-        """获取该服务的详细信息"""
+        """获取单个搬家服务的详细信息"""
         data = parameter_required(('smsid',), others='ignore')
         smsid = data.get('smsid')
-        is_exists = self.sserver.get_mover_by_smsid(smsid)
-        if not is_exists:
+        move = self.sserver.get_mover_by_smsid(smsid)
+        if not move:
             raise NOT_FOUND(u'没有这项服务')
-        detail = self.sserver.get_mover_price_by_smsid(smsid)
+        price = self.sserver.get_mover_price_by_smsid(smsid)
+        if price is not None:
+            move.fill(price, 'pricedetail')
+            move.SMSshowprice = price.SMSPstartprice
         return Success(u'获取服务详情成功', {
-            'detail': detail
+            'detail': move
         })
 
 
-class CLeaner():
+class CLeaner(object):
     # 保洁
     def get_cleanercity_list(self):
         """获取开通清洁的城市"""
@@ -273,6 +260,17 @@ class CLeaner():
         msg = u'取消成功' if deleted else u'无此记录'
         return Success(msg, {
             'city_id': city_id
+        })
+
+    def get_cleaner_detail(self):
+        """获取单条服务的详情"""
+        data = parameter_required(('sceid', ))
+        sceid = data.get('sceid')
+        clean = self.sserver.get_cleanerserver_by_sceid(sceid)
+        if not clean:
+            raise NOT_FOUND(u'该服务不存在')
+        return Success(u'获取保洁服务成功', {
+            'clean': clean
         })
 
 

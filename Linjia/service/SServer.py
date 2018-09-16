@@ -18,8 +18,6 @@ class SServer(SBase):
     @close_session
     def update_mover_server_price(self, smsid, data):
         """更新搬家服务价格"""
-        import ipdb
-        ipdb.set_trace()
         return self.session.query(ServersMoveSelectorPrice).filter(ServersMoveSelectorPrice.SMSid == smsid).update(data)
 
     @close_session

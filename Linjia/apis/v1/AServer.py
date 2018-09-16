@@ -32,8 +32,6 @@ class AMover(Aserver):
             'add_mover_city': self.cserver.add_mover_oppencity,
             'delete_mover_city': self.cserver.del_mover_oppencity,
             'update_mover_selector': self.cserver.update_mover_selector,  # 修改搬家详情
-            'add_mover_price_detail': self.cserver.add_mover_price_detail,
-            'update_mover_price_detail': self.cserver.update_mover_price_detail,
         }
         return apis
 
@@ -45,6 +43,7 @@ class Acleaner(Aserver):
             'city_list': self.cserver.get_cleanercity_list,
             'clean_list': self.cserver.get_clean_list_by_cityid,
             'clean_list_admin': self.cserver.get_clean_list,
+            'get_detail': self.cserver.get_cleaner_detail,
         }
         return apis
 
@@ -56,6 +55,7 @@ class Acleaner(Aserver):
             'delete_cleanercty': self.cserver.del_cleaner_city,
         }
         return apis
+
 
 class AFixer(Aserver):
     def get(self, fixer):
