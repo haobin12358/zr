@@ -42,17 +42,6 @@ class CMover(object):
             'movers': move_list
         })
 
-    def add_moverselector(self):
-        """添加搬家服务选项"""
-        if not is_admin():
-            raise TOKEN_ERROR(u'请使用管理员登录')
-        data = parameter_required(('smstitle', 'smstitlepic', 'smssubtitle', 'smsshowprice'), forbidden=('smsid',))
-        data['smsid'] = str(uuid.uuid4())
-        added = self.sserver.add_model("ServersMoveSelector", data)
-        return Success(u'添加成功', {
-            'smsid': data['smsid']
-        })
-
     def cancle_moverselector(self):
         """取消搬家服务"""
         if not is_admin():
@@ -105,7 +94,90 @@ class CMover(object):
             'city_id': city_id
         })
 
-    # 多余, 待用
+    def add_moverselector(self):
+        """添加搬家服务选项, 同时添加价格详情"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('smstitle', 'smstitlepic', 'smssubtitle', 'smsshowprice', 'pricedetail'),
+                                  forbidden=('smsid',))
+        mod = {}
+        data['smsid'] = str(uuid.uuid4())
+        mod['ServersMoveSelector'] = data
+        pricedetail = data.pop('pricedetail')
+        price_data = parameter_required(('smspstartprice', 'smsppricestartdeadline', 'smsppricesoverstartperkg'),
+                                        datafrom=pricedetail)
+        price_data['smsid'] = data['smsid']
+        price_data['smspid'] = str(uuid.uuid4())
+        mod['ServersMoveSelectorPrice'] = price_data
+        self.sserver.add_models(mod)
+        return Success(u'添加成功', {
+            'smsid': data['smsid']
+        })
+
+    def update_mover_selector(self):
+        """修改搬家服务选项, 同时更新服务价格详情"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('smsid', ))
+        smsid = data.get('smsid')
+        update_data = {
+            'SMStitlepic': data.get('smstilepic'),
+            'SMStitle': data.get('smstitle'),
+            'SMSsubtitle': data.get('smssubtitle'),
+            'SMSshowprice': data.get('smsshowprice'),
+        }
+        update_data = {
+            k: v for k, v in update_data.items() if v is not None
+        }
+        updated = self.sserver.update_mover_server(smsid, update_data)
+        pricedetail = data.pop('pricedetail', None)
+        if pricedetail:  # 因不确定数据库中是否存在价格详情, 应尝试更新, 而后在决定是否添加
+            pricedetail_data = {
+                'SMSPstartprice': pricedetail.get('smspstartprice'),
+                'SMSPpricestartdeadline': pricedetail.get('smsppricestartdeadline'),
+                'SMSPpricesoverstartperkg': pricedetail.get('smsppricesoverstartperkg'),
+            }
+            price_updated = self.sserver.update_mover_server_price(smsid, pricedetail_data)
+            if not price_updated:
+                print('不存在价格详情, 添加')
+                pricedetail_data['smsid'] = smsid
+                pricedetail_data['smspid'] = str(uuid.uuid4())
+                self.sserver.add_model('ServersMoveSelectorPrice', pricedetail_data)
+        msg = u'更新成功' if updated else u'无此记录'
+        return Success(msg, {
+            'smsid': smsid
+        })
+
+    def update_mover_price_detail(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('smspid', ))
+        smspid = data.get('smspid')
+        update_data = {
+            'SMSPstartprice': data.get('smspstartprice'),
+            'SMSPpricestartdeadline': data.get('smsppricestartdeadline'),
+            'SMSPpricesoverstartperkg': data.get('smsppricesoverstartperkg'),
+        }
+        update_data = {k: v for k, v in update_data.items() if v is not None}
+        updated = self.sserver.udpate_mover_prricedetail_by_smspid(smspid, update_data)
+        msg = u'更新成功' if updated else u'无此记录'
+        return Success(msg, {
+            'smspid': smspid
+        })
+
+    def add_mover_price_detail(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('smsid', 'smspstartprice', 'smsppricestartdeadline', 'smsppricesoverstartperkg'))
+        data['smspid'] = str(uuid.uuid4())
+        already_has = self.sserver.get_mover_price_by_smsid(data.get('smsid'))
+        if already_has:
+            raise PARAMS_ERROR(u'该服务已经存在价格详情')
+        self.sserver.add_model('ServersMoveSelectorPrice', data)
+        return Success(u'添加价格详情成功', {
+            'smspid': data['smspid']
+        })
+
     def get_mover_detail(self):
         """获取该服务的详细信息"""
         data = parameter_required(('smsid',), others='ignore')

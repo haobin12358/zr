@@ -16,6 +16,13 @@ class SServer(SBase):
         return self.session.query(ServersMoveSelector).filter(ServersMoveSelector.SMSid == smsid).update(data)
 
     @close_session
+    def update_mover_server_price(self, smsid, data):
+        """更新搬家服务价格"""
+        import ipdb
+        ipdb.set_trace()
+        return self.session.query(ServersMoveSelectorPrice).filter(ServersMoveSelectorPrice.SMSid == smsid).update(data)
+
+    @close_session
     def get_mover_serverlistby_city_id(self, cityid):
         """根据城市获取搬家服务列表信息"""
         return self.session.query(ServersMoveSelector).filter_by(SMScity=cityid).order_by(ServersMoveSelector.SMSshowprice).all()
@@ -28,6 +35,18 @@ class SServer(SBase):
     def get_mover_price_by_smsid(self, smsid):
         """获取搬家服务的价格详情"""
         return self.session.query(ServersMoveSelectorPrice).filter_by(SMSid=smsid).first()
+
+    @close_session
+    def updated_mover_pricedetail_by_smsid(self, smsid, data):
+        """根据搬家服务id更改价格详情"""
+        return self.session.query(ServersMoveSelectorPrice).filter_by(SMSid=smsid).update(data)
+
+    @close_session
+    def udpate_mover_prricedetail_by_smspid(self, smspid, data):
+        """根据搬家服务的价格详情id更新信息"""
+        import ipdb
+        ipdb.set_trace()
+        return self.session.query(ServersMoveSelectorPrice).filter_by(SMSPid=smspid).update(data)
 
     @close_session
     def get_clearerserver_list(self):

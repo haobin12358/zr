@@ -31,6 +31,9 @@ class AMover(Aserver):
             'cancle_moverselector': self.cserver.cancle_moverselector,
             'add_mover_city': self.cserver.add_mover_oppencity,
             'delete_mover_city': self.cserver.del_mover_oppencity,
+            'update_mover_selector': self.cserver.update_mover_selector,  # 修改搬家详情
+            'add_mover_price_detail': self.cserver.add_mover_price_detail,
+            'update_mover_price_detail': self.cserver.update_mover_price_detail,
         }
         return apis
 
