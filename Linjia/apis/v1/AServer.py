@@ -46,10 +46,10 @@ class Acleaner(Aserver):
 
     def post(self, cleaner):
         apis = {
-            'add_cleanselector': self.cleaner.add_cleanselector,
-            'cancle_cleanselector': self.cleaner.cancle_cleanselector,
-            'add_cleanercity': self.cleaner.add_cleaner_city,
-            'delete_cleanercty': self.cleaner.del_cleaner_city,
+            'add_cleanselector': self.cleaner.add_cleanselector,  # 添加保洁服务
+            'cancle_cleanselector': self.cleaner.cancle_cleanselector,  # 删除保洁服务
+            'add_cleanercity': self.cleaner.add_cleaner_city,  # 添加保洁服务开通城市
+            'delete_cleanercty': self.cleaner.del_cleaner_city,  # 删除保洁服务开通城市
         }
         return apis
 
