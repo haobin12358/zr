@@ -81,7 +81,6 @@ class CServer(object):
             'movers': move_list
         })
 
-
     # 多余, 待用
     def get_mover_detail(self):
         """获取该服务的详细信息"""
@@ -112,11 +111,45 @@ class CServer(object):
         is_in_oppner = self.scity.is_clean_oppener(city_id)
         if not is_in_oppner:
             raise NOT_FOUND(u'该城市暂未开通清洁服务')
-        move_list = self.sserver.get_clearerserver_list()
+        clean_list = self.sserver.get_clearerserver_list()
         return Success(u'获取清洁列表成功', {
-            'movers': move_list
+            'cleans': clean_list
         })
 
+    def get_clean_list(self):
+        """获取保洁服务列表, 管理员使用"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        clean_list = self.sserver.get_clearerserver_list()
+        map(lambda x: x.hide('SCMstatus'), clean_list)
+        return Success(u'获取清洁列表成功', {
+            'cleans': clean_list
+        })
+
+    def add_cleanselector(self):
+        """添加保洁服务"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('scmtitle', 'scmtitlepic', 'scmsubtitle', 'scprice'), forbidden=('scmid'))
+        data['sceid'] = str(uuid.uuid4())
+        added = self.sserver.add_model('ServerCleanSelector', data) 
+        return Success(u'添加成功', {
+            'sceid': data['sceid']
+        })
+    
+    def cancle_cleanselector(self):
+        """取消保洁服务"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('sceid', ))
+        updated = self.sserver.update_cleanserver(data.get('sceid'), {
+            'SCMstatus': 1
+        })
+        msg = u'取消成功' if updated else u'无此记录'
+        return Success(msg, {
+            'sceid': data.get('sceid')
+        })
+        
     def get_fixercity_list(self):
         """获取开通维修服务的城市"""
         city_list = self.scity.get_fixeroppencitylist()

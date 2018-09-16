@@ -32,7 +32,15 @@ class Acleaner(Aserver):
     def get(self, cleaner):
         apis = {
             'city_list': self.cserver.get_cleanercity_list,
-            'clean_list': self.cserver.get_clean_list_by_cityid
+            'clean_list': self.cserver.get_clean_list_by_cityid,
+            'clean_list_admin': self.cserver.get_clean_list,
+        }
+        return apis
+
+    def post(self, cleaner):
+        apis = {
+            'add_cleanselector': self.cserver.add_cleanselector,
+            'cancle_cleanselector': self.cserver.cancle_cleanselector,
         }
         return apis
 

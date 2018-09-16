@@ -32,10 +32,15 @@ class SServer(SBase):
     @close_session
     def get_clearerserver_list(self):
         """获取清洁服务列表"""
-        return self.session.query(ServerCleanSelector).all()
+        return self.session.query(ServerCleanSelector).filter(ServerCleanSelector.SCMstatus==0).all()
 
     @close_session
     def get_cleanerserver_by_sceid(self, sceid):
         """根据id获取清洁服务"""
         return self.session.query(ServerCleanSelector).filter(ServerCleanSelector.SCEid==sceid).first()
+
+    @close_session
+    def update_cleanserver(self, sceid, data):
+        """更新保洁服务"""
+        return self.session.query(ServerCleanSelector).filter(ServerCleanSelector.SCEid==sceid).update(data)
 
