@@ -469,3 +469,25 @@ class CRoom(BaseRoomControl):
             'id': data.get('id')
         })
 
+    def add_room_opencity(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('city_id', ))
+        city_id = data.get('city_id')
+        room_city = self.scity.is_room_open_city(city_id)
+        if room_city:
+            raise PARAMS_ERROR(u'重复添加')
+        data['rcid'] = str(uuid.uuid4())
+        added = self.scity.add_model('RoomCity', data)
+        return Success(u'添加房源开放城市成功', {'city_id': city_id})
+
+    def del_room_opencity(self):
+        """取消房源开放城市"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使管理员登录')
+        data = parameter_required(('city_id', ))
+        city_id = data.get('city_id')
+        deleted = self.scity.delete_roomoppencity(city_id)
+        msg = u'取消房源服务成功' if deleted else u'无此记录'
+        return Success(msg, {'city_id': city_id})
+        

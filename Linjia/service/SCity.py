@@ -29,6 +29,15 @@ class SCity(SBase):
         return self.session.query(RoomCity).all()
 
     @close_session
+    def is_room_open_city(self, city_id):
+        """判断城市是否是房源开放城市"""
+        return self.session.query(RoomCity).filter(RoomCity.city_id == city_id).first()
+
+    @close_session
+    def delete_roomoppencity(self, city_id):
+        return self.session.query(RoomCity).filter(RoomCity.city_id == city_id).delete()
+
+    @close_session
     def delete_roomoppencity(self, city_id):
         """取消城市房源开放"""
         return self.session.query(RoomCity).filter_by(city_id=city_id).delete()
