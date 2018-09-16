@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
+import uuid
+
 from Linjia.commons.error_response import NOT_FOUND
 from Linjia.commons.success_response import Success
 from Linjia.service import SServer, SCity
 from Linjia.commons.params_validates import parameter_required
+from Linjia.commons.error_response import TOKEN_ERROR
+from Linjia.commons.token_handler import is_admin
 
 
 class CServer(object):
@@ -41,6 +45,42 @@ class CServer(object):
         return Success(u'获取列表成功', {
             'movers': move_list
         })
+
+    def add_moverselector(self):
+        """添加搬家服务选项"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('smstitle', 'smstitlepic', 'smssubtitle', 'smsshowprice'), forbidden=('smsid', ))
+        data['smsid'] = str(uuid.uuid4())
+        added = self.sserver.add_model("ServersMoveSelector", data)
+        return Success(u'添加成功', {
+            'smsid': data['smsid']
+        })
+        
+    def cancle_moverselector(self):
+        """取消搬家服务"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('smsid',) )
+        smsid = data.get('smsid')
+        cancled = self.sserver.update_mover_server(smsid, {
+            'SMStatus': 1
+        })
+        msg = u'取消成功' if cancled else u'无此记录'
+        return Success(msg, {
+            'smsid': smsid
+        })
+
+    def get_moverlist(self):
+        """获取所有的搬家服务, 管理员使用"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        move_list = self.sserver.get_mover_serverlist()
+        map(lambda x: x.hide('SMStatus'), move_list)
+        return Success(u'获取列表成功', {
+            'movers': move_list
+        })
+
 
     # 多余, 待用
     def get_mover_detail(self):

@@ -14,7 +14,15 @@ class AMover(Aserver):
         apis = {
             'city_list': self.cserver.get_moveercity_list,
             'move_list': self.cserver.get_mover_list_by_city,
-            'get_detail': self.cserver.get_mover_detail
+            'get_detail': self.cserver.get_mover_detail,
+            'mover_list_admin': self.cserver.get_moverlist,
+        }
+        return apis
+
+    def post(self, mover):
+        apis = {
+            'add_moverselector': self.cserver.add_moverselector,
+            'cancle_moverselector': self.cserver.cancle_moverselector,
         }
         return apis
 
