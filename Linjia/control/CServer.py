@@ -177,6 +177,33 @@ class CServer(object):
         return Success(msg, {
             'sceid': data.get('sceid')
         })
+
+    def add_cleaner_city(self):
+        """添加保洁开放城市"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('city_id', ))
+        city_id = data.get('city_id')
+        cleaner_city = self.scity.is_clean_oppener(city_id)
+        if cleaner_city:
+            raise PARAMS_ERROR(u'重复添加')
+        data['ccid'] = str(uuid.uuid4())
+        added = self.sserver.add_model('CleanerCity', data)
+        return Success(u'添加保洁开放城市成功', {
+            'city_id': city_id
+        })
+
+    def del_cleaner_city(self):
+        """取消保洁开放城市"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('city_id', ))
+        city_id = data.get('city_id')
+        deleted = self.scity.delete_cleanoppen(city_id)
+        msg = u'取消成功' if deleted else u'无此记录'
+        return Success(msg, {
+            'city_id': city_id
+        })
         
     def get_fixercity_list(self):
         """获取开通维修服务的城市"""

@@ -49,6 +49,8 @@ class Acleaner(Aserver):
         apis = {
             'add_cleanselector': self.cserver.add_cleanselector,
             'cancle_cleanselector': self.cserver.cancle_cleanselector,
+            'add_cleanercity': self.cserver.add_cleaner_city,
+            'delete_cleanercty': self.cserver.del_cleaner_city,
         }
         return apis
 
