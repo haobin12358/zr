@@ -29,9 +29,19 @@ class SCity(SBase):
         return self.session.query(RoomCity).all()
 
     @close_session
+    def delete_roomoppencity(self, city_id):
+        """取消城市房源开放"""
+        return self.session.query(RoomCity).filter_by(city_id=city_id).delete()
+
+    @close_session
     def get_moveroppencitylist(self):
         """搬家服务开放城市列表"""
         return self.session.query(MoverCity).all()
+
+    @close_session
+    def delete_moveroppen(self, city_id):
+        """取消搬家服务开放"""
+        return self.session.query(MoverCity).filter(MoverCity.city_id == city_id).delete()
 
     @close_session
     def get_area_list_by_cityid(self, cityid):
@@ -49,6 +59,11 @@ class SCity(SBase):
         return self.session.query(CleanerCity).all()
 
     @close_session
+    def delete_cleanoppen(self, city_id):
+        """取消保洁服务的城市"""
+        return self.session.query(CleanerCity).filter_by(city_id=city_id).delete()
+
+    @close_session
     def is_clean_oppener(self, city_id):
         """城市是否开通清洁"""
         return self.session.query(CleanerCity).filter(CleanerCity.city_id==city_id).first()
@@ -57,6 +72,11 @@ class SCity(SBase):
     def get_fixeroppencitylist(self):
         """获取开通维修服务的城市"""
         return self.session.query(FixerCity).all()
+
+    @close_session
+    def delete_fixeroppencity(self, city_id):
+        """取消维修服务城市"""
+        return self.session.query(FixerCity).filter_by(city_id=city_id).delete()
 
     @close_session
     def is_fixer_oppener(self, city_id):

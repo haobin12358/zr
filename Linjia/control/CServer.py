@@ -5,7 +5,7 @@ from Linjia.commons.error_response import NOT_FOUND
 from Linjia.commons.success_response import Success
 from Linjia.service import SServer, SCity
 from Linjia.commons.params_validates import parameter_required
-from Linjia.commons.error_response import TOKEN_ERROR
+from Linjia.commons.error_response import TOKEN_ERROR, PARAMS_ERROR
 from Linjia.commons.token_handler import is_admin
 
 
@@ -79,6 +79,34 @@ class CServer(object):
         map(lambda x: x.hide('SMStatus'), move_list)
         return Success(u'获取列表成功', {
             'movers': move_list
+        })
+
+    def add_mover_oppencity(self):
+        """添加搬家服务开通城市"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('city_id', ))
+        city_id = data.get('city_id')
+        # 先判断是否是已经开通的
+        mover_oppen = self.scity.is_move_oppener(city_id)
+        if mover_oppen:
+            raise PARAMS_ERROR(u'重复开通')
+        data['mcid'] = str(uuid.uuid4())
+        self.scity.add_model('MoverCity', data)
+        return Success('添加搬家服务开放城市成功', {
+            'city_id': data.get('city_id')
+        })
+
+    def del_mover_oppencity(self):
+        """取消城市的搬家服务开放"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('city_id', ))
+        city_id = data.get('city_id')
+        deleted = self.scity.delete_moveroppen(city_id)
+        msg = u'取消成功' if deleted else u'无此记录'
+        return Success(msg, {
+            'city_id': city_id
         })
 
     # 多余, 待用
@@ -170,3 +198,18 @@ class CServer(object):
         return Success(u'获取维修列表成功', {
             'fixers': fixer_list     
         })
+
+    def add_city(self):
+        """添加开通城市, 租房以及服务"""
+        data = parameter_required(('city_id', ), others='ignore')
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        mod = dict()
+        data['rcid'] = data['mcid'] = data['ccid'] = data['fcid'] = str(uuid.uuid4())
+        mod['RoomCity'] = mod['MoverCity'] = mod['CleanerCity'] = mod['FixerCity'] = data
+        self.scity.add_models(mod)
+        return Success(u'添加开通服务成功', {
+            'city_id': data.get('city_id')
+        })
+
+

@@ -6,6 +6,12 @@ from Linjia.control import CServer
 class Aserver(Resource):
     def __init__(self):
         self.cserver = CServer()
+    
+    def post(self, server):
+        apis = {
+            'add_city': self.cserver.add_city,
+        }
+        return apis
 
 
 class AMover(Aserver):
@@ -23,6 +29,8 @@ class AMover(Aserver):
         apis = {
             'add_moverselector': self.cserver.add_moverselector,
             'cancle_moverselector': self.cserver.cancle_moverselector,
+            'add_mover_city': self.cserver.add_mover_oppencity,
+            'delete_mover_city': self.cserver.del_mover_oppencity,
         }
         return apis
 

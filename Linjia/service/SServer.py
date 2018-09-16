@@ -8,7 +8,7 @@ class SServer(SBase):
     @close_session
     def get_mover_serverlist(self):
         """获取搬家服务列表信息"""
-        return self.session.query(ServersMoveSelector).filter_by(SMStatus=0).all()
+        return self.session.query(ServersMoveSelector).filter_by(SMStatus=0).order_by(ServersMoveSelector.SMSshowprice).all()
 
     @close_session
     def update_mover_server(self, smsid, data):
@@ -18,7 +18,7 @@ class SServer(SBase):
     @close_session
     def get_mover_serverlistby_city_id(self, cityid):
         """根据城市获取搬家服务列表信息"""
-        return self.session.query(ServersMoveSelector).filter_by(SMScity=cityid).all()
+        return self.session.query(ServersMoveSelector).filter_by(SMScity=cityid).order_by(ServersMoveSelector.SMSshowprice).all()
 
     @close_session
     def get_mover_by_smsid(self, smsid):
@@ -32,7 +32,7 @@ class SServer(SBase):
     @close_session
     def get_clearerserver_list(self):
         """获取清洁服务列表"""
-        return self.session.query(ServerCleanSelector).filter(ServerCleanSelector.SCMstatus==0).all()
+        return self.session.query(ServerCleanSelector).filter(ServerCleanSelector.SCMstatus==0).order_by(ServerCleanSelector.SCprice).all()
 
     @close_session
     def get_cleanerserver_by_sceid(self, sceid):
