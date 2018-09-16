@@ -34,6 +34,10 @@ class SCity(SBase):
         return self.session.query(RoomCity).filter(RoomCity.city_id == city_id).first()
 
     @close_session
+    def update_room_open_city(self, city_id, data):
+        return self.session.query(RoomCity).filter(RoomCity.city_id == city_id).update(data)
+
+    @close_session
     def delete_roomoppencity(self, city_id):
         return self.session.query(RoomCity).filter(RoomCity.city_id == city_id).delete()
 

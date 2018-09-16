@@ -23,7 +23,7 @@ class SServer(SBase):
     @close_session
     def get_mover_serverlistby_city_id(self, cityid):
         """根据城市获取搬家服务列表信息"""
-        return self.session.query(ServersMoveSelector).filter_by(SMScity=cityid).order_by(ServersMoveSelector.SMSshowprice).all()
+        return self.session.query(ServersMoveSelector).filter_by(SMScity=cityid, SMStatus=0).order_by(ServersMoveSelector.SMSshowprice).all()
 
     @close_session
     def get_mover_by_smsid(self, smsid):
@@ -42,8 +42,6 @@ class SServer(SBase):
     @close_session
     def udpate_mover_prricedetail_by_smspid(self, smspid, data):
         """根据搬家服务的价格详情id更新信息"""
-        import ipdb
-        ipdb.set_trace()
         return self.session.query(ServersMoveSelectorPrice).filter_by(SMSPid=smspid).update(data)
 
     @close_session

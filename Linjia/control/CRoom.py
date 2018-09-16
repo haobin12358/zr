@@ -106,10 +106,14 @@ class CRoom(BaseRoomControl):
 
     def get_oppener_city(self):
         """获取开放城市"""
-        opnerlist = self.scity.get_roomoppencitylist()
-        map(lambda x: x.fill(self.scity.get_city_by_city_id(x.city_id).name, 'name'), opnerlist)
+        data = parameter_required()
+        hot = data.get('hot')  # 是否热门
+        citys = self.scity.get_roomoppencitylist()
+        if hot == 'true':
+            citys = list(filter(lambda x: x.ishot, citys))
+        map(lambda x: x.fill(self.scity.get_city_by_city_id(x.city_id).name, 'name'), citys)
         return Success(u'获取城市列表成功', {
-            'citys': opnerlist
+            'citys': citys
         })
 
     def get_area_by_citynum(self):
@@ -359,7 +363,6 @@ class CRoom(BaseRoomControl):
             'roid': roid
         })
 
-
     def delete_room(self):
         """删除房源"""
         data = parameter_required(('roid', ))
@@ -490,4 +493,29 @@ class CRoom(BaseRoomControl):
         deleted = self.scity.delete_roomoppencity(city_id)
         msg = u'取消房源服务成功' if deleted else u'无此记录'
         return Success(msg, {'city_id': city_id})
-        
+
+    def add_hot_city(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('city_id', ))
+        city_id = data.get('city_id')
+        updated = self.scity.update_room_open_city(city_id, {
+            'ishot': True
+        })
+        msg = u'更新成功' if updated else u'该城市暂未开通服务'
+        return Success(msg, {
+            'city_id': city_id
+        })
+
+    def cancle_hot_city(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('city_id', ))
+        city_id = data.get('city_id')
+        updated = self.scity.update_room_open_city(city_id, {
+            'ishot': False
+        })
+        msg = u'更新成功' if updated else u'该成功暂未开通服务'
+        return Success(msg, {
+            'city_id': city_id
+        })

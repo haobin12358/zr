@@ -38,5 +38,7 @@ class ARoom(Resource):
             'delete_room': self.croom.delete_room,
             'add_room_city': self.croom.add_room_opencity,
             'delete_room_city': self.croom.del_room_opencity,
+            'add_hot_city': self.croom.add_hot_city,  # 热门城市
+            'cancle_hot_city': self.croom.cancle_hot_city,
         }
         return apis
