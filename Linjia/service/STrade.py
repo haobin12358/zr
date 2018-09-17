@@ -17,7 +17,7 @@ class STrade(SBase):
             page_num = args.get('page_num')
             page_size = args.get('page_size')
             return mover_order_list.order_by(UserMoveTrade.UMTcreatetime.desc()).all_with_page(page_num, page_size)
-        return self.session.query(UserMoveTrade).order_by(UserMoveTrade.UMTcreatetime.desc()).all()
+        return self.session.query(UserMoveTrade).filter_ignore_none_args(UserMoveTrade.USid == usid).order_by(UserMoveTrade.UMTcreatetime.desc()).all()
 
     @close_session
     def get_mover_order_by_umtid(self, umtid):
@@ -29,7 +29,7 @@ class STrade(SBase):
         if args:
             cleanserver_order_list = self.session.query(UserCleanTrade).filter_ignore_none_args(UserCleanTrade.USid == usid)
             return cleanserver_order_list.order_by(UserCleanTrade.UCTcreatetime.desc()).all_with_page(args.get('page_num'), args.get('page_size') )
-        return self.session.query(UserCleanTrade).order_by(UserCleanTrade.UCTcreatetime.desc()).all()
+        return self.session.query(UserCleanTrade).filter_ignore_none_args(UserCleanTrade.USid == usid).order_by(UserCleanTrade.UCTcreatetime.desc()).all()
 
     @close_session
     def get_clean_order_by_uctid(self, uctid):
@@ -41,7 +41,7 @@ class STrade(SBase):
         if args:
             fixer_order_list = self.session.query(UserFixerTrade).filter_ignore_none_args(UserFixerTrade.USid==usid)
             return fixer_order_list.order_by(UserFixerTrade.UFTcreatetime.desc()).all_with_page(args.get('page_num'), args.get('page_size'))
-        return self.session.query(UserFixerTrade).order_by(UserFixerTrade.UFTcreatetime.desc()).all()
+        return self.session.query(UserFixerTrade).filter_ignore_none_args(UserFixerTrade.USid == usid).order_by(UserFixerTrade.UFTcreatetime.desc()).all()
 
     @close_session
     def get_fixer_order_by_uftid(self, uftid):
@@ -106,7 +106,7 @@ class STrade(SBase):
 
     @close_session
     def update_cleanorder_detail_by_uctid(self, uctid, data):
-        """更新维修订单任意"""
+        """更新保洁订单任意"""
         return self.session.query(UserCleanTrade).filter(UserCleanTrade.UCTid==uctid).update(data)
 
     @close_session

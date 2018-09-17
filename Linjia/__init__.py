@@ -83,7 +83,7 @@ def register_route(app):
     app.add_url_rule('/mover/<string:mover>/', view_func=AMover.as_view('mover'))  # 搬家
     app.add_url_rule('/cleaner/<string:cleaner>/', view_func=Acleaner.as_view('cleaner'))  # 清洁
     app.add_url_rule('/fixer/<string:fixer>/', view_func=AFixer.as_view('fixer'))  # 维修
-    app.add_url_rule('/server/<string:server>/', view_func=AFixer.as_view('server'))  # 服务总管理
+    # app.add_url_rule('/server/<string:server>/', view_func=AFixer.as_view('server'))  # 服务总管理
     app.add_url_rule('/guide/<string:guide>/', view_func=AGuide.as_view('guide'))  # 入住指南
 
 

@@ -25,6 +25,8 @@ class ATrade(Resource):
             'update_moverorder_price': self.ctrade.update_moverorder_price,
             # 修改申请房源的状态
             'update_provide_house': self.ctrade.update_provide_house_status,
+            # 给订单制定工作人员
+            'point_staff': self.ctrade.point_staff,
         }
         return apis
 

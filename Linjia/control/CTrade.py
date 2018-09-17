@@ -136,9 +136,9 @@ class CTradeBase(object):
             map(lambda x: x.fill(self.sserver.get_cleanerserver_by_sceid(x.SCEid).SCMtitle, 'name'), order_list)
             map(lambda x: x.fill('cleaner', 'type'), order_list)
         else:
-            mover_order_list = self.strade.get_mover_serverlist_by_usid(usid)
-            fixer_order_list = self.strade.get_fixer_serverlist_by_usid(usid)
-            cleaner_list = self.strade.get_clean_serverlist_by_usid(usid)
+            mover_order_list = self.strade.get_mover_serverlist_by_usid(usid, data)
+            fixer_order_list = self.strade.get_fixer_serverlist_by_usid(usid, data)
+            cleaner_list = self.strade.get_clean_serverlist_by_usid(usid, data)
             order_list = mover_order_list + fixer_order_list + cleaner_list
             len_order_list = len(order_list)
             page_size = data['page_size']
@@ -269,10 +269,49 @@ class CMoverTrade(CTradeBase):
 
     def cancle_moverorder(self):
         """用户取消订单"""
+        # todo
         if is_tourist():
             return TOKEN_ERROR(u'请先登录')
         if is_admin():
             return TOKEN_ERROR(u'请使用普通用户登录')
+
+    def point_staff(self):
+        """给订单指定工作人员"""
+        if is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('stfid', ))
+        stfid = data.get('stfid')
+        staff = self.suer.get_staff_by_id(stfid)
+        if not staff:
+            raise NOT_FOUND(u'不存在的工作人员')
+        response = {'stfid': stfid}
+        # 如果是搬家服务
+        if 'umtid' in data:
+            umtid = data.get('umtid')
+            updated = self.strade.update_movertrade_detail_by_umtid(umtid, {
+                'STFid': stfid
+            })
+            msg = u'更新成功' if updated else u'无此记录'
+            response['umtid'] = umtid
+        elif 'uftid' in data:
+            # 如果是维修
+            uftid = data.get('uftid')
+            updated = self.strade.update_fixerorder_detail_by_uftid(uftid, {
+                'STFid': stfid
+            })
+            response['uftid'] = uftid
+        elif 'uctid' in data:
+            # 如果是保洁
+            uctid = data.get('uctid')
+            updated = self.strade.update_cleanorder_detail_by_uctid(uctid, {
+                'SFTid': stfid
+            })
+            response['uctid'] = uctid
+        else:
+            # 其他 参数有误
+            raise PARAMS_ERROR(u'订单参数有误')
+        return Success(msg, response)
+
 
 
 class CCleanerTrade(CTradeBase):
@@ -280,9 +319,9 @@ class CCleanerTrade(CTradeBase):
     def cleaner_appiontment(self):
         """清洁服务预约"""
         if is_admin():
-            return TOKEN_ERROR(u'普通用户才可以预约')
+            raise TOKEN_ERROR(u'普通用户才可以预约')
         if is_tourist():
-            return TOKEN_ERROR(u'请登录后预约')
+            raise TOKEN_ERROR(u'请登录后预约')
         required = ('sceid', 'uctpreviewstarttime', 'uctaddr', 'uctpreviewlastingtime', 'uctphone', 'uctprice', 'uctspecialwish', 'uctlocation')
         data = parameter_required(required, others='ignore')
         cleaner_exists = self.sserver.get_cleanerserver_by_sceid(data.get('sceid'))

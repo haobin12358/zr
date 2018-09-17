@@ -50,6 +50,7 @@ class Acleaner(Aserver):
             'cancle_cleanselector': self.cleaner.cancle_cleanselector,  # 删除保洁服务
             'add_cleanercity': self.cleaner.add_cleaner_city,  # 添加保洁服务开通城市
             'delete_cleanercty': self.cleaner.del_cleaner_city,  # 删除保洁服务开通城市
+            'update_cleaner_detail': self.cleaner.update_cleaner_detail,
         }
         return apis
 

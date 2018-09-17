@@ -141,7 +141,7 @@ class CMover(CServer):
         data = parameter_required(('smsid', ))
         smsid = data.get('smsid')
         update_data = {
-            'SMStitlepic': data.get('smstilepic'),
+            'SMStitlepic': data.get('smstitlepic'),
             'SMStitle': data.get('smstitle'),
             'SMSsubtitle': data.get('smssubtitle'),
             'SMSshowprice': data.get('smsshowprice'),
@@ -277,6 +277,24 @@ class CLeaner(CServer):
             raise NOT_FOUND(u'该服务不存在')
         return Success(u'获取保洁服务成功', {
             'clean': clean
+        })
+
+    def update_cleaner_detail(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('sceid',))
+        sceid = data.get('sceid')
+        update_data = {
+            'SCMtitlepic': data.get('scmtitlepic'),
+            'SCMtitle': data.get('scmtitle'),
+            'SCMsubtitle': data.get('scmsubtitle'),
+            'SCprice': data.get('scprice')
+        }
+        update_data = {k: v for k, v in update_data.items() if v is not None}
+        updated = self.sserver.update_cleanserver(sceid, update_data)
+        msg = u'更新成功' if updated else u'无此记录'
+        return Success(msg, {
+            'sceid': sceid
         })
 
 
