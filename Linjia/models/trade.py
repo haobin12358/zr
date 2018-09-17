@@ -92,7 +92,7 @@ class UserMoveTrade(Base):
     UMTspecialwish = Column(String(64), comment=u'特殊请求')
     # UMTcoupo = Column(String(64), comment=u'优惠券id') todo
     UMTpreviewprice = Column(Float, comment=u'估算价格')  # 真正用到的价格
-    UMTstatus = Column(Integer, default=0, comment=u'订单状态,0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消')
+    UMTstatus = Column(Integer, default=0, comment=u" 0: u'待支付', 1: u'等待服务', 2: u'服务完成', 3: u'退款中', 4: u'交易关闭'")
     UMTtruestarttime = Column(String(16), comment=u'实际搬出时间')
     UMTtrueendtime = Column(String(16), comment=u'订单完成时间')
     UMTtrueprice = Column(Float, comment=u'实收价格')
@@ -114,7 +114,7 @@ class UserCleanTrade(Base):
     UCTphone = Column(String(12), nullable=False, comment=u'手机号码')
     UCTprice = Column(Float, comment=u'价格')
     # UCTcoupo = Column(String(64), comment=u'优惠券id')
-    UCTstatus = Column(Integer, default=0, comment=u'订单状态,0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消')  #
+    UCTstatus = Column(Integer, default=0, comment=u'订单状态,0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消')  # 0: u'待支付', 1: u'等待服务', 2: u'服务完成', 3: u'退款中', 4: u'交易关闭'
     UCTcreatetime = Column(String(16), comment=u'提交预约时间')
     STFid = Column(String(64), comment=u'保洁人员')  # 需要
 
@@ -134,7 +134,7 @@ class UserFixerTrade(Base):
     UFTphone = Column(String(12), nullable=False, comment=u'手机号码')
     UFTspecialwith = Column(String(125), comment=u'备注')
     UFTprice = Column(Float, comment=u'价格')
-    UFTstatus = Column(Integer, default=0, comment=u'订单状态,0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消')  #
+    UFTstatus = Column(Integer, default=0, comment=u'订单状态,0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消')  # 0: u'待支付', 1: u'等待服务', 2: u'服务完成', 3: u'退款中', 4: u'交易关闭'
     UFTcreatetime = Column(String(16), comment=u'提交预约时间')
     STFid = Column(String(64), comment=u'保洁人员')  # 需要
 

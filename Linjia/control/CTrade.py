@@ -176,6 +176,54 @@ class CTradeBase(object):
             request.all_count = len_order_list
         return Success(u'获取列表成功', order_list)
 
+    def point_staff(self):
+        """给订单指定工作人员"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('stfid',))
+        stfid = data.get('stfid')
+        staff = self.suser.get_staff_by_stfid(stfid)
+        if not staff:
+            raise NOT_FOUND(u'不存在的工作人员')
+        if staff.STFisblocked:
+            raise NOT_FOUND(u'黑名单里的工作人员')
+        response = {'stfid': stfid}
+        # 如果是搬家服务
+        if 'umtid' in data:
+            umtid = data.get('umtid')
+            mover_order = self.strade.get_mover_order_by_umtid(umtid)
+            if mover_order.UMTstatus != 1:  # 只有等待服务的订单才可以制定
+                raise PARAMS_ERROR(u'当前订单状态为{}, 只可以指定等待服务中的订单'.format(SERVER_STATUS.get(mover_order.UMTstatus)))
+            updated = self.strade.update_movertrade_detail_by_umtid(umtid, {
+                'STFid': stfid
+            })
+            response['type'] = 'mover'
+        elif 'uftid' in data:
+            # 如果是维修
+            uftid = data.get('uftid')
+            fixer_order = self.strade.get_fixer_order_by_uftid(uftid)
+            if fixer_order.UFTstatus != 1:
+                raise PARAMS_ERROR(u'当前订单状态为{}, 只可以指定等待服务中的订单'.format(SERVER_STATUS.get(fixer_order.UMTstatus)))
+            updated = self.strade.update_fixerorder_detail_by_uftid(uftid, {
+                'STFid': stfid
+            })
+            response['type'] = 'fixer'
+        elif 'uctid' in data:
+            # 如果是保洁
+            uctid = data.get('uctid')
+            cleaner_order = self.strade.get_clean_order_by_uctid(uctid)
+            if cleaner_order.UCTstatus != 1:
+                raise PARAMS_ERROR(u'当前订单状态为{}, 只可以指定等待服务中的订单'.format(SERVER_STATUS.get(cleaner_order.UMTstatus)))
+            updated = self.strade.update_cleanorder_detail_by_uctid(uctid, {
+                'STFid': stfid
+            })
+            response['type'] = 'cleaner'
+        else:
+            # 其他 参数有误
+            raise PARAMS_ERROR(u'订单参数有误')
+        msg = u'更新成功' if updated else u'无此记录'
+        return Success(msg, response)
+
     @staticmethod
     def _allow_starttime(str_time):
         try:
@@ -190,15 +238,19 @@ class CTradeBase(object):
     @staticmethod
     def _allow_order_status(old, new):
         if old == 0:
-            # 0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消'
-            forbidden = [2]
+            # 0: u'待支付', 1: u'等待服务', 2: u'服务完成', 3: u'申请退款', 4: u'退款中', 5: u'交易关闭'
+            allow = [1]
         elif old == 1:
-            forbidden = [0]
+            allow = [2, 4]
         elif old == 2:
-            forbidden = [0, 1]
+            allow = []
+        elif old == 3:
+            allow = [2, 4]
+        elif old == 4:
+            allow = [5]
         else:
-            forbidden = [0, 1, 2, 3]
-        if new in forbidden:
+            allow = [0, 1, 2, 3, 4, 5]
+        if new not in allow:
             raise PARAMS_ERROR(u'状态不合理, 当前状态为: {} '
                                u''.format(SERVER_STATUS.get(old)))
 
@@ -217,8 +269,8 @@ class CMoverTrade(CTradeBase):
         if is_tourist():
             return TOKEN_ERROR(u'请登录后预约')
         required = ('smsid', 'umtstarttime', 'umtmoveoutaddr', 'umtmoveinaddr',
-                    'umtmoveoutlocation', 'umtmoveinlocation', 'umtphone', 'umtspecialwish', 'umtpreviewprice')
-        data = parameter_required(required, others='ignore')
+                    'umtmoveoutlocation', 'umtmoveinlocation', 'umtphone', 'umtpreviewprice')
+        data = parameter_required(required, others='allow')
         # 是否存在这个服务
         mover_exsits = self.sserver.get_mover_by_smsid(data.get('smsid'))
         if not mover_exsits:
@@ -267,53 +319,37 @@ class CMoverTrade(CTradeBase):
             'umtid': umtid
         })
 
-    def cancle_moverorder(self):
+    def user_cancle_moverorder(self):
         """用户取消订单"""
-        # todo
         if is_tourist():
             return TOKEN_ERROR(u'请先登录')
         if is_admin():
             return TOKEN_ERROR(u'请使用普通用户登录')
-
-    def point_staff(self):
-        """给订单指定工作人员"""
-        if is_admin():
-            raise TOKEN_ERROR(u'请使用管理员登录')
-        data = parameter_required(('stfid', ))
-        stfid = data.get('stfid')
-        staff = self.suser.get_staff_by_stfid(stfid)
-        if not staff:
-            raise NOT_FOUND(u'不存在的工作人员')
-        if staff.STFisblocked:
-            raise NOT_FOUND(u'黑名单里的工作人员')
-        response = {'stfid': stfid}
-        # 如果是搬家服务
-        if 'umtid' in data:
-            umtid = data.get('umtid')
-            updated = self.strade.update_movertrade_detail_by_umtid(umtid, {
-                'STFid': stfid
+        data = parameter_required(('umtid', ))
+        umtid = data.get('umtid')
+        usid = request.user.id
+        mover_order = self.strade.get_mover_order_by_umtid(umtid)
+        if mover_order.USid != usid:  # 判断订单是否是该用户的
+            raise NOT_FOUND(u'他人订单')
+        if mover_order.UMTstatus == 0:  # 如果订单状态是未付款
+            canceled = self.strade.update_movertrade_detail_by_umtid(umtid, {
+                'UMTstatus': 5  # 交易关闭
             })
-            response['type'] = 'mover'
-        elif 'uftid' in data:
-            # 如果是维修
-            uftid = data.get('uftid')
-            updated = self.strade.update_fixerorder_detail_by_uftid(uftid, {
-                'STFid': stfid
+            msg = u'操作完成' if canceled else u'无此记录'
+        elif mover_order.UMTstatus == 1:  # 订单状态是付款成功后的等待服务
+            apply_forrefund = self.strade.update_movertrade_detail_by_umtid(umtid, {
+                'UMTstatus': 3  # 申请退款中
             })
-            response['type'] = 'fixer'
-        elif 'uctid' in data:
-            # 如果是保洁
-            uctid = data.get('uctid')
-            updated = self.strade.update_cleanorder_detail_by_uctid(uctid, {
-                'STFid': stfid
-            })
-            response['type'] = 'cleaner'
+            msg = u'操作完成' if apply_forrefund else u'无此记录'
+        elif mover_order.UMTstatus == 3:
+            raise PARAMS_ERROR(u'正在申请退款中')
+        elif mover_order.UMTstatus == 4:
+            raise PARAMS_ERROR(u'退款中')
         else:
-            # 其他 参数有误
-            raise PARAMS_ERROR(u'订单参数有误')
-        msg = u'更新成功' if updated else u'无此记录'
-        return Success(msg, response)
-
+            raise PARAMS_ERROR(u'服务已完成或已关闭')
+        return Success(msg, {
+            'umtid': umtid
+        })
 
 
 class CCleanerTrade(CTradeBase):
@@ -324,7 +360,7 @@ class CCleanerTrade(CTradeBase):
             raise TOKEN_ERROR(u'普通用户才可以预约')
         if is_tourist():
             raise TOKEN_ERROR(u'请登录后预约')
-        required = ('sceid', 'uctpreviewstarttime', 'uctaddr', 'uctpreviewlastingtime', 'uctphone', 'uctprice', 'uctspecialwish', 'uctlocation')
+        required = ('sceid', 'uctpreviewstarttime', 'uctaddr', 'uctpreviewlastingtime', 'uctphone', 'uctprice', 'uctlocation')
         data = parameter_required(required, others='ignore')
         cleaner_exists = self.sserver.get_cleanerserver_by_sceid(data.get('sceid'))
         if not cleaner_exists:
@@ -339,7 +375,7 @@ class CCleanerTrade(CTradeBase):
         return Success(u'预约成功', modelbean_dict)
 
     def update_cleanorder_status(self):
-        """"""
+        """待改进"""
         if not is_admin():
             raise TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('uctid', 'status'))

@@ -27,6 +27,8 @@ class ATrade(Resource):
             'update_provide_house': self.ctrade.update_provide_house_status,
             # 给订单制定工作人员
             'point_staff': self.ctrade.point_staff,
+            # 用户取消订单
+            'user_cancle_moverorder': self.ctrade.user_cancle_moverorder,
         }
         return apis
 
