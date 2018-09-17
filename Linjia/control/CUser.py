@@ -319,9 +319,18 @@ class CUser():
             user.USgender = GENDER_CONFIG.get(user.USgender)
         return Success(u'获取用户列表成功', user_list)
 
-
+    def get_one_housekeeper(self):
+        """获取一个管家"""
+        staff_list = self.suser.get_staff_list(level=0)  # level 0 表示管家
+        # 暂定为随机获取一个管家
+        staff = random.choice(staff_list)
+        staff.clean.add('STFid', 'STFname', 'STFphone', 'STFgender')
+        return Success(u'获取成功', {
+            'housekeeper': staff
+        })
 
     def _async_send_code(self, phone):
+        """发送验证码"""
         headers = {
             'Authorization': auth_key
         }

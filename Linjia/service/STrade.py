@@ -72,6 +72,11 @@ class STrade(SBase):
         if status:
             provide_list = provide_list.filter(ProvideHouseApply.PAHstatus==status)
         return provide_list.order_by(ProvideHouseApply.PHAcreatetime).all_with_page(page, count)
+
+    @close_session
+    def updaet_provideapply(self, phaid, data):
+        """更新房源申请的状态"""
+        return self.session.query(ProvideHouseApply).filter(ProvideHouseApply.PHAid == phaid).update(data)
     
     @close_session
     def update_fixertrade_status_by_utfid(self, utfid, status):

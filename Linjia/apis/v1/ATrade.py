@@ -23,6 +23,8 @@ class ATrade(Resource):
             'update_fixorder_price': self.ctrade.update_fixorder_price,
             'update_cleanerorder_price': self.ctrade.update_cleanerorder_price,
             'update_moverorder_price': self.ctrade.update_moverorder_price,
+            # 修改申请房源的状态
+            'update_provide_house': self.ctrade.update_provide_house_status,
         }
         return apis
 

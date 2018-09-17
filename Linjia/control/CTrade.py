@@ -227,6 +227,20 @@ class CTrade(object):
             'provide': provice_house_list
         })
 
+    def update_provide_house_status(self):
+        """更新设置申请列表的状态"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('phaid', 'pahstatus'))
+        phaid = data.get('phaid')
+        updated = self.strade.updaet_provideapply(phaid, {
+            'PAHstatus': data.get('pahstatus')
+        })
+        msg = u'修改成功' if updated else u'无此记录'
+        return Success(msg, {
+            'phaid': phaid
+        })
+
     def get_appointment_list(self):
         """后台获取预约列表"""
         # 此处将改用for循环 todo

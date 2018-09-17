@@ -15,7 +15,8 @@ class AUser(Resource):
             'staff_list': self.cuser.get_staff_list,
             'get_staff': self.cuser.get_staff_by_id,
             'get_admin_list': self.cuser.get_admin_list,
-            'get_user_list': self.cuser.get_user_list
+            'get_user_list': self.cuser.get_user_list,
+            'get_one_housekeeper': self.cuser.get_one_housekeeper,
         }
         return apis
 
