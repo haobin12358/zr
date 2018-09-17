@@ -51,11 +51,14 @@ class AGuide(Resource):
     def get(self, guide):
         apis = {
             'get_list': self.cguide.get_list,
+            'get_guide': self.cguide.get_guide,
         }
         return apis
     
     def post(self, guide):
         apis = {
             'add_guide': self.cguide.add_customerguide,
+            'update_guide': self.cguide.update_guide,
+            'delete_guide': self.cguide.delete_guide,
         }
         return apis

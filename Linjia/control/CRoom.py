@@ -540,3 +540,45 @@ class CGuide(CRoom):
         return Success(u'获取列表成功', {
             'guides': guide_list
         })
+
+    def update_guide(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('cgid', ), forbidden=('CGisdelete', ))
+        cgid = data.get('cgid')
+        update_data = {
+            'CGtitle': data.get('cgtitle'),
+            'CGtext': data.get('cgtext'),
+            'CGsort': data.get('cgsort'),
+        }
+        update_data = {k: v for k, v in update_data.items() if v is not None}
+        updated = self.sroom.update_guide(cgid, update_data)
+        msg = u'更新成功' if updated else u'无此记录'
+        return Success(msg, {
+            'cgid': cgid
+        })
+
+    def delete_guide(self):
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('cgid', ))
+        cgid = data.get('cgid')
+        deleted = self.sroom.update_guide(cgid, {
+            'CGisdelete': True
+        })
+        msg = u'删除成功' if deleted else u'无此记录'
+        return Success(msg, {
+            'cgid': cgid
+        })
+        
+    def get_guide(self):
+        data = parameter_required(('cgid', ))
+        cgid = data.get('cgid')
+        guide = self.sroom.get_guide_by_cgid(cgid)
+        if not guide:
+            raise NOT_FOUND(u'不存在的指南')
+        guide.hide('CGisdelete')
+        return Success(u'获取指南成功', {
+            'guide': guide
+        })
+

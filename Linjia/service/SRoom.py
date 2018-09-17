@@ -184,4 +184,16 @@ class SRoom(SBase):
     
     @close_session
     def get_guide_list(self):
+        """获取入住指南"""
         return self.session.query(CustomerGuide).filter_by(CGisdelete=False).all()
+
+    @close_session
+    def update_guide(self, cgid, data):
+        """更新入住指南"""
+        return self.session.query(CustomerGuide).filter_by(CGid=cgid).update(data)
+
+    @close_session
+    def get_guide_by_cgid(self, cgid):
+        """获取guide"""
+        return self.session.query(CustomerGuide).filter_by(CGid=cgid).first()
+
