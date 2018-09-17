@@ -12,7 +12,7 @@ class AUser(Resource):
         apis = {
             # 'wechat_login': self.cuser.wechat_login,
             # 'weixin_callback': self.cuser.weixin_callback,
-            'staff_list': self.cuser.get_staff_list,
+            'staff_list': self.cuser.get_staff_list,  # 员工
             'get_staff': self.cuser.get_staff_by_id,
             'get_admin_list': self.cuser.get_admin_list,
             'get_user_list': self.cuser.get_user_list,
@@ -21,7 +21,7 @@ class AUser(Resource):
         return apis
 
     def post(self, user):
-        apis ={
+        apis = {
             'admin_login': self.cuser.admin_login,
             'get_code': self.cuser.get_code,
             'login': self.cuser.login,

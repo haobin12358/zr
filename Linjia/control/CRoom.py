@@ -220,8 +220,8 @@ class CRoom(BaseRoomControl):
 
     def add_room(self):
         """添加房源"""
-        # if not is_admin():
-        #     raise TOKEN_ERROR(u'请使用管理员登录')
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
         required = ('roname', 'roimage', 'roareanum', 'roface', 'roarea', 'roshowprice', 'roshowpriceunit',
                     'rorenttype', 'rodecorationstyle', 'rocitynum', 'roareanum', 'rosubwayaround',
                      'house', 'villegeid', 'medias')
@@ -276,6 +276,8 @@ class CRoom(BaseRoomControl):
 
     def update_room(self):
         """更新房源信息"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('roid', ))
         roid = data.get('roid')
         # 房源主体的参数
@@ -365,6 +367,8 @@ class CRoom(BaseRoomControl):
 
     def delete_room(self):
         """删除房源"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('roid', ))
         roid = data.get('roid')
         deleted = self.sroom.delete_room_by_roid(roid)
@@ -377,6 +381,8 @@ class CRoom(BaseRoomControl):
 
     def add_bedroom(self):
         """添加卧室, 以及卧室入住信息"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('roid', 'bbrnum'), forbidden=('bbrid', 'bbrstatus'))
         room = self.sroom.get_room_by_roid(data.get('roid'))
         mod = {}
@@ -404,6 +410,8 @@ class CRoom(BaseRoomControl):
     
     def update_bedroom(self):
         """更新卧室信息, 比如改为已租出, 或者价格之类"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('bbrid', ))
         bbrid = data.pop('bbrid')
         bedroom = self.sroom.get_bedroom_by_bbrid(bbrid)
@@ -445,6 +453,8 @@ class CRoom(BaseRoomControl):
 
     def delete_bedroom(self):
         """删除卧室"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('bbrid', ))
         deleted = self.sroom.update_bedroom_by_bbrid(data.get('bbrid'), {
             'BBRisdelete': 1
@@ -456,6 +466,8 @@ class CRoom(BaseRoomControl):
 
     def add_villegetinfo(self):
         """添加小区信息"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('city_id', 'name', ), forbidden=('id', ))
         data['id'] = str(uuid.uuid4())
         if 'subway' not in data:
@@ -465,6 +477,8 @@ class CRoom(BaseRoomControl):
 
     def update_villeginfo(self):
         """修改小区信息"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('id', ))
         updated = self.sroom.update_villege_info(data.get('id'), data)
         msg = u'更新成功' if updated else u'无此记录'

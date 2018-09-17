@@ -75,9 +75,6 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             'sisid': data['SISid']
         })
 
-
-
-
     def delete_banner_show(self):
         """删除轮播"""
         if not is_admin():

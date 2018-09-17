@@ -410,6 +410,15 @@ class CTrade(object):
             'umtid': umtid
         })
 
+    def cancle_moverorder(self):
+        """用户取消订单"""
+        if is_tourist():
+            return TOKEN_ERROR(u'请先登录')
+        if is_admin():
+            return TOKEN_ERROR(u'请使用普通用户登录')
+
+
+
     def update_moverorder_price(self):
         """更新订单价格"""
         if not is_admin():
