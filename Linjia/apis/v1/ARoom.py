@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from Linjia.commons.base_resource import Resource
-from Linjia.control import CRoom
+from Linjia.control import CRoom, CGuide
 
 
 class ARoom(Resource):
@@ -40,5 +40,22 @@ class ARoom(Resource):
             'delete_room_city': self.croom.del_room_opencity,
             'add_hot_city': self.croom.add_hot_city,  # 热门城市
             'cancle_hot_city': self.croom.cancle_hot_city,
+        }
+        return apis
+
+
+class AGuide(Resource):
+    def __init__(self):
+        self.cguide = CGuide()
+
+    def get(self, guide):
+        apis = {
+            'get_list': self.cguide.get_list,
+        }
+        return apis
+    
+    def post(self, guide):
+        apis = {
+            'add_guide': self.cguide.add_customerguide,
         }
         return apis

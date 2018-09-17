@@ -34,12 +34,12 @@ def error_handler(app):
         else:
             if not app.debug:
                 return SYSTEM_ERROR()
-            raise Exception(traceback.format_exc().decode('unicode-escape'))
+            raise Exception(traceback.format_exc())
 
     def generic_log(e):
         logger_file_name = datetime.now().strftime("%Y-%m-%d") + u'.log'
         logger_dir = os.path.join(BASEDIR, 'logs', logger_file_name)
-        handler = logging.FileHandler(logger_dir, encoding='UTF-8')
+        handler = logging.FileHandler(logger_dir)
         data = traceback.format_exc()
         logging_format = logging.Formatter(
             # "%(asctime)s - %(levelname)s - %(filename)s \n- %(funcName)s - %(lineno)s - %(message)s"
@@ -48,7 +48,7 @@ def error_handler(app):
         handler.setFormatter(logging_format)
         app.logger.addHandler(handler)
         app.logger.info('>>>>>>>>>>>>>>>>>>bug<<<<<<<<<<<<<<<<<<<')
-        app.logger.error(data.decode('unicode-escape'))
+        app.logger.error(data)
         app.logger.info('request.url is {}'.format(request.url))
         app.logger.info('request.data is {} '.format(request.data))
         app.logger.info('request.args is {} '.format(request.args))

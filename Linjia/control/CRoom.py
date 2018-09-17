@@ -519,3 +519,24 @@ class CRoom(BaseRoomControl):
         return Success(msg, {
             'city_id': city_id
         })
+    
+
+class CGuide(CRoom):
+    """入住指南"""
+    def add_customerguide(self):
+        """添加入住指南"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('cgtitle', 'cgtext', 'cgsort'), forbidden=('cgid', ))
+        data['cgid'] = str(uuid.uuid4())
+        added = self.sroom.add_model('CustomerGuide', data)
+        return Success(u'添加成功', {
+            'cgid': data.get('cgid')
+        })
+
+    def get_list(self):
+        guide_list = self.sroom.get_guide_list()
+        map(lambda x: x.hide('CGisdelete'), guide_list)
+        return Success(u'获取列表成功', {
+            'guides': guide_list
+        })

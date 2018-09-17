@@ -210,6 +210,16 @@ class HomeStayCopywriting(Base):
     HSCindex = Column(Integer, comment=u'文案编号')
 
 
+class CustomerGuide(Base):
+    """入住指南"""
+    __tablename__ = 'custormerguide'
+    CGid = Column(String(64), primary_key=True)
+    CGtitle = Column(String(64), nullable=False, comment=u'标题')
+    CGtext = Column(Text, comment=u'文本内容')
+    CGsort = Column(Integer, comment=u'顺序标志')
+    CGisdelete = Column(Boolean, default=False, comment=u'是否删除')
+
+
 if __name__ == '__main__':
     obj = globals()
     filte_obj = list(filter(lambda x: x[0].isupper(), obj))

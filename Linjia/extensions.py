@@ -18,7 +18,7 @@ def reigster_extensions(app):
     wxlogin = WeixinLogin(APPID, APPSECRET)
     @msg.all
     def all_test(**kwargs):
-        print kwargs
+        print(kwargs)
         # 或者直接返回
         # return "all"
         return msg.reply(
@@ -37,17 +37,17 @@ def reigster_extensions(app):
 
     @msg.image
     def image(**kwargs):
-        print kwargs
+        print(kwargs)
         return "11111"
 
     @msg.subscribe
     def subscribe(**kwargs):
-        print kwargs
+        print(kwargs)
         return "11111"
 
     @msg.unsubscribe
     def unsubscribe(**kwargs):
-        print kwargs
+        print(kwargs)
         return "fdasfdsa"
 
     @app.route('/wechat/callback')

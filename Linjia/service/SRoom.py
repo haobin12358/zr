@@ -3,7 +3,7 @@ from sqlalchemy import or_, and_
 
 from Linjia.commons.base_service import SBase, close_session
 from Linjia.models import Room, House, UserSubslease, RoomEquirment, RoomMedia, RoomTag, Icon, JoinRoomBanner, \
-    HomeStayBanner, BedroomBehindRoom, UserBedroomBehindRoom, VillegeInfoAndSubway
+    HomeStayBanner, BedroomBehindRoom, UserBedroomBehindRoom, VillegeInfoAndSubway, CustomerGuide
 
 
 class SRoom(SBase):
@@ -181,3 +181,7 @@ class SRoom(SBase):
     def update_villege_info(self, viid, data):
         """更新小区信息"""
         return self.session.query(VillegeInfoAndSubway).filter(VillegeInfoAndSubway.id==viid).update(data)
+    
+    @close_session
+    def get_guide_list(self):
+        return self.session.query(CustomerGuide).filter_by(CGisdelete=False).all()

@@ -34,7 +34,7 @@ def close_session(fn):
             self.session.commit()
             return result
         except Exception as e:
-            print("DBERROR" + traceback.format_exc().decode('unicode-escape'))
+            print(u"DBERROR" + traceback.format_exc())
             # current_app.logger.error(traceback.format_exc().decode('unicode-escape'))
             self.session.rollback()
             # raise e
