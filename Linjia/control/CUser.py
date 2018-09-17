@@ -324,7 +324,7 @@ class CUser():
         staff_list = self.suser.get_staff_list(level=0)  # level 0 表示管家
         # 暂定为随机获取一个管家
         staff = random.choice(staff_list)
-        staff.clean.add('STFid', 'STFname', 'STFphone', 'STFgender')
+        staff.clean.add('STFid', 'STFname', 'STFmobiel', 'STFgender')
         return Success(u'获取成功', {
             'housekeeper': staff
         })
