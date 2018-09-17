@@ -281,9 +281,11 @@ class CMoverTrade(CTradeBase):
             raise TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('stfid', ))
         stfid = data.get('stfid')
-        staff = self.suer.get_staff_by_id(stfid)
+        staff = self.suser.get_staff_by_stfid(stfid)
         if not staff:
             raise NOT_FOUND(u'不存在的工作人员')
+        if staff.STFisblocked:
+            raise NOT_FOUND(u'黑名单里的工作人员')
         response = {'stfid': stfid}
         # 如果是搬家服务
         if 'umtid' in data:
@@ -291,25 +293,25 @@ class CMoverTrade(CTradeBase):
             updated = self.strade.update_movertrade_detail_by_umtid(umtid, {
                 'STFid': stfid
             })
-            msg = u'更新成功' if updated else u'无此记录'
-            response['umtid'] = umtid
+            response['type'] = 'mover'
         elif 'uftid' in data:
             # 如果是维修
             uftid = data.get('uftid')
             updated = self.strade.update_fixerorder_detail_by_uftid(uftid, {
                 'STFid': stfid
             })
-            response['uftid'] = uftid
+            response['type'] = 'fixer'
         elif 'uctid' in data:
             # 如果是保洁
             uctid = data.get('uctid')
             updated = self.strade.update_cleanorder_detail_by_uctid(uctid, {
-                'SFTid': stfid
+                'STFid': stfid
             })
-            response['uctid'] = uctid
+            response['type'] = 'cleaner'
         else:
             # 其他 参数有误
             raise PARAMS_ERROR(u'订单参数有误')
+        msg = u'更新成功' if updated else u'无此记录'
         return Success(msg, response)
 
 
