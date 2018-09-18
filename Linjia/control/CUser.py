@@ -151,8 +151,9 @@ class CUser():
         page = int(data.get('page', 1))
         count = int(data.get('count', 15))
         gender = int(data.get('gender')) if 'gender' in data else None
+        city_id = data.get('city_id')
         kw = data.get('kw')  # 员工姓名模糊搜索
-        staff_list = self.suser.get_staff_list(level, page, count, gender, kw)
+        staff_list = self.suser.get_staff_list(level, page, count, gender, city_id, kw)
         for staff in staff_list:
             setattr(staff,  'STFlevel', STAFF_TYPE.get(staff.STFlevel, u'其他'))
             setattr(staff, 'STFgender', GENDER_CONFIG.get(staff.STFgender, u'未知'))

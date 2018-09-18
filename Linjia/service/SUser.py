@@ -49,10 +49,10 @@ class SUser(SBase):
             return admin
 
     @close_session
-    def get_staff_list(self, level=None, page=None, count=None, gender=None, kw=None):
+    def get_staff_list(self, level=None, page=None, count=None, gender=None, city_id=None, kw=None):
         """获取工作人员列表"""
         filter_list = [Staff.STFgender == gender, Staff.STFlevel == level]
-        staff_list = self.session.query(Staff).filter(and_(*filter(lambda x: hasattr(x.right, 'value'), filter_list))).filter(Staff.STFisdelete==False)
+        staff_list = self.session.query(Staff).filter(and_(*filter(lambda x: hasattr(x.right, 'value'), filter_list))).filter(Staff.STFisdelete==False).filter_ignore_none_args(Staff.ADcityid==city_id)
         if kw is not None:
             staff_list = staff_list.filter(Staff.STFname.contains(kw))
         return staff_list.order_by(Staff.STFcreatetime).all_with_page(page, count)
@@ -66,6 +66,11 @@ class SUser(SBase):
     def get_staff_by_stfid(self, stfid):
         """根据id获取工作人员"""
         return self.session.query(Staff).filter(Staff.STFid==stfid, Staff.STFisdelete==False).first()
+
+    @close_session
+    def get_staff_by_city_id(self, city_id):
+        """获取城市内的工作人员"""
+        return self.session.query(Staff).filter(Staff.ADcityid==city_id, Staff.STFisdelete==False,Staff.STFisblocked==False).all()
 
     @close_session
     def delete_staff_by_stfid(self, stfid):

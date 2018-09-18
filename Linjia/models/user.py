@@ -83,6 +83,7 @@ class Staff(Base):
     STFgender = Column(Integer, comment=u'性别, 0 男, 1 女')
     STFlevel = Column(Integer, default=0, comment=u'员工类型, 0 管家, 1 搬家工, 2清洁工, 3维修')
     ADaddressnum = Column(String(16), comment=u'负责区域编号')
+    ADcityid = Column(String(16), comment=u'负责城市id')
     APid = Column(String(64), comment=u'单独负责某个公寓')  # 不存在则为空
     ADdesc = Column(Text, comment=u'个人简述')
     STFcreatetime = Column(String(16), comment=u'创建时间')

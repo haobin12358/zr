@@ -98,6 +98,7 @@ class UserMoveTrade(Base):
     UMTtrueprice = Column(Float, comment=u'实收价格')
     UMTcreatetime = Column(String(16), comment=u'提交预约时间')
     STFid = Column(String(64), comment=u'搬家师傅')  # 需要
+    Citynum = Column(String(16), comment=u'城市编号')
 
 
 class UserCleanTrade(Base):
@@ -117,6 +118,7 @@ class UserCleanTrade(Base):
     UCTstatus = Column(Integer, default=0, comment=u'订单状态,0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消')  # 0: u'待支付', 1: u'等待服务', 2: u'服务完成', 3: u'退款中', 4: u'交易关闭'
     UCTcreatetime = Column(String(16), comment=u'提交预约时间')
     STFid = Column(String(64), comment=u'保洁人员')  # 需要
+    Citynum = Column(String(16), comment=u'城市编号')
 
     # UCTtruestarttime = Column(String(16), comment=u'实际上门时间')
     # UCTtrueendtime = Column(String(16), comment=u'工作人员离开时间')
@@ -137,6 +139,7 @@ class UserFixerTrade(Base):
     UFTstatus = Column(Integer, default=0, comment=u'订单状态,0: 待支付, 1: 等待服务, 2: 服务完成, 3: 取消')  # 0: u'待支付', 1: u'等待服务', 2: u'服务完成', 3: u'退款中', 4: u'交易关闭'
     UFTcreatetime = Column(String(16), comment=u'提交预约时间')
     STFid = Column(String(64), comment=u'保洁人员')  # 需要
+    Citynum = Column(String(16), comment=u'城市编号')
 
 
 class HomeStayComment(Base):

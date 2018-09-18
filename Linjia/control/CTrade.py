@@ -122,7 +122,7 @@ class CTradeBase(object):
             map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr',
                                       'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish',
                                       'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid',
-                                      'UMTcreatetime'), order_list)
+                                      'UMTcreatetime', 'Citynum'), order_list)
             map(lambda x: x.fill(SERVER_STATUS.get(x.UMTstatus), 'umtstatus'), order_list)
             map(lambda x: x.fill(self.sserver.get_mover_by_smsid(x.SMSid).SMStitle, 'name'), order_list)
             map(lambda x: x.fill('mover', 'type'), order_list)
@@ -150,11 +150,10 @@ class CTradeBase(object):
                 start = end
             order_list = order_list[start: end]
             # 搬家
-
             map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr',
                                       'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish',
                                       'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid',
-                                      'UMTcreatetime'), mover_order_list)
+                                      'UMTcreatetime', 'Citynum'), mover_order_list)
             map(lambda x: x.fill(getattr(self.sserver.get_mover_by_smsid(x.SMSid), 'SMStitle', u'未知'), 'name'),
                 mover_order_list)
             map(lambda x: x.fill('mover', 'type'), mover_order_list)
@@ -174,6 +173,14 @@ class CTradeBase(object):
             order_list = sorted(order_list, key=lambda x: x.createtime)
             request.page_count = math.ceil(float(len_order_list) / page_size)
             request.all_count = len_order_list
+            order_list = sorted(order_list, key=lambda x: x.createtime)
+        for order in order_list:
+            stfid = order.STFid
+            staff = {}
+            if stfid:
+                staff = self.suser.get_staff_by_stfid(stfid).clean.add('STFid', 'STFname')
+            setattr(order, 'staff', staff)
+            order.add('staff')
         return Success(u'获取列表成功', order_list)
 
     def point_staff(self):
@@ -280,6 +287,8 @@ class CMoverTrade(CTradeBase):
         data['UMTid'] = str(uuid.uuid4())
         data['usid'] = request.user.id
         data['UMTcreatetime'] = datetime.strftime(datetime.now(), format_for_db)
+        umtmoveoutlocation = data.get('umtmoveoutlocation')
+        data['Citynum'] = BdMap(umtmoveoutlocation).city_id
         model_bean_dict = self.strade.add_model('UserMoveTrade', data, ['UMTstarttime', 'UMTid'])
         model_bean_dict['name'] = mover_exsits.SMStitle
         return Success(u'预约成功', model_bean_dict)
@@ -370,6 +379,8 @@ class CCleanerTrade(CTradeBase):
         data['uctid'] = str(uuid.uuid4())
         data['usid'] = request.user.id
         data['UCTcreatetime'] = datetime.strftime(datetime.now(), format_for_db)
+        uctlocation = data.get('uctlocation')
+        data['Citynum'] = BdMap(uctlocation).city_id  # 获取城市id
         modelbean_dict = self.sserver.add_model('UserCleanTrade', data, ['UCTpreviewstarttime', 'UCTid'])
         modelbean_dict['name'] = cleaner_exists.SCMtitle
         return Success(u'预约成功', modelbean_dict)
@@ -426,6 +437,8 @@ class CFixerTrade(CTradeBase):
         data['UFTid'] = str(uuid.uuid4())
         data['usid'] = request.user.id
         data['UFTcreatetime'] = datetime.strftime(datetime.now(), format_for_db)
+        uftlocation = data.get('uftlocation')
+        data['Citynum'] = BdMap(uftlocation).city_id  # 获取城市id
         model_bean_dict = self.sserver.add_model('UserFixerTrade', data, ['UFTid', 'UFTstarttime'])
         model_bean_dict['name'] = u'维修预约'
         return Success(u'预约成功', model_bean_dict)
