@@ -31,6 +31,10 @@ class ATrade(Resource):
             'user_cancle_moverorder': self.ctrade.user_cancle_moverorder,
             'user_cancle_fixerordder': self.ctrade.user_cancle_fixer_order,
             'user_cancle_cleanerorder': self.ctrade.user_cancle_cleaner_order,
+            # 同意用户取消订单
+            'agree_cancle_mover_order': self.ctrade.agree_cancle_mover_order,
+            'agree_cancel_clean_order': self.ctrade.agree_cancle_cleaner_order,
+            'agree_cancel_fixer_order': self.ctrade.agree_cancle_fixer_order,
         }
         return apis
 
@@ -40,5 +44,6 @@ class ATrade(Resource):
             'get_complaint_list': self.ctrade.get_complaint_list,
             'get_provide_house_list': self.ctrade.get_provide_house_list,
             'get_appointment_list': self.ctrade.get_appointment_list,
+            'get_appointment_one': self.ctrade.get_appointment_one,
         }
         return apis

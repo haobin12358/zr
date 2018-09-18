@@ -32,6 +32,8 @@ class CTradeBase(object):
         data['page_num'] = int(data.get('page', 1))
         data['page_size'] = int(data.get('count', 15))
         usid = data.get('usid')
+        status = data.get('status')
+        data['status'] = status
         server_type = data.get('type')
         if server_type == 'mover':
             order_list = self.strade.get_mover_serverlist_by_usid(usid, data)
@@ -59,9 +61,9 @@ class CTradeBase(object):
                 setattr(clean_order, 'createtime', clean_order.UCTcreatetime)
                 clean_order.fill('cleaner', 'type')
         else:
-            mover_order_list = self.strade.get_mover_serverlist_by_usid(usid)
-            fixer_order_list = self.strade.get_fixer_serverlist_by_usid(usid)
-            cleaner_list = self.strade.get_clean_serverlist_by_usid(usid)
+            mover_order_list = self.strade.get_mover_serverlist_by_usid(usid, {'status': status})
+            fixer_order_list = self.strade.get_fixer_serverlist_by_usid(usid, {'status': status})
+            cleaner_list = self.strade.get_clean_serverlist_by_usid(usid, {'status': status})
             order_list = mover_order_list + fixer_order_list + cleaner_list
             len_order_list = len(order_list)
             page_size = data['page_size']
@@ -183,6 +185,47 @@ class CTradeBase(object):
             order.add('staff')
         return Success(u'获取列表成功', order_list)
 
+    def get_appointment_one(self):
+        """获取单条订单"""
+        if is_tourist():
+            raise TOKEN_ERROR(u'请登录')
+        data = parameter_required()
+        if 'uctid' in data:
+            uctid = data.get('uctid')
+            order = self.strade.get_clean_order_by_uctid(uctid)
+            if not order:
+                raise NOT_FOUND(u'该订单不存在')
+            order.UCTstatus = SERVER_STATUS.get(order.UCTstatus)
+        elif 'uftid' in data:
+            uftid = data.get('uftid')
+            order = self.strade.get_fixer_order_by_uftid(uftid)
+            if not order:
+                raise NOT_FOUND(u'该订单不存在')
+            order.UFTstatus = SERVER_STATUS.get(order.UFTstatus)
+        elif 'umtid' in data:
+            umtid = data.get('umtid')
+            order = self.strade.get_mover_order_by_umtid(umtid)
+            if not order:
+                raise NOT_FOUND(u'该订单不存在')
+            order.UMTstatus = SERVER_STATUS.get(order.UMTstatus)
+        else:
+            return PARAMS_ERROR()
+        if not is_admin():
+            if request.user.id != order.USid:
+                raise NOT_FOUND(u'它人订单')
+        # 工作人员
+        staff = {}
+        stfid = order.STFid
+        if stfid:
+            staff = self.suser.get_staff_by_stfid(stfid).clean.add('STFid', 'STFname')
+        order.fill(staff, 'staff')
+        return Success(u'获取订单成功', {
+            'order': order
+        })
+ 
+
+
+
     def point_staff(self):
         """给订单指定工作人员"""
         if not is_admin():
@@ -293,7 +336,9 @@ class CMoverTrade(CTradeBase):
         model_bean_dict['name'] = mover_exsits.SMStitle
         return Success(u'预约成功', model_bean_dict)
 
+    #  暂时不用
     def update_moverorder_status(self):
+        """更改订单状态就"""
         if not is_admin():
             raise TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('umtid', 'status'))
@@ -357,6 +402,26 @@ class CMoverTrade(CTradeBase):
         else:
             raise PARAMS_ERROR(u'服务已完成或已关闭')
         return Success(msg, {
+            'umtid': umtid
+        })
+
+    def agree_cancle_mover_order(self):
+        """管理员同意执行退款"""
+        if not is_admin():
+            return TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('umtid', ))
+        umtid = data.get('umtid')
+        mover_order = self.strade.get_mover_order_by_umtid(umtid)
+        if not mover_order:
+            raise NOT_FOUND(u'不存在的订单')
+        if mover_order.UMTstatus != 3:
+            raise PARAMS_ERROR(u'当前状态为{}'.format(SERVER_STATUS.get(mover_order.UMTstatus, u'其他')))
+        # 修改服务状态为退款中
+        updated = self.strade.update_movertrade_detail_by_umtid(umtid, {
+            'UMTstatus': 4
+        })
+        # 调用退款接  todo
+        return Success(u'已进入退款状态', {
             'umtid': umtid
         })
 
@@ -454,6 +519,27 @@ class CCleanerTrade(CTradeBase):
             'uctid': uctid
         })
 
+    def agree_cancle_cleaner_order(self):
+        """管理员同意执行退款"""
+        if not is_admin():
+            return TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('uctid', ))
+        uctid = data.get('uctid')
+        order = self.strade.get_clean_order_by_uctid(uctid)
+        if not order:
+            raise NOT_FOUND(u'不存在的订单')
+        if order.UCTstatus != 3:
+            raise PARAMS_ERROR(u'当前状态为{}'.format(SERVER_STATUS.get(order.UCTstatus, u'其他')))
+        # 修改服务状态为退款中
+        updated = self.strade.update_cleanorder_detail_by_uctid(uctid, {
+            'UCTstatus': 4
+        })
+        # 调用退款接  todo
+        return Success(u'已进入退款状态', {
+            'uctid': uctid
+        })
+
+
 
 class CFixerTrade(CTradeBase):
     """维修"""
@@ -543,6 +629,26 @@ class CFixerTrade(CTradeBase):
         else:
             raise PARAMS_ERROR(u'服务已完成或已关闭')
         return Success(msg, {
+            'uftid': uftid
+        })
+
+    def agree_cancle_fixer_order(self):
+        """管理员同意执行退款"""
+        if not is_admin():
+            return TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('uftid', ))
+        uftid = data.get('uftid')
+        order = self.strade.get_fixer_order_by_uftid(uftid)
+        if not order:
+            raise NOT_FOUND(u'不存在的订单')
+        if order.UFTstatus != 3:
+            raise PARAMS_ERROR(u'当前状态为{}'.format(SERVER_STATUS.get(order.UFTstatus, u'其他')))
+        # 修改服务状态为退款中
+        updated = self.strade.update_fixerorder_detail_by_uftid(uftid, {
+            'UFTstatus': 4
+        })
+        # 调用退款接  todo
+        return Success(u'已进入退款状态', {
             'uftid': uftid
         })
 
