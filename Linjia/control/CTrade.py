@@ -420,6 +420,40 @@ class CCleanerTrade(CTradeBase):
             'uctid': uctid
         })
 
+    def user_cancle_cleaner_order(self):
+        """用户取消保洁订单"""
+        if is_tourist():
+            return TOKEN_ERROR(u'请先登录')
+        if is_admin():
+            return TOKEN_ERROR(u'请使用普通用户登录')
+        data = parameter_required(('uctid', ))
+        uctid = data.get('uctid')
+        usid = request.user.id
+        order = self.strade.get_clean_order_by_uctid(uctid)
+        if not order:
+            raise NOT_FOUND(u'没有该订单')
+        if order.USid != usid:  # 判断订单是否是该用户的
+            raise NOT_FOUND(u'他人订单')
+        if order.UCTstatus == 0:  # 如果订单状态是未付款
+            canceled = self.strade.update_cleanorder_detail_by_uctid(uctid, {
+                'UCTstatus': 5  # 交易关闭
+            })
+            msg = u'操作完成' if canceled else u'无此记录'
+        elif order.UCTstatus == 1:  # 订单状态是付款成功后的等待服务
+            apply_forrefund = self.strade.update_cleanorder_detail_by_uctid(uctid, {
+                'UCTstatus': 3  # 申请退款中
+            })
+            msg = u'操作完成' if apply_forrefund else u'无此记录'
+        elif order.UCTstatus == 3:
+            raise PARAMS_ERROR(u'正在申请退款中')
+        elif order.UCTstatus == 4:
+            raise PARAMS_ERROR(u'退款中')
+        else:
+            raise PARAMS_ERROR(u'服务已完成或已关闭')
+        return Success(msg, {
+            'uctid': uctid
+        })
+
 
 class CFixerTrade(CTradeBase):
     """维修"""
@@ -475,6 +509,40 @@ class CFixerTrade(CTradeBase):
             'UFTprice': data.get('price')
         })
         return Success(u'修改成功', {
+            'uftid': uftid
+        })
+
+    def user_cancle_fixer_order(self):
+        """用户取消维修订单"""
+        if is_tourist():
+            return TOKEN_ERROR(u'请先登录')
+        if is_admin():
+            return TOKEN_ERROR(u'请使用普通用户登录')
+        data = parameter_required(('uftid', ))
+        uftid = data.get('uftid')
+        usid = request.user.id
+        order = self.strade.get_fixer_order_by_uftid(uftid)
+        if not order:
+            raise NOT_FOUND(u'没有该订单')
+        if order.USid != usid:  # 判断订单是否是该用户的
+            raise NOT_FOUND(u'他人订单')
+        if order.UFTstatus == 0:  # 如果订单状态是未付款
+            canceled = self.strade.update_fixerorder_detail_by_uftid(uftid, {
+                'UFTstatus': 5  # 交易关闭
+            })
+            msg = u'操作完成' if canceled else u'无此记录'
+        elif order.UFTstatus == 1:  # 订单状态是付款成功后的等待服务
+            apply_forrefund = self.strade.update_fixerorder_detail_by_uftid(uftid, {
+                'UFTstatus': 3  # 申请退款中
+            })
+            msg = u'操作完成' if apply_forrefund else u'无此记录'
+        elif order.UFTstatus == 3:
+            raise PARAMS_ERROR(u'正在申请退款中')
+        elif order.UFTstatus == 4:
+            raise PARAMS_ERROR(u'退款中')
+        else:
+            raise PARAMS_ERROR(u'服务已完成或已关闭')
+        return Success(msg, {
             'uftid': uftid
         })
 

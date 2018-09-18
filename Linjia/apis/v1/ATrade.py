@@ -29,6 +29,8 @@ class ATrade(Resource):
             'point_staff': self.ctrade.point_staff,
             # 用户取消订单
             'user_cancle_moverorder': self.ctrade.user_cancle_moverorder,
+            'user_cancle_fixerordder': self.ctrade.user_cancle_fixer_order,
+            'user_cancle_cleanerorder': self.ctrade.user_cancle_cleaner_order,
         }
         return apis
 
