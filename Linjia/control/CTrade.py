@@ -406,22 +406,30 @@ class CMoverTrade(CTradeBase):
         })
 
     def agree_cancle_mover_order(self):
-        """管理员同意执行退款"""
+        """管理员同意执行退款/ 或拒绝执行退款"""
         if not is_admin():
             return TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('umtid', ))
+        agree = int(data.get('agree', 1))
         umtid = data.get('umtid')
         mover_order = self.strade.get_mover_order_by_umtid(umtid)
         if not mover_order:
             raise NOT_FOUND(u'不存在的订单')
         if mover_order.UMTstatus != 3:
             raise PARAMS_ERROR(u'当前状态为{}'.format(SERVER_STATUS.get(mover_order.UMTstatus, u'其他')))
-        # 修改服务状态为退款中
+        # 拒绝退款:
+        if agree == 0:
+            status = 1
+            msg = u'已拒绝退款'
+        # 同意退款
+        else:
+            status = 4
+            msg = u'已同意退款'
         updated = self.strade.update_movertrade_detail_by_umtid(umtid, {
-            'UMTstatus': 4
+            'UMTstatus': status
         })
         # 调用退款接  todo
-        return Success(u'已进入退款状态', {
+        return Success(msg, {
             'umtid': umtid
         })
 
@@ -525,14 +533,24 @@ class CCleanerTrade(CTradeBase):
             return TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('uctid', ))
         uctid = data.get('uctid')
+        agree = int(data.get('agree', 1))
         order = self.strade.get_clean_order_by_uctid(uctid)
         if not order:
             raise NOT_FOUND(u'不存在的订单')
         if order.UCTstatus != 3:
             raise PARAMS_ERROR(u'当前状态为{}'.format(SERVER_STATUS.get(order.UCTstatus, u'其他')))
+         # 拒绝退款:
+        if agree == 0:
+            status = 1
+            msg = u'已拒绝退款'
+        # 同意退款
+        else:
+            status = 4
+            msg = u'已同意退款'
+        # 拒绝退款
         # 修改服务状态为退款中
         updated = self.strade.update_cleanorder_detail_by_uctid(uctid, {
-            'UCTstatus': 4
+            'UCTstatus': status
         })
         # 调用退款接  todo
         return Success(u'已进入退款状态', {
@@ -637,18 +655,27 @@ class CFixerTrade(CTradeBase):
         if not is_admin():
             return TOKEN_ERROR(u'请使用管理员登录')
         data = parameter_required(('uftid', ))
+        agree = int(data.get('agree', 1))
         uftid = data.get('uftid')
         order = self.strade.get_fixer_order_by_uftid(uftid)
         if not order:
             raise NOT_FOUND(u'不存在的订单')
         if order.UFTstatus != 3:
             raise PARAMS_ERROR(u'当前状态为{}'.format(SERVER_STATUS.get(order.UFTstatus, u'其他')))
+        # 拒绝退款:
+        if agree == 0:
+            status = 1
+            msg = u'已拒绝退款'
+        # 同意退款
+        else:
+            status = 4
+            msg = u'已同意退款'
         # 修改服务状态为退款中
         updated = self.strade.update_fixerorder_detail_by_uftid(uftid, {
-            'UFTstatus': 4
+            'UFTstatus': status
         })
         # 调用退款接  todo
-        return Success(u'已进入退款状态', {
+        return Success(msg, {
             'uftid': uftid
         })
 
