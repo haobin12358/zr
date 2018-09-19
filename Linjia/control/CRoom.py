@@ -49,6 +49,8 @@ class CRoom(BaseRoomControl):
         args_dict['area_id'] = args.get('area_id')
         # 地铁
         args_dict['subway'] = args.get('subway')
+        # 小区
+        args_dict['villege'] = args.get('villege')
         print(args_dict)
         admin = True if is_admin() else None
 

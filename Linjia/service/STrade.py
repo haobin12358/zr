@@ -41,9 +41,9 @@ class STrade(SBase):
     @close_session
     def get_complaint_list(self, page, count, status=None):
         """查看投诉列表"""
-        all_complaint = self.session.query(UserComplaint)
+        all_complaint = self.session.query(UserComplaint).filter(UserComplaint.UserComplaintisdelete == False)
         if status:
-            all_complaint = all_complaint.filter(UserComplaint.UserComplaintstatus == status, UserComplaint.UserComplaintisdelete == False)
+            all_complaint = all_complaint.filter(UserComplaint.UserComplaintstatus == status)
         return all_complaint.order_by(UserComplaint.UserComplaintcreatetime.desc()).all_with_page(page, count)
 
     @close_session

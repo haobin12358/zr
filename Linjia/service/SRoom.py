@@ -32,7 +32,6 @@ class SRoom(SBase):
     @close_session
     def get_room_list_filter(self, kwargs, admin=False, style=[], face_args=[]):
         """获取所有(合租和整租"""
-        # todo 离地铁近
         all_room = self.session.query(Room).filter(Room.ROisdelete == False)
         all_room = all_room.filter_ignore_none_args(Room.ROrenttype == kwargs.get('type'),
                                                     Room.ROcitynum == kwargs.get('city_id'),
@@ -50,6 +49,9 @@ class SRoom(SBase):
 
         if 'subway' in kwargs:
             all_room = all_room.join(House, House.HOid == Room.HOid).join(VillegeInfoAndSubway, House.VIid == VillegeInfoAndSubway.id).contain(VillegeInfoAndSubway.subway == kwargs.get('subway'))
+        if 'villege' in kwargs:
+            all_room = all_room.join(House, House.HOid == Room.HOid).join(VillegeInfoAndSubway, House.VIid == VillegeInfoAndSubway.id).contain(VillegeInfoAndSubway.name == kwargs.get('villege'))
+
         return all_room.all_with_page(kwargs.get('page'), kwargs.get('count'))
 
     @close_session
