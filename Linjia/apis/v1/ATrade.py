@@ -9,7 +9,10 @@ class ATrade(Resource):
 
     def post(self, trade):
         apis = {
+            # 提交房源申请
             'add_providehouse_apply': self.ctrade.add_providehouse_apply,
+            # 删除房源申请
+            'delete_provide_house': self.ctrade.delete_provide_house,
             'mover_appointment': self.ctrade.mover_appointment,
             'cleaner_apponintment': self.ctrade.cleaner_appiontment,
             'fixer_appointment': self.ctrade.fixer_appiontment,
@@ -35,6 +38,7 @@ class ATrade(Resource):
             'agree_cancle_mover_order': self.ctrade.agree_cancle_mover_order,
             'agree_cancel_clean_order': self.ctrade.agree_cancle_cleaner_order,
             'agree_cancel_fixer_order': self.ctrade.agree_cancle_fixer_order,
+            'delete_complaint': self.ctrade.delete_complaint,
         }
         return apis
 

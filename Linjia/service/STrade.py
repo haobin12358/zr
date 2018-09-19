@@ -43,7 +43,7 @@ class STrade(SBase):
         """查看投诉列表"""
         all_complaint = self.session.query(UserComplaint)
         if status:
-            all_complaint = all_complaint.filter(UserComplaint.UserComplaintstatus==status)
+            all_complaint = all_complaint.filter(UserComplaint.UserComplaintstatus == status, UserComplaint.UserComplaintisdelete == False)
         return all_complaint.order_by(UserComplaint.UserComplaintcreatetime.desc()).all_with_page(page, count)
 
     @close_session
@@ -52,22 +52,22 @@ class STrade(SBase):
         return self.session.query(UserComplaint).filter(UserComplaint.UserComplaintid==compid).first()
 
     @close_session
-    def update_somplaint_by_complaintid(self, compid, status):
+    def update_somplaint_by_complaintid(self, compid, data):
         """更新投诉处理状态"""
-        return self.session.query(UserComplaint).filter(UserComplaint.UserComplaintid==compid).update(status)
+        return self.session.query(UserComplaint).filter(UserComplaint.UserComplaintid==compid, UserComplaint.UserComplaintisdelete == False).update(data)
 
     @close_session
     def get_provideapply_list(self, page, count, status=None, **kwargs):
         """管理员获取业主申请房源列表"""
-        provide_list = self.session.query(ProvideHouseApply)
+        provide_list = self.session.query(ProvideHouseApply).filter(ProvideHouseApply.PAHisdelete==False)
         if status:
             provide_list = provide_list.filter(ProvideHouseApply.PAHstatus==status)
-        return provide_list.order_by(ProvideHouseApply.PHAcreatetime).all_with_page(page, count)
+        return provide_list.order_by(ProvideHouseApply.PHAcreatetime.desc()).all_with_page(page, count)
 
     @close_session
     def updaet_provideapply(self, phaid, data):
-        """更新房源申请的状态"""
-        return self.session.query(ProvideHouseApply).filter(ProvideHouseApply.PHAid == phaid).update(data)
+        """更新房源申请"""
+        return self.session.query(ProvideHouseApply).filter(ProvideHouseApply.PHAid == phaid, ProvideHouseApply.PAHisdelete == False).update(data)
     
     @close_session
     def update_fixertrade_status_by_utfid(self, utfid, status):

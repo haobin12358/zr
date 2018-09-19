@@ -103,7 +103,7 @@ class CTradeBase(object):
                 staff = self.suser.get_staff_by_stfid(stfid).clean.add('STFid', 'STFname')
             setattr(order, 'staff', staff)
             order.add('staff')
-        order_list = sorted(order_list, key=lambda x: x.createtime)
+        order_list = sorted(order_list, key=lambda x: x.createtime, reverse=True)
         # request.page_count = math.ceil(float(len_order_list) / page_size)
         # request.all_count = len_order_list
         return Success(u'获取列表成功', order_list)
@@ -196,18 +196,29 @@ class CTradeBase(object):
             if not order:
                 raise NOT_FOUND(u'该订单不存在')
             order.UCTstatus = SERVER_STATUS.get(order.UCTstatus)
+            sceid = order.sceid
+            cleaner_server = self.sserver.get_cleanerserver_by_sceid(sceid)
+            order.fill('clener', 'type')
+            order.fill(getattr(cleaner_server, 'SCMtitle', ''), 'name')
         elif 'uftid' in data:
             uftid = data.get('uftid')
             order = self.strade.get_fixer_order_by_uftid(uftid)
             if not order:
                 raise NOT_FOUND(u'该订单不存在')
             order.UFTstatus = SERVER_STATUS.get(order.UFTstatus)
+            order.fill('fixer', 'type')
+            order.fill('邻家维修', 'name')
         elif 'umtid' in data:
             umtid = data.get('umtid')
             order = self.strade.get_mover_order_by_umtid(umtid)
             if not order:
                 raise NOT_FOUND(u'该订单不存在')
             order.UMTstatus = SERVER_STATUS.get(order.UMTstatus)
+            order.fill('mover', 'type')
+            smsid = order.smsid
+            mover_server = self.sserver.get_mover_by_smsid(smsid)
+            order.fill(getattr(mover_server, 'SMStitle', ''), 'name')
+            order.fill('type', 'mover')
         else:
             return PARAMS_ERROR()
         if not is_admin():
@@ -722,6 +733,20 @@ class CComplaint(CTradeBase):
             'status': COMPLAIN_STATUS[status]
         })
 
+    def delete_complaint(self):
+        """删除投诉"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('usercomplaintid', ))
+        cid = data.get('usercomplaintid')
+        deleted = self.strade.update_somplaint_by_complaintid(cid, {
+            'UserComplaintisdelete': True
+        })
+        msg = u'删除成功' if deleted else u'无此记录'
+        return Success(msg, {
+            'usercomplaintid': cid  
+        })
+
 
 class CProvideHouse(CTradeBase):
     """业主申请"""
@@ -775,6 +800,21 @@ class CProvideHouse(CTradeBase):
         return Success(msg, {
             'phaid': phaid
         })
+
+    def delete_provide_house(self):
+        """删除房源删除"""
+        if not is_admin():
+            raise TOKEN_ERROR(u'请使用管理员登录')
+        data = parameter_required(('phaid', ))
+        phaid = data.get('phaid')
+        deleted = self.strade.updaet_provideapply(phaid, {
+            'PAHisdelete': True
+        })
+        msg = u'删除成功' if deleted else u'无此记录'
+        return Success(msg, {
+            'phaid': phaid
+        })
+
 
 
 class CTrade(CMoverTrade, CCleanerTrade, CFixerTrade, CComplaint, CProvideHouse):

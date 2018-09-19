@@ -16,6 +16,7 @@ class ProvideHouseApply(Base):
     PHAvillege = Column(String(64), nullable=False, comment=u'小区')
     PHAcreatetime = Column(String(16), nullable=False, comment=u'申请时间')
     PAHstatus = Column(Integer, default=0, comment=u'房源申请状态, 0 未查看 1 已查看 2 待处理 3 已处理')
+    PAHisdelete = Column(Boolean, default=False, comment=u'是否删除')
 
 
 class ProprietorHouse(Base):
@@ -163,8 +164,9 @@ class UserComplaint(Base):
     __tablename__ = 'usecomplaint'
     UserComplaintid = Column(String(64), primary_key=True)
     USid = Column(String(64), nullable=False)
-    UserComplainttext= Column(Text, nullable=False, comment=u'投诉文字')
+    UserComplainttext = Column(Text, nullable=False, comment=u'投诉文字')
     UserComplaintAddress = Column(String(255), comment=u'物业地址')
     UserComplaintphone = Column(String(12), nullable=False, comment=u'用户电话')
     UserComplaintcreatetime = Column(String(16), comment=u'创建时间')
     UserComplaintstatus = Column(Integer, default=0, comment=u'处理状态, 0: 未读, 1: 已读')
+    UserComplaintisdelete = Column(Boolean, default=False, comment=u'是否删除')

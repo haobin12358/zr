@@ -55,7 +55,7 @@ class SUser(SBase):
         staff_list = self.session.query(Staff).filter(and_(*filter(lambda x: hasattr(x.right, 'value'), filter_list))).filter(Staff.STFisdelete==False).filter_ignore_none_args(Staff.ADcityid==city_id)
         if kw is not None:
             staff_list = staff_list.filter(Staff.STFname.contains(kw))
-        return staff_list.order_by(Staff.STFcreatetime).all_with_page(page, count)
+        return staff_list.order_by(Staff.STFcreatetime.desc()).all_with_page(page, count)
 
     @close_session
     def update_staff_info(self, stfid, data):
