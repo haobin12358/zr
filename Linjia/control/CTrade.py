@@ -196,7 +196,7 @@ class CTradeBase(object):
             if not order:
                 raise NOT_FOUND(u'该订单不存在')
             order.UCTstatus = SERVER_STATUS.get(order.UCTstatus)
-            sceid = order.sceid
+            sceid = order.SCEid
             cleaner_server = self.sserver.get_cleanerserver_by_sceid(sceid)
             order.fill('clener', 'type')
             order.fill(getattr(cleaner_server, 'SCMtitle', ''), 'name')
@@ -215,7 +215,7 @@ class CTradeBase(object):
                 raise NOT_FOUND(u'该订单不存在')
             order.UMTstatus = SERVER_STATUS.get(order.UMTstatus)
             order.fill('mover', 'type')
-            smsid = order.smsid
+            smsid = order.SMSid
             mover_server = self.sserver.get_mover_by_smsid(smsid)
             order.fill(getattr(mover_server, 'SMStitle', ''), 'name')
             order.fill('type', 'mover')

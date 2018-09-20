@@ -5,7 +5,6 @@ __pycache__/
 uwsgi.ini
 # C extensions
 *.so
-run.py
 # Distribution / packaging
 .Python
 build/
