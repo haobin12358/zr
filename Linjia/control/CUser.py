@@ -7,8 +7,6 @@ from threading import Thread
 
 from flask import request
 from raven.transport import requests
-from weixin import WeixinLogin
-from weixin.login import WeixinLoginError
 from werkzeug.security import generate_password_hash
 
 from Linjia.commons.error_response import NOT_FOUND, SYSTEM_ERROR, TOKEN_ERROR, PARAMS_ERROR, AUTHORITY_ERROR
@@ -21,6 +19,7 @@ from Linjia.configs.timeformat import format_for_db
 from Linjia.configs.url_config import API_HOST, HTTP_HOST
 from Linjia.configs.wxconfig import APPID, APPSECRET, WXSCOPE
 from Linjia.service import SUser, SUserCode
+from Linjia.libs.weixin import WeixinLogin, WeixinMP
 
 
 class CUser():
@@ -134,7 +133,6 @@ class CUser():
         if not data:
             data = {}
         current_url = data.get('url', request.url)
-        from weixin.mp import WeixinMP
         mp = WeixinMP(APPID, APPSECRET)
         print(current_url)
         data = {

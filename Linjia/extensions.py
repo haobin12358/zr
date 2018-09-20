@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
+
 from flask import current_app, request
-from weixin import Weixin, WeixinMsg, WeixinLogin
-from weixin.login import WeixinLoginError
 from werkzeug.utils import redirect
 
-from Linjia import PARAMS_ERROR
 from Linjia.commons.params_validates import parameter_required
 from Linjia.configs.url_config import HTTP_HOST
 from Linjia.configs.wxconfig import APPSECRET, APPID
+from Linjia.libs.weixin.login import WeixinLoginError
 from Linjia.service import SUser
+from Linjia.libs.weixin import WeixinMsg, WeixinLogin, WeixinMP, WeixinError
 
 msg = WeixinMsg('token')
 
 
 def reigster_extensions(app):
+    mp = WeixinMP(APPID, APPSECRET)
     app.add_url_rule("/token", view_func=msg.view_func)
     wxlogin = WeixinLogin(APPID, APPSECRET)
     @msg.all
@@ -78,3 +79,4 @@ def reigster_extensions(app):
             current_app.logger.error(request.url)
             # raise PARAMS_ERROR(u'登录出现错误')
             return redirect(HTTP_HOST)
+
