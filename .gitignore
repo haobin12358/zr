@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 uwsgi.ini
+img/*
 # C extensions
 *.so
 # Distribution / packaging

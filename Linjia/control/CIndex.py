@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import uuid
+from datetime import datetime
 
 from flask import request
 
@@ -127,9 +128,13 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         if self.allowed_file(shuffix):
             newName = self.new_name(shuffix)
             img_name = newName
-            newPath = os.path.join(BASEDIR, 'img', 'banner', newName)
+            dirname = datetime.now().strftime("%Y-%m-%d")
+            newPath = os.path.join(BASEDIR, 'img', dirname)
+            if not os.path.isdir(newPath):
+                os.makedirs(newPath)
+            newPath = os.path.join(newPath, newName)
             file.save(newPath)  # 保存图片
-            data = API_HOST + '/img/banner/' + img_name
+            data = API_HOST + '/img/' + dirname + '/' + img_name
             return Success(u'上传成功', data)
         else:
             return SYSTEM_ERROR(u'上传有误')

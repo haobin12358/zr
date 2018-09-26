@@ -3,7 +3,7 @@ from datetime import datetime
 
 from flask.wrappers import Request as _Request
 from flask_cors import CORS
-from flask import Flask as _Flask, current_app, json, redirect
+from flask import Flask as _Flask, current_app, json, redirect, Blueprint
 from werkzeug.wrappers import Response
 from flask.json import JSONEncoder as _JSONEncoder
 from werkzeug.exceptions import HTTPException
@@ -76,15 +76,17 @@ class Flask(_Flask):
 
 def register_route(app):
     # register_blueprint(app)
-    app.add_url_rule('/user/<string:user>/', view_func=AUser.as_view('user'))
-    app.add_url_rule('/room/<string:room>/', view_func=ARoom.as_view('room'))
-    app.add_url_rule('/index/<string:index>/', view_func=AIndex.as_view('index'))
-    app.add_url_rule('/trade/<string:trade>/', view_func=ATrade.as_view('trade'))
-    app.add_url_rule('/mover/<string:mover>/', view_func=AMover.as_view('mover'))  # 搬家
-    app.add_url_rule('/cleaner/<string:cleaner>/', view_func=Acleaner.as_view('cleaner'))  # 清洁
-    app.add_url_rule('/fixer/<string:fixer>/', view_func=AFixer.as_view('fixer'))  # 维修
+    api = Blueprint(__name__, 'api', url_prefix='/api')
+    api.add_url_rule('/user/<string:user>/', view_func=AUser.as_view('user'))
+    api.add_url_rule('/room/<string:room>/', view_func=ARoom.as_view('room'))
+    api.add_url_rule('/index/<string:index>/', view_func=AIndex.as_view('index'))
+    api.add_url_rule('/trade/<string:trade>/', view_func=ATrade.as_view('trade'))
+    api.add_url_rule('/mover/<string:mover>/', view_func=AMover.as_view('mover'))  # 搬家
+    api.add_url_rule('/cleaner/<string:cleaner>/', view_func=Acleaner.as_view('cleaner'))  # 清洁
+    api.add_url_rule('/fixer/<string:fixer>/', view_func=AFixer.as_view('fixer'))  # 维修
     # app.add_url_rule('/server/<string:server>/', view_func=AFixer.as_view('server'))  # 服务总管理
-    app.add_url_rule('/guide/<string:guide>/', view_func=AGuide.as_view('guide'))  # 入住指南
+    api.add_url_rule('/guide/<string:guide>/', view_func=AGuide.as_view('guide'))  # 入住指南
+    app.register_blueprint(api)
 
 
 def create_app():
