@@ -124,17 +124,24 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         if not file:
             raise SYSTEM_ERROR(u'上传有误')
         filename = file.filename
+
         shuffix = os.path.splitext(filename)[-1]
         if self.allowed_file(shuffix):
             newName = self.new_name(shuffix)
             img_name = newName
-            dirname = datetime.now().strftime("%Y-%m-%d")
-            newPath = os.path.join(BASEDIR, 'img', dirname)
+
+            time_now = datetime.now()
+            year = str(time_now.year)
+            month = str(time_now.month)
+            day = str(time_now.day)
+            newPath = os.path.join(BASEDIR, 'img', year, month, day)
             if not os.path.isdir(newPath):
                 os.makedirs(newPath)
+
             newPath = os.path.join(newPath, newName)
             file.save(newPath)  # 保存图片
-            data = API_HOST + '/img/' + dirname + '/' + img_name
+
+            data = '{}/img/{}/{}/{}/{}'.format(API_HOST, year, month, day, img_name)
             return Success(u'上传成功', data)
         else:
             return SYSTEM_ERROR(u'上传有误')
@@ -149,12 +156,6 @@ class CIndex(BaseRoomControl, BaseIndexControl):
     @staticmethod
     def allowed_file(shuffix):
         return shuffix in ['.jpg', '.jpeg', '.png', '.gif', '.mp4', '.avi', ]
-
-    @staticmethod
-    def new_name(shuffix):
-        import string, random  # import random
-        myStr = string.ascii_letters + '12345678'
-        return ''.join(random.choice(myStr) for i in range(20)) + shuffix
 
 
 
