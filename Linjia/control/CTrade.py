@@ -152,26 +152,42 @@ class CTradeBase(object):
                 start = end
             order_list = order_list[start: end]
             # 搬家
-            map(lambda x: x.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr',
-                                      'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish',
-                                      'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid',
-                                      'UMTcreatetime', 'Citynum'), mover_order_list)
-            map(lambda x: x.fill(getattr(self.sserver.get_mover_by_smsid(x.SMSid), 'SMStitle', u'未知'), 'name'),
-                mover_order_list)
-            map(lambda x: x.fill('mover', 'type'), mover_order_list)
-            map(lambda x: x.fill(SERVER_STATUS.get(x.UMTstatus), 'umtstatus'), mover_order_list)
-            map(lambda x: setattr(x, 'createtime', x.UMTcreatetime), mover_order_list)
+            for mover_order in mover_order_list:
+                mover_order.clean.add('UMTid', 'SMSid', 'UMTstarttime', 'UMTmoveoutaddr',
+                                          'UMTmoveinaddr', 'UMTphone', 'UMTspecialwish',
+                                          'UMTpreviewprice', 'UMTmoveinlocation', 'UMTmoveoutlocation', 'USid',
+                                          'UMTcreatetime', 'Citynum')
+                mover_order.fill(getattr(self.sserver.get_mover_by_smsid(mover_order.SMSid), 'SMStitle', u'未知'), 'name')
+                mover_order.fill(SERVER_STATUS.get(mover_order.UMTstatus), 'umtstatus')
+                setattr(mover_order, 'createtime', mover_order.UMTcreatetime)
+                mover_order.fill('mover', 'type')
+                # map(lambda x: x.fill(getattr(self.sserver.get_mover_by_smsid(x.SMSid), 'SMStitle', u'未知'), 'name'),
+                #     mover_order_list)
+                # map(lambda x: x.fill('mover', 'type'), mover_order_list)
+                # map(lambda x: x.fill(SERVER_STATUS.get(x.UMTstatus), 'umtstatus'), mover_order_list)
+                # map(lambda x: setattr(x, 'createtime', x.UMTcreatetime), mover_order_list)
             # 清洁
-            map(lambda x: x.fill(getattr(self.sserver.get_cleanerserver_by_sceid(x.SCEid), 'SCMtitle', u'未知'), 'name'),
-                cleaner_list)
-            map(lambda x: setattr(x, 'UCTstatus', SERVER_STATUS.get(x.UCTstatus)), cleaner_list)
-            map(lambda x: setattr(x, 'createtime', x.UCTcreatetime), cleaner_list)
-            map(lambda x: x.fill('cleaner', 'type'), cleaner_list)
+            for cleaner_order in cleaner_list:
+                cleaner_order.fill(getattr(self.sserver.get_cleanerserver_by_sceid(cleaner_order.SCEid), 'SCMtitle', u'未知'), 'name')
+                setattr(cleaner_order, 'UCTstatus', SERVER_STATUS.get(cleaner_order.UCTstatus))
+                setattr(cleaner_order, 'createtime', cleaner_order.UCTcreatetime)
+                cleaner_order.fill('cleaner', 'type')
+            # map(lambda x: x.fill(getattr(self.sserver.get_cleanerserver_by_sceid(x.SCEid), 'SCMtitle', u'未知'), 'name'),
+            #     cleaner_list)
+            # map(lambda x: setattr(x, 'UCTstatus', SERVER_STATUS.get(x.UCTstatus)), cleaner_list)
+            # map(lambda x: setattr(x, 'createtime', x.UCTcreatetime), cleaner_list)
+            # map(lambda x: x.fill('cleaner', 'type'), cleaner_list)
             # 维修
-            map(lambda x: setattr(x, 'createtime', x.UFTcreatetime), fixer_order_list)
-            map(lambda x: x.fill(u'邻家维修', 'name'), fixer_order_list)
-            map(lambda x: setattr(x, 'UFTstatus', SERVER_STATUS.get(x.UFTstatus)), fixer_order_list)
-            map(lambda x: x.fill(u'fixer', 'type'), fixer_order_list)
+            for fix_order in fixer_order_list:
+                x = fix_order
+                setattr(fix_order, 'createtime', fix_order.UFTcreatetime)
+                fix_order.fill(u'邻家维修', 'name')
+                setattr(x, 'UFTstatus', SERVER_STATUS.get(x.UFTstatus))
+                x.fill(u'fixer', 'type')
+                # map(lambda x: setattr(x, 'createtime', x.UFTcreatetime), fixer_order_list)
+                # map(lambda x: x.fill(u'邻家维修', 'name'), fixer_order_list)
+                # map(lambda x: setattr(x, 'UFTstatus', SERVER_STATUS.get(x.UFTstatus)), fixer_order_list)
+                # map(lambda x: x.fill(u'fixer', 'type'), fixer_order_list)
             order_list = sorted(order_list, key=lambda x: x.createtime)
             request.page_count = math.ceil(float(len_order_list) / page_size)
             request.all_count = len_order_list

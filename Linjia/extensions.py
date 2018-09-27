@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from flask import current_app, request
 from werkzeug.utils import redirect
 
