@@ -38,7 +38,10 @@ def error_handler(app):
 
     def generic_log(e):
         logger_file_name = datetime.now().strftime("%Y-%m-%d") + u'.log'
-        logger_dir = os.path.join(BASEDIR, 'logs', logger_file_name)
+        logger_dir = os.path.join(BASEDIR, 'logs')
+        if not os.path.isdir(logger_dir):
+            os.makedirs(logger_dir)
+        logger_dir = os.path.join(logger_dir, logger_file_name)
         handler = logging.FileHandler(logger_dir)
         data = traceback.format_exc()
         logging_format = logging.Formatter(
@@ -47,10 +50,10 @@ def error_handler(app):
             )
         handler.setFormatter(logging_format)
         app.logger.addHandler(handler)
-        app.logger.error('>>>>>>>>>>>>>>>>>>bug<<<<<<<<<<<<<<<<<<<')
+        app.logger.error(u'>>>>>>>>>>>>>>>>>>bug<<<<<<<<<<<<<<<<<<<')
         app.logger.error(data)
-        app.logger.error('request.url is {}'.format(request.url))
-        app.logger.error('request.data is {} '.format(request.data))
-        app.logger.error('request.args is {} '.format(request.args))
-        app.logger.error('method : {} '.format(request.method))
+        app.logger.error(u'request.url is {}'.format(request.url))
+        app.logger.error(u'request.data is {} '.format(request.data))
+        app.logger.error(u'request.args is {} '.format(request.args))
+        app.logger.error(u'method : {} '.format(request.method))
 
