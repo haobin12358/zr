@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from flask import request, jsonify
 from flask.views import MethodView
+from werkzeug.wrappers import Response
 
 from Linjia.commons.error_response import APIS_WRONG, MethodNotAllowed
 
@@ -18,7 +19,9 @@ class Resource(MethodView):
         for kwarg in kwargs.values():
             if kwarg not in apis:
                 raise APIS_WRONG()
-            return jsonify(apis[kwarg]())
+            res = jsonify(apis[kwarg]())
+            if isinstance(res, str) or isinstance(res, Response):
+                return res
         return meth(*args, **kwargs)
 
     def get(self, *args, **kwargs):

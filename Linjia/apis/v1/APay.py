@@ -16,5 +16,6 @@ class APay(Resource):
 
     def get(self, pay):
         apis = {
+            'check_refund': self.cpay.check_refund,
         }
         return apis

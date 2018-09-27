@@ -13,6 +13,9 @@ from Linjia.commons.token_handler import is_admin, is_tourist
 from Linjia.configs.enums import SERVER_STATUS, COMPLAIN_STATUS, PROVIDE_HOUSE_STATUS
 from Linjia.configs.server_config import MOVER_APPOINT_MAX_TIME_ON_ROAD, MOVER_APPOINT_MIN_TIME_ON_ROAD
 from Linjia.configs.timeformat import format_for_db
+from Linjia.configs.url_config import notify_url
+from Linjia.configs.wxconfig import APPID, MCH_ID, MCH_KEY
+from Linjia.libs.weixin import WeixinPay
 from Linjia.service import STrade, SServer, SCity, SUser
 
 
@@ -22,6 +25,8 @@ class CTradeBase(object):
         self.sserver = SServer()
         self.scity = SCity()
         self.suser = SUser()
+        self.pay = WeixinPay(APPID, MCH_ID, MCH_KEY, notify_url, '/home/admin/tool/apiclient_key.pem',
+                             '/home/admin/tool/apiclient_cert.pem')  # 后两个参数可选
 
     def get_appointment_list(self):
         """后台获取预约列表"""
@@ -456,6 +461,8 @@ class CMoverTrade(CTradeBase):
             'UMTstatus': status
         })
         # 调用退款接  todo
+        out_trade_no = mover_order.sn
+        self.pay.refund(out_trade_no=out_trade_no)
         return Success(msg, {
             'umtid': umtid
         })
@@ -580,6 +587,8 @@ class CCleanerTrade(CTradeBase):
             'UCTstatus': status
         })
         # 调用退款接  todo
+        out_trade_no = order.sn
+        self.pay.refund(out_trade_no=out_trade_no)
         return Success(u'已进入退款状态', {
             'uctid': uctid
         })
@@ -702,6 +711,8 @@ class CFixerTrade(CTradeBase):
             'UFTstatus': status
         })
         # 调用退款接  todo
+        out_trade_no = order.sn
+        self.pay.refund(out_trade_no=out_trade_no)
         return Success(msg, {
             'uftid': uftid
         })
@@ -830,7 +841,6 @@ class CProvideHouse(CTradeBase):
         return Success(msg, {
             'phaid': phaid
         })
-
 
 
 class CTrade(CMoverTrade, CCleanerTrade, CFixerTrade, CComplaint, CProvideHouse):

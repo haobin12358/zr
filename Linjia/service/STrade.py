@@ -106,17 +106,15 @@ class STrade(SBase):
         return self.session.query(UserMoveTrade).filter(UserMoveTrade.UMTid==umtid).update(data)
 
     @close_session
-    def get_mover_order_by_sn(self, sn):
-        """根据生成的订单号获取, 支付回调时使用"""
-        return self.session.query(UserMoveTrade).filter_strip_(UserMoveTrade.UMTid == sn).first()
+    def update_movertrade_detail_by_sn(self, sn, data):
+        return self.session.query(UserMoveTrade).filter(UserMoveTrade.sn==sn).update(data)
 
     @close_session
-    def get_cleaner_order_by_sn(self, sn):
-        """根据生成的订单号获取, 支付回调时使用"""
-        return self.session.query(UserCleanTrade).filter_strip_(UserCleanTrade.UCTid == sn).first()
-
+    def update_cleanerorder_detail_by_sn(self, sn, data):
+        """更新保洁订单任意"""
+        return self.session.query(UserCleanTrade).filter(UserCleanTrade.sn==sn).update(data)
+    
     @close_session
-    def get_fixer_order_by_sn(self, sn):
-        """根据生成的订单号获取, 支付回调时使用"""
-        return self.session.query(UserFixerTrade).filter_strip_(UserFixerTrade.UFTid == sn).first()
-
+    def udpate_fixerorder_detail_by_sn(self, sn, data):
+        """更新维修订单任意"""
+        return self.session.query(UserFixerTrade).filter(UserFixerTrade.sn==sn).update(data)

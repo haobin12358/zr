@@ -4,7 +4,7 @@ import os
 import traceback
 from datetime import datetime
 
-from flask import request
+from flask import request, current_app
 from werkzeug.exceptions import HTTPException
 
 from Linjia.commons.base_error import BaseError
@@ -36,24 +36,25 @@ def error_handler(app):
                 return SYSTEM_ERROR()
             raise Exception(traceback.format_exc())
 
-    def generic_log(e):
-        logger_file_name = datetime.now().strftime("%Y-%m-%d") + u'.log'
-        logger_dir = os.path.join(BASEDIR, 'logs')
-        if not os.path.isdir(logger_dir):
-            os.makedirs(logger_dir)
-        logger_dir = os.path.join(logger_dir, logger_file_name)
-        handler = logging.FileHandler(logger_dir)
-        data = traceback.format_exc()
-        logging_format = logging.Formatter(
-            # "%(asctime)s - %(levelname)s - %(filename)s \n- %(funcName)s - %(lineno)s - %(message)s"
-            "%(asctime)s - %(levelname)s - %(filename)s \n %(message)s"
-            )
-        handler.setFormatter(logging_format)
-        app.logger.addHandler(handler)
-        app.logger.error(u'>>>>>>>>>>>>>>>>>>bug<<<<<<<<<<<<<<<<<<<')
-        app.logger.error(data)
-        app.logger.error(request.url)
-        app.logger.error(request.data)
-        app.logger.error(request.args)
-        app.logger.error(request.method)
+
+def generic_log(e):
+    logger_file_name = datetime.now().strftime("%Y-%m-%d") + u'.log'
+    logger_dir = os.path.join(BASEDIR, 'logs')
+    if not os.path.isdir(logger_dir):
+        os.makedirs(logger_dir)
+    logger_dir = os.path.join(logger_dir, logger_file_name)
+    handler = logging.FileHandler(logger_dir)
+    data = traceback.format_exc()
+    logging_format = logging.Formatter(
+        # "%(asctime)s - %(levelname)s - %(filename)s \n- %(funcName)s - %(lineno)s - %(message)s"
+        "%(asctime)s - %(levelname)s - %(filename)s \n %(message)s"
+        )
+    handler.setFormatter(logging_format)
+    current_app.logger.addHandler(handler)
+    current_app.logger.error(u'>>>>>>>>>>>>>>>>>>bug<<<<<<<<<<<<<<<<<<<')
+    current_app.logger.error(data)
+    current_app.logger.error(request.url)
+    current_app.logger.error(request.data)
+    current_app.logger.error(request.args)
+    current_app.logger.error(request.method)
 
