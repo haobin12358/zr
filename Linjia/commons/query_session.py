@@ -92,6 +92,15 @@ class Query(_Query):
             return self
         return self.filter(cen.left < cen.right)
 
+    def filter_strip_(self, cen):
+        """
+        eg: self.session.query(User).filter_strip_(Trade.id == '1cee8db5f460451089181d6a2efae09')
+        """
+        right_value = cen.right.value
+        uuid_str = right_value[:8] + '-' + right_value[8: 12] + '-' + right_value[12: 16] + '-' + right_value[16: 20] + '-' + right_value[20: ]
+        cen.right.value = uuid_str
+        return self.filter(cen)
+
     def test(self, cen):
         """测试"""
         import ipdb

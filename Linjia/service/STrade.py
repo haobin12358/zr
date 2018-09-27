@@ -105,3 +105,18 @@ class STrade(SBase):
         """更新搬家订单任意"""
         return self.session.query(UserMoveTrade).filter(UserMoveTrade.UMTid==umtid).update(data)
 
+    @close_session
+    def get_mover_order_by_sn(self, sn):
+        """根据生成的订单号获取, 支付回调时使用"""
+        return self.session.query(UserMoveTrade).filter_strip_(UserMoveTrade.UMTid == sn).first()
+
+    @close_session
+    def get_cleaner_order_by_sn(self, sn):
+        """根据生成的订单号获取, 支付回调时使用"""
+        return self.session.query(UserCleanTrade).filter_strip_(UserCleanTrade.UCTid == sn).first()
+
+    @close_session
+    def get_fixer_order_by_sn(self, sn):
+        """根据生成的订单号获取, 支付回调时使用"""
+        return self.session.query(UserFixerTrade).filter_strip_(UserFixerTrade.UFTid == sn).first()
+

@@ -52,8 +52,8 @@ def error_handler(app):
         app.logger.addHandler(handler)
         app.logger.error(u'>>>>>>>>>>>>>>>>>>bug<<<<<<<<<<<<<<<<<<<')
         app.logger.error(data)
-        app.logger.error(u'request.url is {}'.format(request.url))
-        app.logger.error(u'request.data is {} '.format(request.data))
-        app.logger.error(u'request.args is {} '.format(request.args))
-        app.logger.error(u'method : {} '.format(request.method))
+        app.logger.error(request.url)
+        app.logger.error(request.data)
+        app.logger.error(request.args)
+        app.logger.error(request.method)
 

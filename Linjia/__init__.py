@@ -9,6 +9,7 @@ from flask.json import JSONEncoder as _JSONEncoder
 from werkzeug.exceptions import HTTPException
 
 from Linjia.apis.v1 import AUser, ARoom, AIndex, ATrade, AServer, AMover, Acleaner, AFixer, AGuide
+from Linjia.apis.v1.APay import APay
 from Linjia.apis.v1.verify_wechat import register_blueprint
 from Linjia.commons.error_response import PARAMS_ERROR
 from Linjia.commons.logger_handler import error_handler
@@ -29,7 +30,6 @@ class JSONEncoder(_JSONEncoder):
             return res
         if isinstance(o, Response):
             return o
-            current_app.logger.error(str(o))
         if isinstance(o, datetime):
             # 也可以序列化时间类型的对象
             return o.strftime('%Y%m%d%H%M%S')
@@ -86,6 +86,7 @@ def register_route(app):
     api.add_url_rule('/fixer/<string:fixer>/', view_func=AFixer.as_view('fixer'))  # 维修
     # app.add_url_rule('/server/<string:server>/', view_func=AFixer.as_view('server'))  # 服务总管理
     api.add_url_rule('/guide/<string:guide>/', view_func=AGuide.as_view('guide'))  # 入住指南
+    api.add_url_rule('/pay/<string:pay>/', view_func=APay.as_view('pay'))  # 支付
     app.register_blueprint(api)
 
 

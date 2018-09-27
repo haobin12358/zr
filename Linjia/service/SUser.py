@@ -13,7 +13,7 @@ class SUser(SBase):
 
     @close_session
     def get_user_by_usid(self, usid):
-        return self.session.query(User).filter_by(USid=usid).all()
+        return self.session.query(User).filter_by(USid=usid).first()
 
     @close_session
     def get_user_list(self, page=None, count=None, gender=None, contain_filter=None, usid=None):

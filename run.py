@@ -6,7 +6,6 @@ from Linjia import create_app
 app = create_app()
 
 
-
 @app.route('/test')
 def default_route():
     return 'hello'
