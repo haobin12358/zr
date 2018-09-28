@@ -449,6 +449,8 @@ class CMoverTrade(CTradeBase):
             raise NOT_FOUND(u'不存在的订单')
         if mover_order.UMTstatus != 3:
             raise PARAMS_ERROR(u'当前状态为{}'.format(SERVER_STATUS.get(mover_order.UMTstatus, u'其他')))
+        if not mover_order.sn or not mover_order.paytime:
+            raise NOT_FOUND(u'未付款的订单')
         # 拒绝退款:
         if agree == 0:
             status = 1
@@ -580,6 +582,8 @@ class CCleanerTrade(CTradeBase):
             raise NOT_FOUND(u'不存在的订单')
         if order.UCTstatus != 3:
             raise PARAMS_ERROR(u'当前状态为{}'.format(SERVER_STATUS.get(order.UCTstatus, u'其他')))
+        if not order.sn or not order.paytime:
+            raise NOT_FOUND(u'未付款的订单')
          # 拒绝退款:
         if agree == 0:
             status = 1
@@ -708,6 +712,8 @@ class CFixerTrade(CTradeBase):
             raise NOT_FOUND(u'不存在的订单')
         if order.UFTstatus != 3:
             raise PARAMS_ERROR(u'当前状态为{}'.format(SERVER_STATUS.get(order.UFTstatus, u'其他')))
+        if not order.sn or not order.paytime:
+            raise NOT_FOUND(u'未付款的订单')
         # 拒绝退款:
         if agree == 0:
             status = 1
