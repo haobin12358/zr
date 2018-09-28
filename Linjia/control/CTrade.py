@@ -16,6 +16,7 @@ from Linjia.configs.timeformat import format_for_db
 from Linjia.configs.url_config import notify_url
 from Linjia.configs.wxconfig import APPID, MCH_ID, MCH_KEY
 from Linjia.libs.weixin import WeixinPay
+from Linjia.libs.weixin.pay import WeixinPayError
 from Linjia.service import STrade, SServer, SCity, SUser
 
 
@@ -466,8 +467,11 @@ class CMoverTrade(CTradeBase):
             out_trade_no = mover_order.sn
             total_fee = int(mover_order.UMTpreviewprice * 100)
             # 调用退款
-            self.pay.refund(out_trade_no=out_trade_no, total_fee=total_fee, refund_fee=total_fee
-                            , op_user_id=openid, out_refund_no=out_trade_no, spbill_create_ip=request.remote_addr)
+            try:
+                self.pay.refund(out_trade_no=out_trade_no, total_fee=total_fee, refund_fee=total_fee
+                                , op_user_id=openid, out_refund_no=out_trade_no, spbill_create_ip=request.remote_addr)
+            except WeixinPayError as e:
+                raise PARAMS_ERROR(u'签名错误')
         updated = self.strade.update_movertrade_detail_by_umtid(umtid, {
             'UMTstatus': status
         })
@@ -598,8 +602,11 @@ class CCleanerTrade(CTradeBase):
             openid = user.WXopenid
             out_trade_no = order.sn
             total_fee = int(order.UCTprice * 100)
-            self.pay.refund(out_trade_no=out_trade_no, total_fee=total_fee, refund_fee=total_fee
-                            , op_user_id=openid, out_refund_no=out_trade_no, spbill_create_ip=request.remote_addr)
+            try:
+                self.pay.refund(out_trade_no=out_trade_no, total_fee=total_fee, refund_fee=total_fee
+                                , op_user_id=openid, out_refund_no=out_trade_no, spbill_create_ip=request.remote_addr)
+            except WeixinPayError as e:
+                raise PARAMS_ERROR(u'签名错误')
         # 修改服务状态为退款中
         updated = self.strade.update_cleanorder_detail_by_uctid(uctid, {
             'UCTstatus': status
@@ -728,8 +735,11 @@ class CFixerTrade(CTradeBase):
             out_trade_no = order.sn
             total_fee = int(order.UFTprice * 100)
             # 调用退款
-            self.pay.refund(out_trade_no=out_trade_no, total_fee=total_fee, refund_fee=total_fee
-                            , op_user_id=openid, out_refund_no=out_trade_no, spbill_create_ip=request.remote_addr)
+            try:
+                self.pay.refund(out_trade_no=out_trade_no, total_fee=total_fee, refund_fee=total_fee
+                                , op_user_id=openid, out_refund_no=out_trade_no, spbill_create_ip=request.remote_addr)
+            except WeixinPayError as e:
+                raise PARAMS_ERROR(u'签名错误')
 
         # 修改服务状态为退款中
         updated = self.strade.update_fixerorder_detail_by_uftid(uftid, {
