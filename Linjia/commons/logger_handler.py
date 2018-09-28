@@ -37,14 +37,15 @@ def error_handler(app):
             raise Exception(traceback.format_exc())
 
 
-def generic_log(e):
+def generic_log(data):
     logger_file_name = datetime.now().strftime("%Y-%m-%d") + u'.log'
     logger_dir = os.path.join(BASEDIR, 'logs')
     if not os.path.isdir(logger_dir):
         os.makedirs(logger_dir)
     logger_dir = os.path.join(logger_dir, logger_file_name)
     handler = logging.FileHandler(logger_dir)
-    data = traceback.format_exc()
+    if isinstance(data, Exception):
+        data = traceback.format_exc()
     logging_format = logging.Formatter(
         # "%(asctime)s - %(levelname)s - %(filename)s \n- %(funcName)s - %(lineno)s - %(message)s"
         "%(asctime)s - %(levelname)s - %(filename)s \n %(message)s"
@@ -53,8 +54,8 @@ def generic_log(e):
     current_app.logger.addHandler(handler)
     current_app.logger.error(u'>>>>>>>>>>>>>>>>>>bug<<<<<<<<<<<<<<<<<<<')
     current_app.logger.error(data)
-    current_app.logger.error(request.url)
-    current_app.logger.error(request.data)
-    current_app.logger.error(request.args)
-    current_app.logger.error(request.method)
+    current_app.logger.error(request.detail)
+    # current_app.logger.error(request.data)
+    # current_app.logger.error(request.args)
+    # current_app.logger.error(request.method)
 

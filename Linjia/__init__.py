@@ -68,6 +68,14 @@ class Request(_Request):
                 self._cached_json = (rv, rv)
         return rv
 
+    @property
+    def detail(self):
+        return str({
+            'url': self.url,
+            'method': self.method,
+            'args': self.args.to_dict(),
+            'data': self.data,
+        })
 
 class Flask(_Flask):
     json_encoder = JSONEncoder
