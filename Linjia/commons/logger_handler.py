@@ -58,4 +58,5 @@ def generic_log(data):
     # current_app.logger.error(request.data)
     # current_app.logger.error(request.args)
     # current_app.logger.error(request.method)
+    current_app.logger.removeHandler(handler)
 
