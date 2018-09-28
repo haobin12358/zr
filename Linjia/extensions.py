@@ -14,7 +14,7 @@ msg = WeixinMsg('token')
 
 def reigster_extensions(app):
     mp = WeixinMP(APPID, APPSECRET)
-    app.add_url_rule("/token", view_func=msg.view_func)
+    app.add_url_rule("/api/token", view_func=msg.view_func)
     wxlogin = WeixinLogin(APPID, APPSECRET)
     @msg.all
     def all_test(**kwargs):
@@ -50,7 +50,7 @@ def reigster_extensions(app):
         print(kwargs)
         return "fdasfdsa"
 
-    @app.route('/wechat/callback')
+    @app.route('/api/wechat/callback')
     def weixin_callback():
         """通过code, 获取用户信息"""
         args = parameter_required(('code', ))

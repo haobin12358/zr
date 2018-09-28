@@ -64,7 +64,7 @@ class CUser():
             self.suser.add_model('User', user_dict)
             token = usid_to_token(user_dict['usid'])
             state = str(user_dict['usid']) + u'P' + redirect
-            redirect_url = self.wxlogin.authorize(API_HOST + "/wechat/callback", WXSCOPE, state=state)
+            redirect_url = self.wxlogin.authorize(API_HOST + "/api/wechat/callback", WXSCOPE, state=state)
             return Success(u'注册成功', status=302, data={
                 'token': token,
                 'redirect_url': redirect_url
@@ -72,7 +72,7 @@ class CUser():
         elif not user.WXopenid:  # 无用户资料
             token = usid_to_token(user.USid)
             state = str(user.USid) + u'P' + redirect
-            redirect_url = self.wxlogin.authorize(API_HOST + "/wechat/callback", WXSCOPE, state=state)
+            redirect_url = self.wxlogin.authorize(API_HOST + "/api/wechat/callback", WXSCOPE, state=state)
             return Success(u'注册成功', status=302, data={
                 'token': token,
                 'redirect_url': redirect_url
