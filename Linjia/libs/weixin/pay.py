@@ -9,6 +9,7 @@ import random
 import hashlib
 import requests
 
+from Linjia.commons.logger_handler import generic_log
 from .base import Map, WeixinError
 
 try:
@@ -101,6 +102,7 @@ class WeixinPay(object):
                 raise WeixinPayError(data.err_code_des)
             return data
         return content
+
 
     def reply(self, msg, ok=True):
         code = SUCCESS if ok else FAIL

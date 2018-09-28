@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import time
+
 from flask import request, jsonify
 
 from Linjia.commons.error_response import PARAMS_ERROR, TOKEN_ERROR, AUTHORITY_ERROR, SYSTEM_ERROR
@@ -24,7 +26,6 @@ class CPay(object):
 
     def pay_for_service(self):
         data = parameter_required()
-        generic_log(data)
         if is_tourist():
             raise TOKEN_ERROR()
         if is_admin():
@@ -54,7 +55,7 @@ class CPay(object):
             self.strade.update_cleanorder_detail_by_uctid(uctid, {
                 'sn': out_trade_no
             })
-            body = u'邻家清洁'
+            body = u'cleaner'
             attach = u'cleaner'
             
         elif 'uftid' in data:
@@ -67,23 +68,17 @@ class CPay(object):
             self.strade.update_fixerorder_detail_by_uftid(uftid, {
                 'sn': out_trade_no
             })
-            body = u'邻家维修'
+            body = u'fixer'
             attach = u'fixer'
         else:
             raise PARAMS_ERROR()
         try:
             total_fee *= 100
-            raw = self.pay.unified_order(trade_type="JSAPI", openid=openid, body=body,
+            raw = self.pay.jsapi(trade_type="JSAPI", openid=openid, body=body,
                                          out_trade_no=out_trade_no,
-                                         total_fee=int(total_fee), attach=attach)
-            raw = dict(raw)
-            res = {
-                "appId": raw['appid'],
-                "nonceStr": raw['nonce_str'],
-                "package": "prepay_id=" + raw['prepay_id'],
-                "signType": "MD5",
-                "paySign": raw['sign']
-            }
+                                         total_fee=int(total_fee), attach=attach, spbill_create_ip=request.remote_addr)
+            res = dict(raw)
+            res['paySign'] = res.get('sign')
         except WeixinPayError as e:
             return SYSTEM_ERROR(e.message)
         return Success(res)
