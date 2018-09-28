@@ -5,7 +5,6 @@ import traceback
 from datetime import datetime
 
 from flask import request, current_app
-from werkzeug.exceptions import HTTPException
 
 from Linjia.commons.base_error import BaseError
 from Linjia.commons.error_response import SYSTEM_ERROR, APIS_WRONG
@@ -17,6 +16,7 @@ def error_handler(app):
 
     @app.errorhandler(404)
     def error404(e):
+        generic_log(e)
         return APIS_WRONG(u'接口未注册' + request.path)
 
     # @app.errorhandler(ValueError)
@@ -29,12 +29,13 @@ def error_handler(app):
         if isinstance(e, Success):
             return e
         generic_log(e)
+        print('dddddddddd')
         if isinstance(e, BaseError):
             return e
         else:
-            if not app.debug:
-                return SYSTEM_ERROR()
-            raise Exception(traceback.format_exc())
+            # if not app.debug:
+            return SYSTEM_ERROR()
+            # raise Exception(traceback.format_exc())
 
 
 def generic_log(data):
