@@ -457,12 +457,19 @@ class CMoverTrade(CTradeBase):
         else:
             status = 4
             msg = u'已同意退款'
+            # 调用退款接  todo
+            usid = mover_order.USid
+            user = self.suser.get_user_by_usid(usid)
+            openid = user.WXopenid
+            out_trade_no = mover_order.sn
+            total_fee = int(mover_order.UMTpreviewprice * 100)
+            # 调用退款
+            self.pay.refund(out_trade_no=out_trade_no, total_fee=total_fee, refund_fee=total_fee
+                            , op_user_id=openid, out_refund_no=out_trade_no, spbill_create_ip=request.remote_addr)
         updated = self.strade.update_movertrade_detail_by_umtid(umtid, {
             'UMTstatus': status
         })
-        # 调用退款接  todo
-        out_trade_no = mover_order.sn
-        self.pay.refund(out_trade_no=out_trade_no)
+
         return Success(msg, {
             'umtid': umtid
         })
@@ -581,18 +588,21 @@ class CCleanerTrade(CTradeBase):
         else:
             status = 4
             msg = u'已同意退款'
-        # 拒绝退款
+            # 调用退款接  todo
+            usid = order.USid
+            user = self.suser.get_user_by_usid(usid)
+            openid = user.WXopenid
+            out_trade_no = order.sn
+            total_fee = int(order.UCTprice * 100)
+            self.pay.refund(out_trade_no=out_trade_no, total_fee=total_fee, refund_fee=total_fee
+                            , op_user_id=openid, out_refund_no=out_trade_no, spbill_create_ip=request.remote_addr)
         # 修改服务状态为退款中
         updated = self.strade.update_cleanorder_detail_by_uctid(uctid, {
             'UCTstatus': status
         })
-        # 调用退款接  todo
-        out_trade_no = order.sn
-        self.pay.refund(out_trade_no=out_trade_no)
-        return Success(u'已进入退款状态', {
+        return Success(msg, {
             'uctid': uctid
         })
-
 
 
 class CFixerTrade(CTradeBase):
@@ -706,13 +716,19 @@ class CFixerTrade(CTradeBase):
         else:
             status = 4
             msg = u'已同意退款'
+            usid = order.USid
+            user = self.suser.get_user_by_usid(usid)
+            openid = user.WXopenid
+            out_trade_no = order.sn
+            total_fee = int(order.UFTprice * 100)
+            # 调用退款
+            self.pay.refund(out_trade_no=out_trade_no, total_fee=total_fee, refund_fee=total_fee
+                            , op_user_id=openid, out_refund_no=out_trade_no, spbill_create_ip=request.remote_addr)
+
         # 修改服务状态为退款中
         updated = self.strade.update_fixerorder_detail_by_uftid(uftid, {
             'UFTstatus': status
         })
-        # 调用退款接  todo
-        out_trade_no = order.sn
-        self.pay.refund(out_trade_no=out_trade_no)
         return Success(msg, {
             'uftid': uftid
         })

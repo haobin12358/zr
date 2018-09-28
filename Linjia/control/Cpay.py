@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import time
-
 from flask import request, jsonify
 
 from Linjia.commons.error_response import PARAMS_ERROR, TOKEN_ERROR, AUTHORITY_ERROR, SYSTEM_ERROR
@@ -117,18 +115,18 @@ class CPay(object):
         if 'umtid' in data:
             umtid = data.get('umtid')
             order = self.strade.get_mover_order_by_umtid(umtid)
-            if not order or order.UMTstatus != 0:
+            if not order or order.UMTstatus != 4:
                 raise NOT_FOUND()
             pass
         elif 'uctid' in data:
             uctid = data.get('uctid')
             order = self.strade.get_clean_order_by_uctid(uctid)
-            if not order or order.UCTstatus != 0:
+            if not order or order.UCTstatus != 4:
                 raise NOT_FOUND()
         elif 'uftid' in data:
             uftid = data.get('uftid')
             order = self.strade.get_fixer_order_by_uftid(uftid)
-            if not order or order.UFTstatus != 0:
+            if not order or order.UFTstatus != 4:
                 raise NOT_FOUND()
         else:
             raise PARAMS_ERROR()
