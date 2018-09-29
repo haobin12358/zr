@@ -358,6 +358,7 @@ class CMoverTrade(CTradeBase):
         mover_exsits = self.sserver.get_mover_by_smsid(data.get('smsid'))
         if not mover_exsits:
             raise NOT_FOUND(u'不存在服务{}'.format(data.get('smsid')))
+        data['umtphone'] = data['umtphone'].strip()
         validate_phone(data.get('umtphone'))
         self._allow_starttime(data.get('umtstarttime'))
         data['UMTid'] = str(uuid.uuid4())
@@ -494,6 +495,7 @@ class CCleanerTrade(CTradeBase):
         cleaner_exists = self.sserver.get_cleanerserver_by_sceid(data.get('sceid'))
         if not cleaner_exists:
             raise NOT_FOUND(u'不存在的清洁服务')
+        data['uctphone'] = data.get('uctphone').strip()
         validate_phone(data.get('uctphone'))
         self._allow_starttime(data.get('uctpreviewstarttime'))
         data['uctid'] = str(uuid.uuid4())
@@ -627,6 +629,7 @@ class CFixerTrade(CTradeBase):
         required = ('uftaddr' , 'uftstarttime', 'uftphone', 'uftlocation')
         forbidden = ('usid', 'uftstatus')
         data = parameter_required(required, forbidden=forbidden)
+        data['uftphone'] = data.get('uftphone').strip()
         validate_phone(data.get('uftphone'))
         self._allow_starttime(data.get('uftstarttime'))
         data['UFTid'] = str(uuid.uuid4())
