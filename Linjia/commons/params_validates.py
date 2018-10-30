@@ -36,7 +36,7 @@ def parameter_required(required=None, others='allow', filter_none=True, forbidde
 
 
 def validate_phone(arg):
-    regex_phone = "^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$"
+    regex_phone = "^1\d{10}$"
     return validate_arg(regex_phone, arg, str(arg) + u'不是手机号码')
 
 
