@@ -13,6 +13,7 @@ from Linjia.configs.appsettings import BASEDIR
 from Linjia.configs.enums import RENT_TYPE
 from Linjia.configs.url_config import API_HOST
 from Linjia.control.base_control import BaseRoomControl, BaseIndexControl
+from Linjia.extensions import cache
 from Linjia.service import SIndex, SRoom, SCity
 
 
@@ -27,15 +28,18 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         return Success('获取成功', banner_list)
 
     def get_index_room_list(self):
-        index_shows = self.sindex.get_rooms_index_show()
-        map(self._fill_index_room_detail, index_shows)
-        # 分类
-        data = dict(
-            join_rent=filter(lambda x: x.ROrenttype == RENT_TYPE[0], index_shows),
-            whole_rent=filter(lambda x: x.ROrenttype == RENT_TYPE[1], index_shows),
-            apartment=filter(lambda x: x.ROrenttype == RENT_TYPE[0], index_shows),  # 位置改变, 原来显示公寓的位置需要显示合租
-            homestay=filter(lambda x: x.ROrenttype == RENT_TYPE[3], index_shows),
-        )
+        data = cache.get("get_index_room_list_data")
+        if not data:
+            index_shows = self.sindex.get_rooms_index_show()
+            map(self._fill_index_room_detail, index_shows)
+            # 分类
+            data = dict(
+                join_rent=filter(lambda x: x.ROrenttype == RENT_TYPE[0], index_shows),
+                whole_rent=filter(lambda x: x.ROrenttype == RENT_TYPE[1], index_shows),
+                apartment=filter(lambda x: x.ROrenttype == RENT_TYPE[0], index_shows),  # 位置改变, 原来显示公寓的位置需要显示合租
+                homestay=filter(lambda x: x.ROrenttype == RENT_TYPE[3], index_shows),
+            )
+            cache.set("get_index_room_list_data", data)
         return Success(u'获取首页信息成功', data)
 
     def get_index_server(self):
@@ -61,6 +65,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         data = parameter_required(('roid', 'rotype', 'rosort'), others='ignore')
         data['RISid'] = str(uuid.uuid4())
         self.sindex.add_model('RoomIndexShow', data)
+        cache.delete("get_index_room_list_data")  # 删除缓存
         return Success(u'添加成功', {
             'risid': data['RISid']
         })
@@ -93,6 +98,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             raise AUTHORITY_ERROR('请使用管理员登录')
         data = parameter_required(('risid', ))
         room_index_show = self.sindex.delete_room_show_by_risid(data.get('risid'))
+        cache.delete("get_index_room_list_data")  # 删除缓存
         message = u'删除成功' if room_index_show else u'要删除的对象不存在'
         return Success(message, {
             'risid': data.get('risid')
@@ -103,6 +109,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
             raise AUTHORITY_ERROR('请使用管理员登录')
         data = parameter_required(('roid', ))
         room_index_show = self.sindex.delete_room_show_by_roid(data.get('roid'))
+        cache.delete("get_index_room_list_data")  # 删除缓存
         message = u'取消成功' if room_index_show else u'要取消的房源不在首页'
         return Success(message, {
             'roid': data.get('roid')

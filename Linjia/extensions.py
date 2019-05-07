@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import current_app, request
+from flask_caching import Cache
 from werkzeug.utils import redirect
 
 from Linjia.commons.params_validates import parameter_required
@@ -10,9 +11,11 @@ from Linjia.service import SUser
 from Linjia.libs.weixin import WeixinMsg, WeixinLogin, WeixinMP, WeixinError
 
 msg = WeixinMsg('token')
+cache = Cache()
 
 
 def reigster_extensions(app):
+    cache.init_app(app)
     mp = WeixinMP(APPID, APPSECRET)
     app.add_url_rule("/api/token", view_func=msg.view_func)
     wxlogin = WeixinLogin(APPID, APPSECRET)

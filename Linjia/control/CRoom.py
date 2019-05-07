@@ -11,6 +11,7 @@ from Linjia.commons.token_handler import is_admin
 from Linjia.configs.enums import FACE_CONFIG, RENT_TYPE
 from Linjia.configs.timeformat import format_for_db
 from Linjia.control.base_control import BaseRoomControl
+from Linjia.extensions import cache
 from Linjia.service import SRoom, SUser, SCity, SIndex
 
 
@@ -74,20 +75,23 @@ class CRoom(BaseRoomControl):
         """房源详细信息"""
         data = parameter_required(('roid', ))
         roid = data.get('roid')
-        room = self.sroom.get_room_by_roid(roid)
+        room = cache.get('room_detail::{}'.format(roid))
         if not room:
-            raise NOT_FOUND(u'房源不存在')
-        self._fill_house_info(room)  # 楼层和规格
-        self._fill_roomate_info(room)  # 室友信息
-        room.fill(self.sroom.get_room_equirment_by_roid(room.ROid), 'equirment', hide=('IConid', 'REid', 'ROid'))
-        room.fill(self.sroom.get_room_media_by_roid(room.ROid), 'media')
-        room.fill(self.scity.get_city_by_city_id(room.ROcitynum), 'city')
-        room.fill(self.scity.get_areainfo_by_id(room.ROareanum), 'area')
-        room.ROface = FACE_CONFIG.get(room.ROface, u'未知')
-        room.ROrenttype = RENT_TYPE.get(room.ROrenttype, u'未知')
-        room.fill(self.sroom.get_tags_by_roid(roid), 'tags', hide=('ROid', ))   # 填充tag信息
-        self._fix_villege_subway_info(room)
-        room.add('ROisdelete', 'ROcreatetime', 'ROcitynum')
+            room = self.sroom.get_room_by_roid(roid)
+            if not room:
+                raise NOT_FOUND(u'房源不存在')
+            self._fill_house_info(room)  # 楼层和规格
+            self._fill_roomate_info(room)  # 室友信息
+            room.fill(self.sroom.get_room_equirment_by_roid(room.ROid), 'equirment', hide=('IConid', 'REid', 'ROid'))
+            room.fill(self.sroom.get_room_media_by_roid(room.ROid), 'media')
+            room.fill(self.scity.get_city_by_city_id(room.ROcitynum), 'city')
+            room.fill(self.scity.get_areainfo_by_id(room.ROareanum), 'area')
+            room.ROface = FACE_CONFIG.get(room.ROface, u'未知')
+            room.ROrenttype = RENT_TYPE.get(room.ROrenttype, u'未知')
+            room.fill(self.sroom.get_tags_by_roid(roid), 'tags', hide=('ROid', ))   # 填充tag信息
+            self._fix_villege_subway_info(room)
+            room.add('ROisdelete', 'ROcreatetime', 'ROcitynum')
+            cache.set('room_detail::{}'.format(roid), room)
         return Success(u'获取房源信息成功', room)
 
     def get_detail_the_same_like_add(self):
@@ -185,7 +189,10 @@ class CRoom(BaseRoomControl):
 
     def get_homestay_banner(self):
         """获取民宿页的轮播图"""
-        homestay_banner_list = self.sroom.get_homestay_banner_list()
+        homestay_banner_list = cache.get('home_stay_banner')
+        if not homestay_banner_list:
+            homestay_banner_list = self.sroom.get_homestay_banner_list()
+            cache.get('home_stay_banner', homestay_banner_list)
         return Success(u'获取轮播图成功', homestay_banner_list)
 
     def add_homestay_banner(self):
@@ -195,6 +202,7 @@ class CRoom(BaseRoomControl):
         data = parameter_required(('hsbimage', 'hsbsort'), others='ignore')
         data['hsbid'] = str(uuid.uuid4())
         model_bean = self.sroom.add_model('HomeStayBanner', data)
+        cache.delete('home_stay_banner')
         return Success(u'添加成功', {
             'hsbid': data['hsbid']
         })
@@ -206,6 +214,7 @@ class CRoom(BaseRoomControl):
         data = parameter_required(('hsbid',))
         hsbid = data.get('hsbid')
         homestaybanner = self.sroom.delete_homestay_banner(hsbid)
+        cache.delete('home_stay_banner')
         msg = u'删除成功' if homestaybanner else u'要删除的对象不存在'
         return Success(msg, {
             'hsbid': hsbid
@@ -366,6 +375,8 @@ class CRoom(BaseRoomControl):
             self.sroom.update_house_by_hoid(hoid, {
                 'VIid': data.get('villegeid')
             })
+        cache.delete('room_detail::{}'.format(roid))
+        cache.delete("get_index_room_list_data")  # 删除缓存
         return Success(u'修改成功', {
             'roid': roid
         })
@@ -379,6 +390,8 @@ class CRoom(BaseRoomControl):
         deleted = self.sroom.delete_room_by_roid(roid)
         # 同时取消在首页的显示
         self.sindex.delete_room_show_by_roid(roid)
+        cache.delete('room_detail::{}'.format(roid))
+        cache.delete("get_index_room_list_data")  # 删除缓存
         msg = u'删除成功' if deleted else u'无此记录'
         return Success(msg, {
             'roid': roid
@@ -409,6 +422,7 @@ class CRoom(BaseRoomControl):
         else:
             raise PARAMS_ERROR(u'缺少必要的参数')
         self.sroom.add_models(mod)
+        cache.delete('room_detail::{}'.format(data.get('roid')))
         return Success(u'添加成功', {
             'bbrid': data['bbrid']
         })
@@ -422,6 +436,7 @@ class CRoom(BaseRoomControl):
         bedroom = self.sroom.get_bedroom_by_bbrid(bbrid)
         if not bedroom:
             raise NOT_FOUND(u'此卧室不存在')
+        roid = bedroom.ROid
         if 'bbrshowprice' in data:
             # 需要改为未租出的状态
             self.sroom.update_bedroom_by_bbrid(bbrid, {
@@ -452,6 +467,7 @@ class CRoom(BaseRoomControl):
             msg = u'改为已入住成功'
         else:
             raise PARAMS_ERROR(u'缺少必要的参数')
+        cache.delete('room_detail::{}'.format(roid))
         return Success(msg, {
             'bbrid': bbrid     
         })
@@ -501,6 +517,7 @@ class CRoom(BaseRoomControl):
             raise PARAMS_ERROR(u'重复添加')
         data['rcid'] = str(uuid.uuid4())
         added = self.scity.add_model('RoomCity', data)
+
         return Success(u'添加房源开放城市成功', {'city_id': city_id})
 
     def del_room_opencity(self):
