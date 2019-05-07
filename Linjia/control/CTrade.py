@@ -106,7 +106,9 @@ class CTradeBase(object):
             stfid = order.STFid
             staff = {}
             if stfid:
-                staff = self.suser.get_staff_by_stfid(stfid).clean.add('STFid', 'STFname')
+                staff = self.suser.get_staff_by_stfid(stfid)
+                if staff:
+                    staff = staff.clean.add('STFid', 'STFname')
             setattr(order, 'staff', staff)
             order.add('staff')
         order_list = sorted(order_list, key=lambda x: x.createtime, reverse=True)

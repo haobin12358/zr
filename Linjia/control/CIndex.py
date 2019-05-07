@@ -33,7 +33,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
         data = dict(
             join_rent=filter(lambda x: x.ROrenttype == RENT_TYPE[0], index_shows),
             whole_rent=filter(lambda x: x.ROrenttype == RENT_TYPE[1], index_shows),
-            apartment=filter(lambda x: x.ROrenttype == RENT_TYPE[2], index_shows),
+            apartment=filter(lambda x: x.ROrenttype == RENT_TYPE[0], index_shows),  # 位置改变, 原来显示公寓的位置需要显示合租
             homestay=filter(lambda x: x.ROrenttype == RENT_TYPE[3], index_shows),
         )
         return Success(u'获取首页信息成功', data)
@@ -155,7 +155,7 @@ class CIndex(BaseRoomControl, BaseIndexControl):
 
     @staticmethod
     def allowed_file(shuffix):
-        return shuffix in ['.jpg', '.jpeg', '.png', '.gif', '.mp4', '.avi', ]
+        return shuffix.lower() in ['.jpg', '.jpeg', '.png', '.gif', '.mp4', '.avi', ]
 
 
 

@@ -18,7 +18,7 @@ from Linjia.configs.phone_code import auth_key, code_url
 from Linjia.configs.timeformat import format_for_db
 from Linjia.configs.url_config import API_HOST, HTTP_HOST
 from Linjia.configs.wxconfig import APPID, APPSECRET, WXSCOPE
-from Linjia.service import SUser, SUserCode
+from Linjia.service import SUser, SUserCode, SRoom
 from Linjia.libs.weixin import WeixinLogin, WeixinMP
 
 
@@ -150,7 +150,7 @@ class CUser():
         count = int(data.get('count', 15))
         gender = int(data.get('gender')) if 'gender' in data else None
         city_id = data.get('city_id')
-        kw = data.get('kw')  # 员工姓名模糊搜索
+        kw = data.get('kw', '').strip()   # 员工姓名模糊搜索
         staff_list = self.suser.get_staff_list(level, page, count, gender, city_id, kw)
         for staff in staff_list:
             setattr(staff,  'STFlevel', STAFF_TYPE.get(staff.STFlevel, u'其他'))
@@ -320,9 +320,18 @@ class CUser():
 
     def get_one_housekeeper(self):
         """获取一个管家"""
-        staff_list = self.suser.get_staff_list(level=0)  # level 0 表示管家
+        data = parameter_required(('roid', ))
+        # staff_list = self.suser.get_staff_list(level=0)  # level 0 表示管家
         # 暂定为随机获取一个管家
-        staff = random.choice(staff_list)
+        self.sroom = SRoom()
+        roid = data.get('roid')
+        room = self.sroom.get_room_by_roid(roid)
+        if not room:
+            raise NOT_FOUND(u'房源不存在')
+        stfid = room.STFid
+        staff = self.suser.get_staff_by_stfid(stfid)
+        if not staff:
+            raise NOT_FOUND('未绑定管家')
         staff.clean.add('STFid', 'STFname', 'STFmobiel', 'STFgender')
         return Success(u'获取成功', {
             'housekeeper': staff

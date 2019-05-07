@@ -90,6 +90,11 @@ class SUser(SBase):
         return self.session.query(Admin).filter(Admin.ADid==adid).first()
 
     @close_session
+    def update_admin_by_adid(self, adid, data):
+        """根据管理员id获取"""
+        return self.session.query(Admin).filter(Admin.ADid==adid).update(data)
+
+    @close_session
     def freeze_adiin_by_adid(self, adid):
         """冻结管理员"""
         return self.session.query(Admin).filter(Admin.ADid==adid).update({

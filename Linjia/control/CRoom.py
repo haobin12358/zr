@@ -3,7 +3,6 @@ import uuid
 from datetime import datetime
 
 from flask import request, current_app
-from raven.contrib import flask
 
 from Linjia.commons.error_response import NOT_FOUND, TOKEN_ERROR, PARAMS_ERROR
 from Linjia.commons.params_validates import parameter_required
@@ -63,6 +62,9 @@ class CRoom(BaseRoomControl):
         map(self._fill_house_info, room_detail_list)  # 楼层和规格
         map(lambda x: x.fill(self.sroom.get_tags_by_roid(x.ROid), 'tags', hide=('ROid', )), room_detail_list)  # 填充tag信息
         map(lambda x: x.fill(self.sindex.is_room_showinindex_by_roid(x.ROid), 'show_index'), room_detail_list)  # 是否显示在首页
+        for room in room_detail_list:
+            if room.ROdistance in ['无', u'无']:
+                room.fill(None, 'ROdistance')
         page_count = getattr(request, 'page_count')
         all_count = getattr(request, 'all_count')
         data = Success(u'获取房源列表成功', data=room_detail_list, page_count=page_count, all_count=all_count)
@@ -226,7 +228,7 @@ class CRoom(BaseRoomControl):
             raise TOKEN_ERROR(u'请使用管理员登录')
         required = ('roname', 'roimage', 'roareanum', 'roface', 'roarea', 'roshowprice', 'roshowpriceunit',
                     'rorenttype', 'rodecorationstyle', 'rocitynum', 'roareanum', 'rosubwayaround',
-                     'house', 'villegeid', 'medias')
+                     'house', 'villegeid', 'medias', 'stfid')
         data = parameter_required(required, forbidden=('roid', 'hoid', ))
         house = data.pop('house', None)
         medias = data.pop('medias', [])
@@ -307,6 +309,7 @@ class CRoom(BaseRoomControl):
             'ROshowprice': data.get('roshowprice'),
             'ROcitynum': data.get('rocitynum'),
             'ROsubwayaround': data.get('rosubwayaround'),
+            'STFid': data.get('stfid')
         }
         room_data = {
             k: v for k, v in room_data.items() if v is not None

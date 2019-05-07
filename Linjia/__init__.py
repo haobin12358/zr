@@ -8,7 +8,7 @@ from werkzeug.wrappers import Response
 from flask.json import JSONEncoder as _JSONEncoder
 from werkzeug.exceptions import HTTPException
 
-from Linjia.apis.v1 import AUser, ARoom, AIndex, ATrade, AServer, AMover, Acleaner, AFixer, AGuide
+from Linjia.apis.v1 import AUser, ARoom, AIndex, ATrade, AServer, AMover, Acleaner, AFixer, AGuide, MUserManage
 from Linjia.apis.v1.APay import APay
 from Linjia.apis.v1.verify_wechat import register_blueprint
 from Linjia.commons.error_response import PARAMS_ERROR
@@ -95,6 +95,8 @@ def register_route(app):
     # app.add_url_rule('/server/<string:server>/', view_func=AFixer.as_view('server'))  # 服务总管理
     api.add_url_rule('/guide/<string:guide>/', view_func=AGuide.as_view('guide'))  # 入住指南
     api.add_url_rule('/pay/<string:pay>/', view_func=APay.as_view('pay'))  # 支付
+    api.add_url_rule('/MUserManage/ResetPassword', view_func=MUserManage.as_view('reset'))  # 支付
+
     app.register_blueprint(api)
 
 

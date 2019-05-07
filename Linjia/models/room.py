@@ -33,6 +33,8 @@ class Room(Base):
     # 类型为民宿的时候需要用到的字段
     ROentertime  = Column(String(16), comment=u'入住时间')  # 入住时间
     ROleavetime = Column(String(16), comment=u'离开时间')  # 离开时间
+    # 管家
+    STFid = Column(String(64), comment=u'员工id, 管家')
 
 
 class House(Base):

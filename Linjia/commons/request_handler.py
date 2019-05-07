@@ -9,6 +9,8 @@ User = namedtuple('User', ('id', 'model', 'level'))
 def request_first_handler(app):
     @app.before_request
     def get_main_url():
+        from Linjia.commons.logger_handler import generic_log
+        generic_log('before request')
         args = request.args.to_dict()
         if args and 'token' in args:
             token = args.get('token')

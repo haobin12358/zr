@@ -80,7 +80,7 @@ class Query(_Query):
         """
         if isinstance(cen.right.type, NullType):
             return self
-        return self.filter(cen.left > cen.right)
+        return self.filter(cen.left >= cen.right)
 
     def lt(self, cen):
         """
@@ -90,7 +90,7 @@ class Query(_Query):
         """
         if isinstance(cen.right.type, NullType):
             return self
-        return self.filter(cen.left < cen.right)
+        return self.filter(cen.left <= cen.right)
 
     def filter_strip_(self, cen):
         """
